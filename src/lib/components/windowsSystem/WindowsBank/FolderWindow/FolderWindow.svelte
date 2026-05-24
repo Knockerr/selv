@@ -26,21 +26,21 @@
     folderSystem.getFolderData(folderName)?.isFolderFav || false,
   );
 
-  $effect(() => {
+  $effect(async () => {
     if (isFolderFav !== folderSystem.getFavoriteValue(folderName)) {
-      folderSystem.setFavoriteValue(folderName, isFolderFav);
+      await folderSystem.setFavoriteValue(folderName, isFolderFav);
     }
   });
 
   // Systeme de rennomage de fichiers
   let nouveauNom = $state();
-  function onClickRenommage() {
-    folderSystem.getFolder(folderName).rename(nouveauNom);
+  async function onClickRenommage() {
+    await folderSystem.getFolder(folderName).rename(nouveauNom);
     windowsManager.closeAll();
   }
 
-  function onClickSupprimer(){
-    folderSystem.delete(folderName);
+  async function onClickSupprimer() {
+    await folderSystem.delete(folderName);
     windowsManager.closeAll();
   }
 
@@ -57,8 +57,8 @@
       <WindowAligned>
         <WindowTextInput placeholder="Nouveau nom" bind:value={nouveauNom} />
         <WindowButton
-          onclick={() => {
-            onClickRenommage();
+          onclick={async () => {
+            await onClickRenommage();
           }}>Renommer</WindowButton
         >
       </WindowAligned>
@@ -66,13 +66,13 @@
     <WindowSection title="Serveurs">
       <ServersManager {folderName}></ServersManager>
     </WindowSection>
-  
+
     <WindowSection title="Zone critique">
       <WindowButton
-          onclick={() => {
-            onClickSupprimer();
-          }}>Supprimer</WindowButton
-        >
+        onclick={async () => {
+          await onClickSupprimer();
+        }}>Supprimer</WindowButton
+      >
     </WindowSection>
   </Window>
 {/if}

@@ -1,5 +1,5 @@
 <script>
-    // @ts-nocheck
+  // @ts-nocheck
   import Icon from "$lib/components/Icon.svelte";
   import { pathDb } from "$lib/icons/pathDb";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
@@ -8,8 +8,8 @@
 
   // Regler nom de classes bizzares + rendre plus beau
 
-  function onSwitchStateButtonClick() {
-    folderSystem.getFolder(folderName).toggleServerPresence(serverUuid);
+  async function onSwitchStateButtonClick() {
+    await folderSystem.getFolder(folderName).toggleServerPresence(serverUuid);
   }
 </script>
 
@@ -18,7 +18,12 @@
     <h3 id="folderName">{serverName}</h3>
   </div>
   <div class="containerRight">
-    <button class="switchStateButton" onclick={onSwitchStateButtonClick}>
+    <button
+      class="switchStateButton"
+      onclick={async () => {
+        onSwitchStateButtonClick();
+      }}
+    >
       {#if isInFolder}
         <Icon path={pathDb.minus} size="18" />
       {:else}

@@ -18,16 +18,17 @@
 
   export const showForm = () => {
     formRef.showForm();
-  }
+  };
 </script>
 
 <Form bind:this={formRef}>
   <Title title={`Gestion du dossier ${folderName}`} />
   <SubTitle content="Favori?" />
   <CheckboxField
-    onChangeFn={folderSystem.toggleFavorite}
+    onChangeFn={async () => {
+      await folderSystem.toggleFavorite();
+    }}
     {inputs}
     valueGetter={() => folderSystem.getFavoriteValue}
   />
-  
 </Form>
