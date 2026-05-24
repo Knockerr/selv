@@ -1,0 +1,99 @@
+import utilities.mcUtilities as mcUtilities
+import json as Json
+
+
+# Internal cache, for optimization purposes
+class Cache:
+    def __init__(self):
+        self.storedServers = {}
+        self.storedServerManagers = {}
+
+    def storeServer(self, server: mcUtilities.Server) -> None:
+        if server.uuid in self.storedServers:
+            return
+        self.storedServers[server.uuid] = server
+
+    def storeServerManager(self, serverManager: mcUtilities.ServerManager) -> None:
+        if serverManager.server.uuid in self.storedServerManagers:
+            return
+        self.storedServerManagers[serverManager.server.uuid] = serverManager
+
+    def isInStoredServers(self, uuid: str):
+        return uuid in self.storedServers
+
+    def isInStoredServerManagers(self, uuid: str):
+        return uuid in self.storedServerManagers
+
+    def clearCache(self):
+        """
+        Dangerous methode, only use it if you know what you're doing…
+        """
+        self.storedServers = {}
+        self.storedServerManagers = {}
+
+    def getCurrentServerAndSm(self, uuid: str):
+        """
+        Get current Server and ServerManager, weither they are stored in cache or not
+        :param uuid: uuid du serveur
+        :return: {"server": Server, "serverManager": ServerManager}
+        """
+        if not self.isInStoredServers(uuid):
+            server = mcUtilities.Server(uuid=uuid)
+            self.storeServer(server)
+
+        if not self.isInStoredServerManagers(uuid):
+            SM: mcUtilities.ServerManager = mcUtilities.ServerManager(server=self.storedServers[uuid])
+            self.storeServerManager(SM)
+
+        return {
+            "server": self.storedServers[uuid],
+            "serverManager": self.storedServerManagers[uuid]
+        }
+
+
+cache = Cache()
+
+
+class ArraySorter:
+
+    def __init__(self, array: list = None):
+        self.array = array if array is not None else []
+
+    def merge_sort(self, array: list = None) -> list:
+        if array is None:
+            array = self.array
+
+        if len(array) <= 1:
+            return array
+
+        mid = len(array) // 2
+        left = array[:mid]
+        right = array[mid:]
+
+        left = self.merge_sort(left)
+        right = self.merge_sort(right)
+
+        return self._merge(left, right)
+
+    @staticmethod
+    def _merge(left: list, right: list) -> list:
+        result = []
+        i = j = 0
+
+        # Comparer et fusionner
+        while i < len(left) and j < len(right):
+            if left[i] <= right[j]:
+                result.append(left[i])
+                i += 1
+            else:
+                result.append(right[j])
+                j += 1
+
+        result.extend(left[i:])
+        result.extend(right[j:])
+
+        return result
+
+    def sort(self) -> list:
+        self.array = self.merge_sort(self.array)
+        return self.array
