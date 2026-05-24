@@ -11,7 +11,7 @@ import {
 } from "svelte/reactivity";
 
 function createFolderSystem() {
-    const store = null;
+    let store = null;
     const state = $state({
         currentPageIndex: 0,
         currentSelectedFolder: 'all',
@@ -21,7 +21,7 @@ function createFolderSystem() {
 
     async function loadDatas() {
         store = await load("folders.json");
-        foldersDatas = store.get("folderDatas")
+        let foldersDatas = store.get("folderDatas")
     }
     loadDatas();
 
