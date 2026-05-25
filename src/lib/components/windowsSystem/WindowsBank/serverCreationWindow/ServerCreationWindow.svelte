@@ -11,7 +11,7 @@
   import WindowTextInput from "$lib/components/windowsSystem/WindowTextInput.svelte";
   import { pathDb } from "$lib/icons/pathDb";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import WindowAligned from "../../WindowAligned.svelte";
   import WindowSlider from "../../WindowSlider.svelte";
   import { windowsManager } from "../../windowsManager.svelte";
@@ -68,7 +68,7 @@
 
     const data = await response.json();
 
-    folderSystem.addServer(data.uuid);
+    await folderSystem.addServer(data.uuid);
 
     windowsManager.closeAll();
 
@@ -76,6 +76,13 @@
   }
 
   const isOpen = $derived(windowsManager.openWindows.has(windowId));
+  $effect(() => {
+    isOpen;
+    untrack(() => {
+      console.error("JE veux m'ouvrir!");
+    });
+  });
+
 </script>
 
 {#if isOpen}

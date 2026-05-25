@@ -1,18 +1,21 @@
 <script>
   // @ts-nocheck
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
+  import { online } from "svelte/reactivity/window";
   import ServerCard from "./ServerCard.svelte";
 
   const { folderName } = $props();
 
   const allServers = $derived(folderSystem.getAllServers);
 
+  $inspect(allServers).with(() => {console.info("allServers", allServers)})
+
   const serversInFolder = $derived(
     folderSystem.getFolder(folderName)?.getServers || []
   );
 
   const otherServers = $derived(
-    [...allServers].filter((uuid) => !serversInFolder.includes(uuid)),
+    [...allServers].filter((uuid) => !(serversInFolder.includes(uuid)))
   );
   
   let serversName = $state({});

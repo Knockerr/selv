@@ -12,6 +12,7 @@
     folderName = "UNDEFINED",
     numberOfServers = 0,
     isFavorite,
+    removeEditButton = false,
   } = $props();
 
   const onFolderClick = () => {
@@ -19,9 +20,9 @@
   };
 
   let openFolderWindow = () => {
+    console.info("Opening folder windows " + `FolderWindow-${folderName}`);
     windowsManager.open(`FolderWindow-${folderName}`);
   };
-
 </script>
 
 <div
@@ -47,16 +48,20 @@
   <div class="containerRight">
     <p id="numOfServs">{numberOfServers}</p>
 
-    <button
-      id="folderEditBtn"
-      aria-label="Edit folder"
-      onclick={(e) => {
-        e.stopPropagation();
-        openFolderWindow();
-      }}
-    >
-      <Icon path={pathDb.pencil} size="16" color="#998fbb" />
-    </button>
+    {#if !removeEditButton}
+      <button
+        id="folderEditBtn"
+        aria-label="Edit folder"
+        onclick={(e) => {
+          e.stopPropagation();
+          openFolderWindow();
+        }}
+      >
+        <Icon path={pathDb.pencil} size="16" color="#998fbb" />
+      </button>
+    {:else}
+      <div id="blank"></div>
+    {/if}
   </div>
 </div>
 
@@ -129,6 +134,10 @@
     width: var(--containerEditButtonSize);
     height: var(--containerEditButtonSize);
     transition: background-color 0.2s ease;
+  }
+
+  #blank {
+    width:5px;
   }
 
   .containerRight button:hover {

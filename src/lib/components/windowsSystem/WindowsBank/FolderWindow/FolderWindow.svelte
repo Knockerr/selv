@@ -11,7 +11,7 @@
   import WindowTextInput from "$lib/components/windowsSystem/WindowTextInput.svelte";
   import { pathDb } from "$lib/icons/pathDb";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import WindowAligned from "../../WindowAligned.svelte";
   import WindowSlider from "../../WindowSlider.svelte";
   import { windowsManager } from "../../windowsManager.svelte";
@@ -21,6 +21,7 @@
 
   // Liaison au store
   let windowId = $derived("FolderWindow-" + folderName);
+  $inspect(windowId);
 
   let isFolderFav = $derived(
     folderSystem.getFolderData(folderName)?.isFolderFav || false,

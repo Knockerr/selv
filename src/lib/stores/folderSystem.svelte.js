@@ -11,22 +11,41 @@ import {
 } from "svelte/reactivity";
 
 function createFolderSystem() {
+    // Store handling
     let store = null;
+    let foldersDatas = $state({});
+    let allServers = $state(new SvelteSet());
+
     const state = $state({
         currentPageIndex: 0,
         currentSelectedFolder: 'all',
-        pageLen: 7,
-        //allServers: new SvelteSet(JSON.parse(localStorage.getItem("allServers"))) || new SvelteSet(),
+        pageLen: 7
     });
 
     async function loadDatas() {
         store = await load("folders.json");
-        let foldersDatas = store.get("folderDatas")
+        foldersDatas = await store.get("folderDatas") || {
+            all: {
+                isFolderFav: true,
+                servers: []
+            }
+        };
+        let allServersVal = await store.get("allServers")
+        allServers = new SvelteSet(allServersVal)
     }
     loadDatas();
 
     const serversToRender = $derived.by(() => {
-        const folderDatas = foldersDatas[state.currentSelectedFolder];
+        if (foldersDatas === {}) return [];
+
+        if (state.currentSelectedFolder === "all") {
+            return [...allServers].slice(
+                state.currentPageIndex * state.pageLen,
+                state.currentPageIndex * state.pageLen + state.pageLen
+            );
+        };
+
+        let folderDatas = foldersDatas[state.currentSelectedFolder];
 
         if (!folderDatas) {
             console.warn("Empty folder");
@@ -39,28 +58,15 @@ function createFolderSystem() {
         );
     });
 
-    // Function that keeps state.allServers up to date 
-    // "servers" is an array
-    function editAllServers(servers) {
-        let allServersVal = [];
-        servers.forEach(uuid => {
-            allServersVal.push(uuid);
-        });
-        state.allServersJson.set('content', {
-            content: allServersVal
-        });
-        state.allServers.save();
-    };
-
-    function saveDatas() {
-        console.warn("SaveDatas > ", state.allServers);
+    async function saveDatas() {
         if (!store) return;
         if (!foldersDatas) return;
-        foldersDatas.save();
+        await store.set("folderDatas", foldersDatas);
+        await store.set("allServers", [...allServers]);
+        await store.save();
     };
 
     async function createFolder(folderName, isFav, servers) {
-        // editAllServers(servers);
         foldersDatas[folderName] = {
             isFolderFav: isFav,
             servers: servers
@@ -116,6 +122,11 @@ function createFolderSystem() {
                 }
             };
 
+            await saveDatas();
+        },
+
+        async addServer(uuid){
+            allServers.add(uuid);
             await saveDatas();
         },
 
@@ -241,7 +252,7 @@ function createFolderSystem() {
         },
 
         get getAllServers() {
-            return state.allServers;
+            return allServers;
         },
 
         getFolderData(folder) {
@@ -250,19 +261,9 @@ function createFolderSystem() {
 
         async resetFolder() {
             foldersDatas = {};
-            state.allServers = new SvelteSet();
+            allServers = [];
             await saveDatas();
             createFolder("all", true, []);
-            await saveDatas();
-        },
-
-        async addServer(serverUuid) {
-            console.log("Adding ", serverUuid, " to allServers");
-            state.allServers.add(serverUuid);
-            await saveDatas();
-        },
-        async forceAllFoldersEdit(allServers) {
-            state.allServers = new SvelteSet(allServers);
             await saveDatas();
         },
     };

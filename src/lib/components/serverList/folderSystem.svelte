@@ -48,6 +48,7 @@
 
   export function displayFolders() {
     clearFoldersContainers();
+    if (!folderSystem.folderDatas) return;
     Object.keys(folderSystem.folderDatas).forEach((folderName) => {
       const folderDatas = folderSystem.getFolder(folderName).datas();
       if (folderDatas.isFolderFav) {
@@ -59,14 +60,6 @@
       console.info(`favfoldersToRender > ${favfoldersToRender}`);
     });
   }
-
-  $effect(() => {
-    foldersToRender.forEach((folder) => {
-      if (folderSystem.getFolderData(folder) === undefined) {
-        displayFolders();
-      }
-    });
-  });
 
   function createFolder() {
     console.log("Creating folder..");
@@ -114,6 +107,12 @@
   </div>
   <div class="foldersContainer">
     <div class="favoriteFolders" id="favoriteFoldersContainer">
+    <FolderItem
+          folderName="all"
+          numberOfServers={[...folderSystem.getAllServers].length}
+          isFavorite="true"
+          removeEditButton={true}
+        />
       {#each favfoldersToRender as favFolder (favFolder)}
         <FolderItem
           folderName={favFolder}

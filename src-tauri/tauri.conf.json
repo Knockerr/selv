@@ -32,8 +32,7 @@
       "icons/icon.ico"
     ],
     "externalBin": [
-      "binaries/mcpanel-backend",
-      "binaries/nssm"
+      "binaries/mcpanel-backend"
     ]
   }
 }

@@ -19,14 +19,11 @@
   import { pathDb } from "$lib/icons/pathDb";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
 
-  folderSystem.setPage(0);
-
   // $inspect(folderSystem.serversToRender);
 
   function onFolderCreationClick() {
     windowsManager.open("ServerCreationWindow");
   }
-
 
   let folderSystemRef = $state();
 </script>
@@ -37,10 +34,10 @@
       <h1>Serveurs</h1>
     </div>
     <div class="titleBarRightSide">
-      <CustomButton iconPath={pathDb.download} iconSize="18" onclick={onFolderCreationClick}>
+      <CustomButton iconPath={pathDb.download} iconSize="18">
         Importer serveur
       </CustomButton>
-      <CustomButton iconPath={pathDb.plus} iconSize="18" emphasize={true}>
+      <CustomButton iconPath={pathDb.plus} iconSize="18" emphasize={true} onclick={onFolderCreationClick}>
         Créer un serveur
       </CustomButton>
     </div>

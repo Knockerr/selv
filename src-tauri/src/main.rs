@@ -1,43 +1,78 @@
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::process::Command;
+use windows::core::PCWSTR;
+use windows::Win32::System::Services::*;
+use windows::Win32::Foundation::*;
+
+fn to_wide(s: &str) -> Vec<u16> {
+    s.encode_utf16().chain(std::iter::once(0)).collect()
+}
 
 fn install_service() {
-    let nssm = "binaries/nssm.exe";
-    // Recupere automatiquement le lien vers le exe du backend
-    let backend = std::env::current_exe()
+    let exe_dir = std::env::current_exe()
         .unwrap()
-        .parent() 
+        .parent()
         .unwrap()
-        .join("mcpanel-backend.exe");
+        .to_path_buf();
 
-    // Installe le service
-    Command::new(nssm)
-        .args(["install", "mcPanelBackend", backend.to_str().unwrap()])
-        .status().ok();
+    let backend = exe_dir.join("mcpanel-backend.exe");
+    let backend_str = backend.to_str().unwrap();
 
-    // Configure le démarrage automatique
-    Command::new(nssm)
-        .args(["set", "mcPanelBackend", "Start", "SERVICE_AUTO_START"])
-        .status().ok();
+    unsafe {
+        let scm = OpenSCManagerW(
+            PCWSTR::null(),
+            PCWSTR::null(),
+            SC_MANAGER_CREATE_SERVICE,
+        ).unwrap();
 
-    // Démarre le service
-    Command::new(nssm)
-        .args(["start", "mcPanelBackend"])
-        .status().ok();
+        let service_name = to_wide("mcPanelBackend");
+        let binary_path = to_wide(backend_str);
+
+        let svc = CreateServiceW(
+            scm,
+            PCWSTR(service_name.as_ptr()),
+            PCWSTR(service_name.as_ptr()),
+            SERVICE_ALL_ACCESS,
+            SERVICE_WIN32_OWN_PROCESS,
+            SERVICE_AUTO_START,
+            SERVICE_ERROR_NORMAL,
+            PCWSTR(binary_path.as_ptr()),
+            PCWSTR::null(),
+            None,
+            PCWSTR::null(),
+            PCWSTR::null(),
+            PCWSTR::null(),
+        ).unwrap();
+
+        StartServiceW(svc, None).ok();
+        CloseServiceHandle(svc).ok();
+        CloseServiceHandle(scm).ok();
+    }
+}
+
+fn service_is_running() -> bool {
+    let output = std::process::Command::new("sc")
+        .args(["query", "mcPanelBackend"])
+        .output();
+
+    match output {
+        Ok(o) => String::from_utf8_lossy(&o.stdout).contains("RUNNING"),
+        Err(_) => false,
+    }
 }
 
 fn main() {
-    // Installe le service seulement si pas déjà installé
-    let status = Command::new("sc")
-        .args(["query", "mcPanelBackend"])
-        .output();
-    
-    if status.is_err() || !status.unwrap().status.success() {
-        install_service();
-    }
+    let _ = std::panic::catch_unwind(|| {
+        if !service_is_running() {
+            let start = std::process::Command::new("sc")
+                .args(["start", "mcPanelBackend"])
+                .output();
 
-    // Lance Tauri en dernier (bloquant)
+            if start.is_err() || !start.unwrap().status.success() {
+                install_service();
+            }
+        }
+    });
+
     mcpaneltauriappsv_lib::run();
 }
