@@ -8,7 +8,6 @@ node_modules
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-
 /.vscode
 backend/.idea
 src-tauri/target
@@ -20,4 +19,3 @@ backend/mcpanel-backend-x86_64-pc-windows-msvc.spec
 backend/mcpanel-backend.spec
 backend/servers.db
 *.log
-
