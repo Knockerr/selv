@@ -24,12 +24,7 @@ function createFolderSystem() {
 
     async function loadDatas() {
         store = await load("folders.json");
-        foldersDatas = await store.get("folderDatas") || {
-            all: {
-                isFolderFav: true,
-                servers: []
-            }
-        };
+        foldersDatas = await store.get("folderDatas") || {};
         let allServersVal = await store.get("allServers")
         allServers = new SvelteSet(allServersVal)
     }
