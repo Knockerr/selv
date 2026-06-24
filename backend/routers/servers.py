@@ -7,6 +7,7 @@ import sqlite3
 import uuid as uuidLib
 from loguru import logger
 import sys
+import platformdirs as plat
 
 logger.remove()
 logger.add(
@@ -18,12 +19,14 @@ logger.add(
     colorize=True
 )
 
+appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
+
 # Create routeur
 router = APIRouter()
 
 
 def getNewCursor() -> sqlite3.Cursor:
-    conn = sqlite3.connect("servers.db")
+    conn = sqlite3.connect(appDir.user_data_path / "servers.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     return cursor
