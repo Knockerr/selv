@@ -5,11 +5,7 @@ import sys
 from asyncio.subprocess import Process
 import psutil
 from loguru import logger
-import sqlite3
-
-conn = sqlite3.connect('servers.db')
-conn.row_factory = sqlite3.Row
-cursor = conn.cursor()
+import utilities.db as db
 
 logger.remove()
 logger.add(
@@ -61,7 +57,7 @@ async def executeFileAndTrackOutput(serverPath: str = None, fileToExecute: str =
         stderr=asyncio.subprocess.PIPE,
         stdin=asyncio.subprocess.PIPE,
         cwd=serverPath,
-        bufsize = 0
+        bufsize=0
     )
     return process
 
@@ -200,7 +196,7 @@ class Server:
      - lastUseDate: str -> date de dernière utilisation ddu server // Format AAAAMMDDHHMM
      - maxRam: str -> la ram allouée au serveur.
      - version: str -> la version du serveur.
-     - sType: str -> le "type" de serveur (vanilla, forge, spigot, sponge).
+     - serverType: str -> le "type" de serveur (vanilla, forge, spigot, sponge).
      - serverPath: str -> le chemin du serveur.
      - uuid: str -> l'identifiant unique du serveur. C'est lui qu'on utilise pour représenter le fichier dans le Json.
     \n
@@ -223,7 +219,7 @@ class Server:
                  lastUseDate: str = None,
                  maxRam: int = None,
                  version: str = None,
-                 sType: str = None,
+                 serverType: str = None,
                  path: str = None,
                  uuid: str = None):
 
@@ -233,17 +229,20 @@ class Server:
         self.lastUseDate = lastUseDate
         self.maxRam: int = maxRam
         self.version: str = version
-        self.sType: str = sType
+        self.serverType: str = serverType
         self.serverPath: str = path
         self.isOnline: bool = False
 
         self.batPath: str
         self.propertiesPath: str
 
-        if all(x is None for x in [name, maxRam, version, sType, path]):
+        if all(x is None for x in [name, maxRam, version, serverType, path]):
             print("Aucune des valeurs ne sont définies. Tentative de récuperation des données automatique")
+            conn = db.getConnexion()
+            cursor = conn.cursor()
             cursor.execute("SELECT 1 FROM servers WHERE uuid = ?", (self.uuid,))
             serverInstance = cursor.fetchone()
+            conn.close()
             if self.uuid is None or serverInstance is None:
                 print("UUID de serveur non fournie ou non reconnune. Echec de la tentative de récuperation "
                       "automatique de données. Merci de fournir un UUID correcte.")
@@ -257,19 +256,25 @@ class Server:
             self.batPath = None
 
     def init(self) -> None:
+        conn = db.getConnexion()
+        cursor = conn.cursor()
         cursor.execute(f"""
-            INSERT INTO servers (uuid, name, lastUseDate, maxRam, version, sType, serverPath) 
+            INSERT INTO servers (uuid, name, lastUseDate, maxRam, version, serverType, serverPath) 
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (self.uuid, self.name, self.lastUseDate, self.maxRam, self.version, self.sType, self.serverPath))
+        """, (self.uuid, self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.serverPath))
         conn.commit()
+        conn.close()
 
     def save(self) -> None:
+        conn = db.getConnexion()
+        cursor = conn.cursor()
         cursor.execute(f"""
             UPDATE servers 
             SET name = ?, lastUseDate = ?, maxRam = ?,  version = ?, sTye = ?, serverPath = ?
             WHERE uuid = {self.uuid}
-        """, (self.name, self.lastUseDate, self.maxRam, self.version, self.sType, self.serverPath))
+        """, (self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.serverPath))
         conn.commit()
+        conn.close()
 
     def getPropertiesPath(self):
         return findSpecifiedFileByExtension('.properties', self.serverPath)
@@ -282,16 +287,18 @@ class Server:
         Cette fonction permet de mettre a jour les attributs du serveur en récuperant les données depuis le fichiers
         Json.
         """
-
+        conn = db.getConnexion()
+        cursor = conn.cursor()
         cursor.execute("SELECT * FROM servers WHERE uuid = ?", (self.uuid,))
         servers = cursor.fetchone()
+        conn.close()
 
         self.name: str = servers["name"]
         self.creationDate = servers["creationDate"]
         self.lastUseDate = servers["lastUseDate"]
         self.maxRam: int = servers["maxRam"]
         self.version: str = servers["version"]
-        self.sType: str = servers["sType"]
+        self.serverType: str = servers["serverType"]
         self.serverPath: str = servers["serverPath"]
 
     def getPropertiesAsDict(self) -> {str: str}:

@@ -1,19 +1,23 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from routers import servers, websockets
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
+import utilities.db as dbManager
+import uvicorn
 
 app = FastAPI(
     title="Minecraft Panel API",
     description="API pour gérer vos serveurs Minecraft",
-    version="1.0.0"
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    version="1.0.0",
+    middleware=[
+        Middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=False,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+    ]
 )
 
 app.include_router(servers.router, prefix="/api", tags=["servers"])
@@ -30,5 +34,5 @@ def root():
 
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000, reload=False)
+    dbManager.initDb()
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=False)

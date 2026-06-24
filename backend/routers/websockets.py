@@ -4,11 +4,9 @@ import psutil
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from utilities.serverUtilities import cache
 from loguru import logger
-import json as Json
 
 # Create routeur
 router = APIRouter()
-
 
 @router.websocket("/servers/{uuid}/hooks/console")
 async def consoleHook(webSocket: WebSocket, uuid: str):

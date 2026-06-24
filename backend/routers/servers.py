@@ -8,6 +8,7 @@ import uuid as uuidLib
 from loguru import logger
 import sys
 import platformdirs as plat
+import utilities.db as db
 
 logger.remove()
 logger.add(
@@ -25,18 +26,14 @@ appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
 router = APIRouter()
 
 
-def getNewCursor() -> sqlite3.Cursor:
-    conn = sqlite3.connect(appDir.user_data_path / "servers.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    return cursor
-
-
 @router.get("/servers")
 def getServersR():
-    cursor = getNewCursor()
+    conn = db.getConnexion()
+    cursor = conn.cursor()
     cursor.execute("SELECT * FROM servers")
-    return [dict(row) for row in cursor.fetchall()]
+    result = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return result
 
 
 class Configuration(BaseModel):
@@ -56,11 +53,13 @@ async def createServerR(config: Configuration):
 
 @router.get("/servers/{uuid}/serverListDatas")
 async def getServerDatas(uuid: str):
-    cursor = getNewCursor()
+    conn = db.getConnexion()
+    cursor = conn.cursor()
     cursor.execute("SELECT * FROM servers WHERE UUID = ?", (uuid,))
     curServerDatas = dict(cursor.fetchone())
+    conn.close()
     name = curServerDatas['name']
-    type_ = curServerDatas['sType']
+    type_ = curServerDatas['serverType']
     state = '...'  # TODO
     lastUse = curServerDatas['lastUseDate']
     version = curServerDatas['version']
