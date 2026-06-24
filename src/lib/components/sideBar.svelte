@@ -10,7 +10,7 @@
 
 	<ul id="topOptions">
 		<SideBarButton
-			href="dashboard.html"
+			href="/core/dashboard"
 			title="Dashboard"
 			path={pathDb.treeStructure}
 			classes="topOptions"
@@ -19,7 +19,7 @@
 			/>
 
 		<SideBarButton
-			href="serverList.html"
+			href="/core/serverList"
 			title="Servers"
 			path={pathDb.hardDrives}
 			classes="topOptions"
@@ -28,7 +28,7 @@
 		/>
 
 		<SideBarButton
-			href="parameters.html"
+			href="/core/settings"
 			title="Paramètres"
 			path={pathDb.wrench}
 			classes="topOptions"
@@ -37,7 +37,7 @@
 		/>
 
 		<SideBarButton
-			href="addOns.html"
+			href="TODO"
 			title="Extensions"
 			path={pathDb.puzzlePiece}
 			classes="topOptions"

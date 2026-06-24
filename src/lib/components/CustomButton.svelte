@@ -5,9 +5,9 @@
 
   const {
     iconPath,
-    iconSize,
+    iconSize = "18px",
     emphasize = false,
-    style,
+    style = "",
     onclick,
     children,
     ...others

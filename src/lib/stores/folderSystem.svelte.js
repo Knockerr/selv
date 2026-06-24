@@ -254,12 +254,11 @@ function createFolderSystem() {
             return foldersDatas[folder];
         },
 
-        async resetFolder() {
+        async resetDatas() {
             foldersDatas = {};
-            allServers = [];
+            allServers = new SvelteSet();
             await saveDatas();
-            createFolder("all", true, []);
-            await saveDatas();
+            console.info("Full datas reset has been completed succesfully.")
         },
     };
 }
