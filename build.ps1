@@ -1,7 +1,6 @@
 # build.ps1
+$ErrorActionPreference = "Stop"
 Set-Location backend
-.venv\Scripts\activate
-pyinstaller --onefile  --noconsole --name mcpanel-backend-x86_64-pc-windows-msvc --distpath ../src-tauri/binaries main.py
-deactivate
+.venv\Scripts\python.exe -m PyInstaller main.spec --distpath ../src-tauri/binaries
 Set-Location ..
 npm run tauri build
