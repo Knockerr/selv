@@ -18,4 +18,5 @@ backend/dist
 backend/mcpanel-backend-x86_64-pc-windows-msvc.spec
 backend/mcpanel-backend.spec
 backend/servers.db
+backend/temp.py
 *.log
