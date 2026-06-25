@@ -84,6 +84,13 @@ async def getServerIp(uuid: str):
     return {"ip": formatted}
 
 
+@router.get("/servers/{uuid}/properties")
+async def getServerProperties(uuid: str):
+    curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]
+    properties = curServer.getPropertiesAsDict()
+    return {"properties": properties}
+
+
 @router.post("/servers/{uuid}/start")
 async def startServerR(uuid: str):
     result = cache.getCurrentServerAndSm(uuid)
