@@ -4,6 +4,7 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 import utilities.db as dbManager
 import uvicorn
+import utilities.miscellaneous
 
 app = FastAPI(
     title="Minecraft Panel API",
@@ -35,4 +36,5 @@ def root():
 
 if __name__ == "__main__":
     dbManager.initDb()
+    utilities.miscellaneous.initLogger()
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=False)

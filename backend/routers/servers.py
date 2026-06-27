@@ -10,16 +10,6 @@ import sys
 import platformdirs as plat
 import utilities.db as db
 
-logger.remove()
-logger.add(
-    sys.stdout,
-    format="<green>{time:HH:mm:ss}</green> | "
-           "<level>{level: <8}</level> | "
-           "<cyan>{file.name}</cyan> | "
-           "{message}",
-    colorize=True
-)
-
 appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
 
 # Create routeur

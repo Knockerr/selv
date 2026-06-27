@@ -6,6 +6,7 @@ import utilities.mcUtilities as mcUtilities
 from utilities.serverUtilities import cache
 from loguru import logger
 
+
 # Create routeur
 router = APIRouter()
 

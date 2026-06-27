@@ -7,17 +7,6 @@ import psutil
 from loguru import logger
 import utilities.db as db
 
-logger.remove()
-logger.add(
-    sys.stdout,
-    format="<green>{time:HH:mm:ss}</green> | "
-           "<level>{level: <8}</level> | "
-           "<cyan>{file.name}</cyan> | "
-           "{message}",
-    colorize=True
-)
-
-
 # ----------------------------------------
 # ----------------------------------------
 # ----------------------------------------
