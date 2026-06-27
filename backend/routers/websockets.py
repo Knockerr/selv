@@ -1,20 +1,24 @@
 import asyncio
-
 import psutil
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from starlette.websockets import WebSocketState
+import utilities.mcUtilities as mcUtilities
 from utilities.serverUtilities import cache
 from loguru import logger
 
 # Create routeur
 router = APIRouter()
 
+
 @router.websocket("/servers/{uuid}/hooks/console")
 async def consoleHook(webSocket: WebSocket, uuid: str):
     await webSocket.accept()
 
-    curServerManager = cache.getCurrentServerAndSm(uuid)["serverManager"]
+    curServerManager: mcUtilities.ServerManager = cache.getCurrentServerAndSm(uuid)["serverManager"]
 
     await curServerManager.onlineEvent.wait()
+    queue = asyncio.Queue()
+    curServerManager.subscribeToConsole(queue)
     try:
         logger.info("Server detected as online")
 
@@ -24,17 +28,25 @@ async def consoleHook(webSocket: WebSocket, uuid: str):
 
         logger.info(f"{uuid} successfully hooked to newLineInConsole")
 
-        async for line_byte in curServerManager.process.stdout:
-            line = line_byte.decode().strip()
-            if line:
-                await webSocket.send_text(line)
+        queue = asyncio.Queue()
+        curServerManager.subscribeToConsole(queue)
+
+        while True:
+            line = await queue.get()
+            if webSocket.client_state != WebSocketState.CONNECTED:
+                logger.info("Websocket disconnected from ws")
+                break
+            await webSocket.send_text(line.strip())
 
         await curServerManager.handleServerAutoStop()
         await webSocket.send_text("Extinction du serveur exécutée avec succès.")
+        curServerManager.unsubscribeConsole(queue)
         await webSocket.close(1000, f"Le serveur {uuid} est fermé")
 
     except WebSocketDisconnect:
-        logger.error(f"Console WebSocket disconnected for {uuid}")
+        curServerManager.unsubscribeConsole(queue)
+        logger.info(f"Console WebSocket disconnected for {uuid}")
+        return
 
     except Exception as e:
         logger.error(f"Error in console WebSocket: {e}")
@@ -73,8 +85,8 @@ async def metricsHook(webSocket: WebSocket, uuid: str):
             await asyncio.sleep(1)
 
         except WebSocketDisconnect:
-            logger.error(f"Console WebSocket disconnected for {uuid}")
-            break
+            logger.info(f"Console WebSocket disconnected for {uuid}")
+            return
 
         except Exception as e:
             logger.error(f"Error in console WebSocket: {e}")
@@ -84,4 +96,3 @@ async def metricsHook(webSocket: WebSocket, uuid: str):
         "ram": 0
     })
     await webSocket.close(1000, f"Le serveur {uuid} est fermé")
-

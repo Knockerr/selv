@@ -52,12 +52,11 @@ async def executeFileAndTrackOutput(serverPath: str = None, fileToExecute: str =
     :param fileToExecute: str -> Le fichier à executer.
     """
     process = await asyncio.create_subprocess_exec(
-        "cmd", "/c", fileToExecute,
+        fileToExecute,
         stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.STDOUT,
         stdin=asyncio.subprocess.PIPE,
         cwd=serverPath,
-        bufsize=0
     )
     return process
 
@@ -77,6 +76,7 @@ class ServerManager:
             raise ValueError("le serveur précisé n'est pas de type valide ou précisé.")
         self.onlineEvent = asyncio.Event()
         self.pid: int = 0
+        self.consoleSubscribers: list = []
 
     async def addLineInConsole(self, textToWrite: str):
         self.process.stdin.write(textToWrite.encode() + b"\n")
@@ -92,6 +92,7 @@ class ServerManager:
         logger.info("Trying to start the server..")
         serverBat = findSpecifiedFileByExtension("bat", self.server.serverPath)
         self.process = await executeFileAndTrackOutput(self.server.serverPath, serverBat)
+        _ = asyncio.create_task(self.trackConsole())
 
         await asyncio.sleep(1)
 
@@ -180,6 +181,22 @@ class ServerManager:
 
         with open(pathlib.Path(self.server.serverPath) / "eula.txt", "w") as file:
             file.writelines(lines)
+
+    async def trackConsole(self):
+        logger.debug(f"Now tracking console")
+        async for line_byte in self.process.stdout:
+            line = line_byte.decode().strip()
+            if line:
+                for queue in self.consoleSubscribers:
+                    await queue.put(line)
+
+    def subscribeToConsole(self, queue: asyncio.Queue):
+        logger.debug(f"New queue subscribed to console")
+        self.consoleSubscribers.append(queue)
+
+    def unsubscribeConsole(self, q: asyncio.Queue):
+        logger.debug(f"Queue unsubscribed to console")
+        self.consoleSubscribers.remove(q)
 
 
 # ----------------------------------------
@@ -317,6 +334,18 @@ class Server:
                 dict_[str(key).strip()] = str(value).strip()
 
         return dict_
+
+    def getCurrentLogs(self):
+        """
+        Fonction qui récupère le contenu des dernières logs du serveur
+        """
+        eulaLatestLogPath = pathlib.Path(self.serverPath) / "logs/latest.log"
+        if not eulaLatestLogPath.exists():
+            logger.error("Aucun fichier de logs n'a pu être récupéré")
+            return
+        with open(eulaLatestLogPath) as file:
+            logs = file.readlines()
+        return logs
 
 
 # --DEPRECATED

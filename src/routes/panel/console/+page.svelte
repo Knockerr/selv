@@ -8,12 +8,16 @@
   import EulaWindow from "$lib/components/windowsSystem/WindowsBank/eulaWIndow/eulaWindow.svelte";
   import { windowsManager } from "$lib/components/windowsSystem/windowsManager.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
+  import { onDestroy, onMount, untrack } from "svelte";
 
   let serverIp = $state(10);
   let ramUsage = $state(10);
   let cpuUsage = $state(10);
-  let uptime = $state(10)
+  let uptime = $state(10);
   let onlinePlayers = $state(10);
+  let serverStatus = $state("");
+
+  let recovery = false;
 
   let consoleContent = $state("");
 
@@ -27,6 +31,7 @@
       .then((res) => res.json())
       .then((data) => console.log("data -> ", data))
       .catch((error) => console.error(error));
+    serverStatus = "on";
   }
 
   function stopServer() {
@@ -36,6 +41,7 @@
       .then((res) => res.json())
       .then((data) => console.log("data -> ", data))
       .catch((error) => console.error(error));
+    serverStatus = "off";
   }
 
   function getServerIp() {
@@ -50,8 +56,9 @@
       .catch((err) => console.error(err));
   }
 
+  let consoleWs;
   function hookConsole() {
-    const consoleWs = new WebSocket(
+    consoleWs = new WebSocket(
       `ws://localhost:8000/ws/servers/${uuid}/hooks/console`,
     );
 
@@ -78,61 +85,124 @@
     };
   }
 
+  let metricsWs;
   function hookMetrics() {
-    const consoleWs = new WebSocket(
+    metricsWs = new WebSocket(
       `ws://localhost:8000/ws/servers/${uuid}/hooks/metrics`,
     );
 
-    consoleWs.onopen = () => {
+    metricsWs.onopen = () => {
       console.info("Connected to metrics hook");
     };
 
-    consoleWs.onmessage = (event) => {
+    metricsWs.onmessage = (event) => {
       const datas = JSON.parse(event.data);
       ramUsage = `${datas.ram}/MAX`;
       cpuUsage = `${datas.cpu}%`;
     };
 
-    consoleWs.onerror = (err) => {
+    metricsWs.onerror = (err) => {
       console.error("Error : ", err);
     };
 
-    consoleWs.onclose = () => {
+    metricsWs.onclose = () => {
       console.info("Closed metrics webSocket.");
     };
   }
+
+  async function recoverConsoleLogs() {
+    let serverLogs = [];
+    await fetch("http://localhost:8000/api/servers/" + uuid + "/logs", {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        serverLogs = data.logs;
+        serverLogs.forEach(line => {
+          consoleContent += line;
+        });
+      })
+      .catch((err) => console.error(err));
+  }
+
+  onMount(() => {
+    // Fetch IP (temp)
+    fetch("http://localhost:8000/api/servers/" + uuid + "/ip", {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("data", data.ip);
+        serverIp = data.ip;
+      })
+      .catch((err) => console.error(err));
+
+    // Getting server state on Mount
+    fetch("http://localhost:8000/api/servers/" + uuid + "/status", {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        serverStatus = data.status;
+        if (serverStatus === "on") recovery = true;
+      })
+      .catch((err) => console.error(err));
+  });
+
+  $effect(() => {
+    let _ = serverStatus;
+    untrack(() => {
+      if (serverStatus === "on") {
+        console.info("Server status detected as on.");
+        if (recovery) recoverConsoleLogs();
+        hookConsole();
+        hookMetrics();
+      } else if (serverStatus === "off") {
+        console.info("Server status detected as off.");
+        consoleWs?.close();
+        metricsWs?.close();
+      }
+    });
+  });
+
+  onDestroy(() => {
+    if (serverStatus === "on") {
+      consoleWs.close();
+      metricsWs.close();
+    }
+  });
 </script>
 
 <div class="container">
-    <div class="rightSideElemsContainer">
-      <Console {consoleContent} {uuid} />
-      <div class="executionPanel">
-        <div class="buttonsRow">
-          <button
-            id="start"
-            onclick={() => {
-              startServer();
-              hookConsole();
-              hookMetrics();
-            }}>START</button
-          >
-          <button
-            id="stop"
-            onclick={() => {
-              stopServer();
-            }}>STOP</button
-          >
-        </div>
-
-        <ul class="datasList">
-          <DataDisplayer stat="IP du serveur" bind:value={serverIp} />
-          <DataDisplayer stat="Disponibilité" bind:value={uptime} />
-          <DataDisplayer stat="Joueurs connectés" bind:value={onlinePlayers} />
-          <DataDisplayer stat="Charge CPU" bind:value={cpuUsage} />
-          <DataDisplayer stat="Ram utilisée" bind:value={ramUsage} />
-        </ul>
+  <div class="rightSideElemsContainer">
+    <Console {consoleContent} {uuid} />
+    <div class="executionPanel">
+      <div class="buttonsRow">
+        <button
+          id="start"
+          onclick={() => {
+            startServer();
+          }}
+          disabled={serverStatus === "on"}>START</button
+        >
+        <button
+          id="stop"
+          onclick={() => {
+            stopServer();
+          }}
+          disabled={serverStatus === "off"}>STOP</button
+        >
       </div>
+
+      <ul class="datasList">
+        <DataDisplayer stat="IP du serveur" bind:value={serverIp} />
+        <DataDisplayer stat="Disponibilité" bind:value={uptime} />
+        <DataDisplayer stat="Joueurs connectés" bind:value={onlinePlayers} />
+        <DataDisplayer stat="Charge CPU" bind:value={cpuUsage} />
+        <DataDisplayer stat="Ram utilisée" bind:value={ramUsage} />
+      </ul>
     </div>
+  </div>
 </div>
 
 <EulaWindow serverUuid={uuid} />

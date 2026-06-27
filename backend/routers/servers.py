@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from utilities.serverUtilities import cache
 from utilities import mcUtilities
 from pydantic import BaseModel
@@ -89,6 +89,25 @@ async def getServerProperties(uuid: str):
     curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]
     properties = curServer.getPropertiesAsDict()
     return {"properties": properties}
+
+
+@router.get("/servers/{uuid}/status")
+async def getServerStatus(uuid: str):
+    curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]
+    serverOnline = curServer.isOnline
+    if serverOnline:
+        return {"status": "on"}
+    else:
+        return {"status": "off"}
+
+
+@router.get("/servers/{uuid}/logs")
+async def getServerCurrentLogs(uuid: str):
+    curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]
+    if not curServer.isOnline:
+        raise HTTPException(status_code=503, detail="Serveur éteint ou indisponible")
+    serverLogs = curServer.getCurrentLogs()
+    return {"logs": serverLogs}
 
 
 @router.post("/servers/{uuid}/start")
