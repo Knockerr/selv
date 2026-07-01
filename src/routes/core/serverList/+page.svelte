@@ -1,7 +1,7 @@
 <script>
   // @ts-nocheck
   import FolderContextMenu from "$lib/components/contextMenuSystem/ContextMenusBank/FolderContextMenu/FolderContextMenu.svelte";
-  import CustomButton from "$lib/components/CustomButton.svelte";
+  import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";
   import FolderManagement from "$lib/components/formSystem/forms/folderManagement.svelte";
   import Icon from "$lib/components/Icon.svelte";
   import ServerItem from "$lib/components/serverItem.svelte";
@@ -18,12 +18,10 @@
   import WindowTextInput from "$lib/components/windowsSystem/WindowTextInput.svelte";
   import { pathDb } from "$lib/icons/pathDb";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
-
-  // $inspect(folderSystem.serversToRender);
-
-  function onFolderCreationClick() {
-    windowsManager.open("ServerCreationWindow");
-  }
+  import Input from "$lib/components/bits-ui/baseComponents/Input.svelte";
+  import Dialog from "$lib/components/bits-ui/baseComponents/dialog.svelte";
+  import CreateServerDialog from "$lib/components/bits-ui/presets/createServerDialog.svelte";
+  import ImportServerDialog from "$lib/components/bits-ui/presets/importServerDialog.svelte";
 
   let folderSystemRef = $state();
 </script>
@@ -34,12 +32,12 @@
       <h1>Serveurs</h1>
     </div>
     <div class="titleBarRightSide">
-      <CustomButton iconPath={pathDb.download} iconSize="18">
-        Importer serveur
-      </CustomButton>
-      <CustomButton iconPath={pathDb.plus} iconSize="18" emphasize={true} onclick={onFolderCreationClick}>
-        Créer un serveur
-      </CustomButton>
+      <ImportServerDialog
+        refreshFoldersFunction={folderSystemRef.displayFolders}
+      />
+      <CreateServerDialog
+        refreshFoldersFunction={folderSystemRef.displayFolders}
+      />
     </div>
   </div>
   <div class="serverSorterGlobalContainer">

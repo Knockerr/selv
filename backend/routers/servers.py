@@ -26,21 +26,6 @@ def getServersR():
     return result
 
 
-class Configuration(BaseModel):
-    name: str
-    ram: int
-    type: str
-    version: str
-
-
-@router.post("/servers/create")
-async def createServerR(config: Configuration):
-    logger.info("Server Creation Detected!")
-    uuid = uuidLib.uuid4()
-    utilities.serverCreator.createServer(config.name, str(uuid), config.type, config.version, config.ram)
-    return {"status": "created", "uuid": str(uuid)}
-
-
 @router.get("/servers/{uuid}/serverListDatas")
 async def getServerDatas(uuid: str):
     conn = db.getConnexion()
@@ -53,7 +38,7 @@ async def getServerDatas(uuid: str):
     state = '...'  # TODO
     lastUse = curServerDatas['lastUseDate']
     version = curServerDatas['version']
-    path = curServerDatas['serverPath']
+    path = curServerDatas['path']
 
     return {
         'name': name,
@@ -127,6 +112,43 @@ async def sendCommandR(uuid: str, cmd: CommandModel):
     serverManager = result["serverManager"]
     await serverManager.sendCommand(cmd)
     return {"status": "sent", "uuid": uuid}
+
+
+class Configuration(BaseModel):
+    name: str
+    ram: int
+    type: str
+    version: str
+
+
+@router.post("/servers/create")
+async def createServerR(config: Configuration):
+    logger.info("Server Creation Detected!")
+    uuid = uuidLib.uuid4()
+    utilities.serverCreator.createServer(config.name, str(uuid), config.type, config.version, config.ram)
+    return {"status": "created", "uuid": str(uuid)}
+
+
+class importConfig(BaseModel):
+    name: str
+    ram: int
+    type: str
+    version: str
+    path: str
+
+
+@router.post("/servers/import")
+async def importServerR(config: importConfig):
+    name = config.name
+    ram = config.ram
+    serverType = config.type
+    version = config.version
+    path = config.path
+
+    logger.info(f"Importing server {name}")
+    uuid = str(uuidLib.uuid4())
+    utilities.serverCreator.importServer(name, path, ram, version, serverType, uuid)
+    return {"status": "imported", "uuid": uuid}
 
 
 @router.post("/servers/{uuid}/acceptEula")

@@ -3,11 +3,16 @@ import json
 import os
 import subprocess
 import sys
+
+import pathlib
+import uuid
+
 from loguru import logger
 import requests
 import shutil
 import utilities.mcUtilities as mcUtilities
 import platformdirs as plat
+import re
 
 logger.remove()
 logger.add(
@@ -163,7 +168,8 @@ def handleVanillaDownload(version: str) -> None:
     # Récuperer le manifest paper de la version
     mojangVersionManifestRequest = requests.get(versionsManifestRoute)
     if mojangVersionManifestRequest.status_code != 200:
-        logger.error(f"Erreur lors de la récuperation du manifest de mojang : {mojangVersionManifestRequest.status_code}")
+        logger.error(
+            f"Erreur lors de la récuperation du manifest de mojang : {mojangVersionManifestRequest.status_code}")
         return
     mojangVersionManifest = mojangVersionManifestRequest.json()
     # Boucler sur les versions
@@ -384,3 +390,30 @@ def createServer(name: str, uuid: str, type_: str, version: str, ram: int):
             handleForgeCreation(name, uuid, type_, version, ram)
         case _:
             logger.error(f"Le type du serveur n'a pas été reconnu. Type : {type_}")
+
+
+def getServerRam(name, path):
+    batFile = pathlib.Path(mcUtilities.findSpecifiedFileByExtension("bat", path))
+    if not batFile.exists():
+        logger.warning(f"No bat file seems to exist for {name}")
+    batFileContent = batFile.read_text().split(r"\n")
+    startCommandArgs = batFileContent[1].split(" ")
+    for arg in startCommandArgs:
+        if arg.startswith("-Xmx"):
+            return arg[4:]
+    else:
+        logger.error("No max ram is indicated. One must be provided.")
+        return "askUser"
+
+
+def importServer(name: str, path: str | pathlib.Path, ram, version, serverType, uuid):
+    # TODO: Create a system that automatically gets servers datas
+    # Récuperer la date
+    now = datetime.datetime.now()
+    creationDate: str = f'{now.year}{now.month}{now.day}{now.hour}{now.minute}'
+
+    logger.debug("Création du serveur")
+    # Créer le serveur
+    server = mcUtilities.Server(name, creationDate, creationDate, ram, version, serverType, path, uuid)
+    server.init()
+    logger.debug(f"Objet Server de {name} créé et sauvegardé.")
