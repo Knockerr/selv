@@ -236,26 +236,15 @@ def handlePaperDownload(version: str) -> None:
     Gère le téléchargement d'une version de paper.
     """
     # Déterminer la route api qui sera utilisée :
-    apiRoute = f"https://api.papermc.io/v2/projects/paper/versions/{version}"
+    apiRoute = f"https://fill.papermc.io/v3/projects/paper/versions/{version}/builds"
     # Récuperer le manifest paper de la version
-    paperManifestRequest = requests.get(apiRoute)
-    if paperManifestRequest.status_code != 200:
-        logger.error(f"Erreur lors de la récuperation du manifest de paper : {paperManifestRequest.status_code}")
+    paperVersionManifestRequest = requests.get(apiRoute)
+    if paperVersionManifestRequest.status_code != 200:
+        logger.error(f"Erreur lors de la récuperation du manifest de paper : {paperVersionManifestRequest.status_code}")
         return
-    paperManifest = paperManifestRequest.json()
-    # Récuperer le dernier build
-    buildNumber = paperManifest['builds'][-1]
-    # Récuperer les données du build
-    apiBuildRoute = f"{apiRoute}/builds/{buildNumber}"
-    buildDatasRequest = requests.get(apiBuildRoute)
-    if buildDatasRequest.status_code != 200:
-        logger.error(f"Erreur lors de récuperation des données de build de paper: {buildDatasRequest.status_code}")
-        return
-    buildDatas = buildDatasRequest.json()
-    # Récuperer le nom du jar
-    jarName = buildDatas['downloads']['application']['name']
-    # Récuperer l'url du jar
-    jarFileLink = f"https://api.papermc.io/v2/projects/paper/versions/{version}/builds/{buildNumber}/downloads/{jarName}"
+    paperVersionManifest = paperVersionManifestRequest.json()
+    # Récuperer le lien de téléchargement
+    jarFileLink = paperVersionManifest[0]['downloads']["server:default"]["url"]
     # Télécharger le jar
     jarFile = requests.get(jarFileLink)
     if jarFile.status_code != 200:
