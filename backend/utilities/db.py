@@ -18,7 +18,7 @@ def initDb():
         name TEXT NOT NULL,
         serverType TEXT NOT NULL,
         version TEXT NOT NULL,
-        serverPath TEXT NOT NULL,
+        path TEXT NOT NULL,
         maxRam INTEGER NOT NULL,
         lastUseDate TEXT,
         creationDate TEXT
