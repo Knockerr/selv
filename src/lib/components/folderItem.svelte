@@ -7,6 +7,9 @@
   import Icon from "./Icon.svelte";
   import FolderWindow from "./windowsSystem/WindowsBank/FolderWindow/FolderWindow.svelte";
   import { windowsManager } from "./windowsSystem/windowsManager.svelte";
+  import EditFolderDialog from "./bits-ui/presets/editFolderDialog.svelte";
+  import IconButton from "./bits-ui/baseComponents/iconButton.svelte";
+  import { uiStore } from "./bits-ui/uiComponentsStore.svelte";
 
   const {
     folderName = "UNDEFINED",
@@ -49,16 +52,13 @@
     <p id="numOfServs">{numberOfServers}</p>
 
     {#if !removeEditButton}
-      <button
-        id="folderEditBtn"
-        aria-label="Edit folder"
-        onclick={(e) => {
-          e.stopPropagation();
-          openFolderWindow();
+      <IconButton
+        onClick={() => {
+          uiStore.setCurrentEditedFolder(folderName);
+          uiStore.openDialog("editFolderDialog");
         }}
-      >
-        <Icon path={pathDb.pencil} size="16" color="#998fbb" />
-      </button>
+        iconPath={pathDb.pencil}
+      />
     {:else}
       <div id="blank"></div>
     {/if}
@@ -119,36 +119,5 @@
     font-size: 14.5px;
     color: #8a8e94;
     margin-right: 0;
-  }
-
-  .containerRight button {
-    --containerEditButtonSize: 30px;
-    background-color: transparent;
-    border: 0px solid;
-    border-radius: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 14px;
-    width: var(--containerEditButtonSize);
-    height: var(--containerEditButtonSize);
-    transition: background-color 0.2s ease;
-  }
-
-  #blank {
-    width:5px;
-  }
-
-  .containerRight button:hover {
-    background-color: #1d2735;
-  }
-
-  .containerRight button:active {
-    transition:
-      background-color 0s ease,
-      color 0s ease;
-    background-color: #121820;
-    color: #998fbb;
   }
 </style>

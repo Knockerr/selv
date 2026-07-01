@@ -22,6 +22,7 @@
   import Dialog from "$lib/components/bits-ui/baseComponents/dialog.svelte";
   import CreateServerDialog from "$lib/components/bits-ui/presets/createServerDialog.svelte";
   import ImportServerDialog from "$lib/components/bits-ui/presets/importServerDialog.svelte";
+  import EditFolderDialog from "$lib/components/bits-ui/presets/editFolderDialog.svelte";
 
   let folderSystemRef = $state();
 </script>
@@ -90,7 +91,7 @@
   </div>
 </div>
 
-<FolderWindowsContainer />
+<EditFolderDialog/>
 <ServerCreationWindow refreshFoldersFunction={folderSystemRef.displayFolders} />
 
 <style>
