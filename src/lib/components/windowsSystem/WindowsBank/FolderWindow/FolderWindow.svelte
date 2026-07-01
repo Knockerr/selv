@@ -15,7 +15,8 @@
   import WindowAligned from "../../WindowAligned.svelte";
   import WindowSlider from "../../WindowSlider.svelte";
   import { windowsManager } from "../../windowsManager.svelte";
-  import ServersManager from "./ServersManager.svelte";
+  import ServersManager from "$lib/components/bits-ui/presets/presetSpecificComponents/ServersManager.svelte";
+  
 
   const { folderName } = $props();
 
