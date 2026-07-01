@@ -10,6 +10,8 @@
     style = "",
     onclick,
     variant = 0,
+    label,
+    className,
     children,
     ...others
   } = $props();
@@ -23,17 +25,22 @@
   );
 </script>
 
-<button
-  class="component"
-  style={`--bgColor: ${color}; --bgHoverColor: ${hoverColor}; --bgActiveColor: ${activeColor}; ${style}`}
-  {onclick}
-  {...others}
->
-  <div class="iconContainer">
-    <Icon path={iconPath} size={iconSize} color="white" />
-  </div>
-  <p>{@render children?.()}</p>
-</button>
+<div class="flex flex-col gap-1">
+  {#if label}
+    <span class="text-sm font-semibold">{label}</span>
+  {/if}
+  <button
+    class="component ${className}"
+    style={`--bgColor: ${color}; --bgHoverColor: ${hoverColor}; --bgActiveColor: ${activeColor}; ${style}`}
+    {onclick}
+    {...others}
+  >
+    <div class="iconContainer">
+      <Icon path={iconPath} size={iconSize} color="white" />
+    </div>
+    <p>{@render children?.()}</p>
+  </button>
+</div>
 
 {#if variant == 0}
   <style>
