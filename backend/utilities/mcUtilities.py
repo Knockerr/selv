@@ -7,6 +7,7 @@ import psutil
 from loguru import logger
 import utilities.db as db
 
+
 # ----------------------------------------
 # ----------------------------------------
 # ----------------------------------------
@@ -34,10 +35,10 @@ def findSpecifiedFileByExtension(extension: str = None, folderPath: str = None) 
     raise FileNotFoundError(f"Erreur : Aucun fichier avec l'extension '{extension}' trouvé dans {folderPath}.")
 
 
-async def executeFileAndTrackOutput(serverPath: str = None, fileToExecute: str = None) -> Process:
+async def executeFileAndTrackOutput(path: str = None, fileToExecute: str = None) -> Process:
     """
     Cette fonction execute un fichier et traque sa sortie.
-    :param serverPath: str -> Le chemin du serveur.
+    :param path: str -> Le chemin du serveur.
     :param fileToExecute: str -> Le fichier à executer.
     """
     process = await asyncio.create_subprocess_exec(
@@ -45,7 +46,7 @@ async def executeFileAndTrackOutput(serverPath: str = None, fileToExecute: str =
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.STDOUT,
         stdin=asyncio.subprocess.PIPE,
-        cwd=serverPath,
+        cwd=path,
     )
     return process
 
@@ -66,6 +67,7 @@ class ServerManager:
         self.onlineEvent = asyncio.Event()
         self.pid: int = 0
         self.consoleSubscribers: list = []
+        self.updateMaxRam()
 
     async def addLineInConsole(self, textToWrite: str):
         self.process.stdin.write(textToWrite.encode() + b"\n")
@@ -79,8 +81,8 @@ class ServerManager:
             logger.warning("Impossible to start the server - it is already online")
             return
         logger.info("Trying to start the server..")
-        serverBat = findSpecifiedFileByExtension("bat", self.server.serverPath)
-        self.process = await executeFileAndTrackOutput(self.server.serverPath, serverBat)
+        serverBat = findSpecifiedFileByExtension("bat", self.server.path)
+        self.process = await executeFileAndTrackOutput(self.server.path, serverBat)
         _ = asyncio.create_task(self.trackConsole())
 
         await asyncio.sleep(1)
@@ -160,7 +162,7 @@ class ServerManager:
         return line.strip()
 
     async def acceptEula(self):
-        with open(pathlib.Path(self.server.serverPath) / "eula.txt", "r") as file:
+        with open(pathlib.Path(self.server.path) / "eula.txt", "r") as file:
             lines = file.readlines()
 
         for i, line in enumerate(lines):
@@ -168,7 +170,7 @@ class ServerManager:
                 lines[i] = "eula=true\n"
                 break
 
-        with open(pathlib.Path(self.server.serverPath) / "eula.txt", "w") as file:
+        with open(pathlib.Path(self.server.path) / "eula.txt", "w") as file:
             file.writelines(lines)
 
     async def trackConsole(self):
@@ -187,6 +189,18 @@ class ServerManager:
         logger.debug(f"Queue unsubscribed to console")
         self.consoleSubscribers.remove(q)
 
+    def updateMaxRam(self):
+        batFile = pathlib.Path(findSpecifiedFileByExtension("bat", self.server.path))
+        if not batFile.exists():
+            logger.warning(f"No bat file seems to exist for {self.server.name}")
+        batFileContent = batFile.read_text().split(r" ")
+        for arg in batFileContent:
+            if arg.startswith("-Xmx"):
+                self.server.maxRam = arg[4:]
+                break
+        else:
+            logger.error("No max ram is indicated. One must be provided.")
+
 
 # ----------------------------------------
 # ----------------------------------------
@@ -203,7 +217,7 @@ class Server:
      - maxRam: str -> la ram allouée au serveur.
      - version: str -> la version du serveur.
      - serverType: str -> le "type" de serveur (vanilla, forge, spigot, sponge).
-     - serverPath: str -> le chemin du serveur.
+     - path: str -> le chemin du serveur.
      - uuid: str -> l'identifiant unique du serveur. C'est lui qu'on utilise pour représenter le fichier dans le Json.
     \n
     Ses méthodes :
@@ -236,28 +250,28 @@ class Server:
         self.maxRam: int = maxRam
         self.version: str = version
         self.serverType: str = serverType
-        self.serverPath: str = path
+        self.path: str = path
         self.isOnline: bool = False
 
         self.batPath: str
         self.propertiesPath: str
 
         if all(x is None for x in [name, maxRam, version, serverType, path]):
-            print("Aucune des valeurs ne sont définies. Tentative de récuperation des données automatique")
+            logger.debug("Aucune des valeurs ne sont définies. Tentative de récuperation des données automatique")
             conn = db.getConnexion()
             cursor = conn.cursor()
             cursor.execute("SELECT 1 FROM servers WHERE uuid = ?", (self.uuid,))
             serverInstance = cursor.fetchone()
             conn.close()
             if self.uuid is None or serverInstance is None:
-                print("UUID de serveur non fournie ou non reconnune. Echec de la tentative de récuperation "
-                      "automatique de données. Merci de fournir un UUID correcte.")
+                logger.error("UUID de serveur non fournie ou non reconnune. Echec de la tentative de récuperation "
+                             "automatique de données. Merci de fournir un UUID correcte.")
                 return
             self.loadDatas()
-            print("Récuperation des données du serveur réussie.")
+            logger.info("Récuperation des données du serveur réussie.")
 
-        if self.serverPath is not None:
-            self.batPath = findSpecifiedFileByExtension('.bat', self.serverPath)
+        if self.path is not None:
+            self.batPath = findSpecifiedFileByExtension('.bat', self.path)
         else:
             self.batPath = None
 
@@ -265,9 +279,9 @@ class Server:
         conn = db.getConnexion()
         cursor = conn.cursor()
         cursor.execute(f"""
-            INSERT INTO servers (uuid, name, lastUseDate, maxRam, version, serverType, serverPath) 
+            INSERT INTO servers (uuid, name, lastUseDate, maxRam, version, serverType, path) 
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (self.uuid, self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.serverPath))
+        """, (self.uuid, self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path))
         conn.commit()
         conn.close()
 
@@ -276,22 +290,21 @@ class Server:
         cursor = conn.cursor()
         cursor.execute(f"""
             UPDATE servers 
-            SET name = ?, lastUseDate = ?, maxRam = ?,  version = ?, sTye = ?, serverPath = ?
+            SET name = ?, lastUseDate = ?, maxRam = ?,  version = ?, sTye = ?, path = ?
             WHERE uuid = {self.uuid}
-        """, (self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.serverPath))
+        """, (self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path))
         conn.commit()
         conn.close()
 
     def getPropertiesPath(self):
-        return findSpecifiedFileByExtension('.properties', self.serverPath)
+        return findSpecifiedFileByExtension('.properties', self.path)
 
     def loadDatas(self) -> None:
         # ETAT : Ok
         # DOC : Ok
 
         """
-        Cette fonction permet de mettre a jour les attributs du serveur en récuperant les données depuis le fichiers
-        Json.
+        Cette fonction permet de mettre a jour les attributs du serveur en récuperant les données depuis la bdd sqlite
         """
         conn = db.getConnexion()
         cursor = conn.cursor()
@@ -305,7 +318,7 @@ class Server:
         self.maxRam: int = servers["maxRam"]
         self.version: str = servers["version"]
         self.serverType: str = servers["serverType"]
-        self.serverPath: str = servers["serverPath"]
+        self.path: str = servers["path"]
 
     def getPropertiesAsDict(self) -> {str: str}:
         dict_ = {}
@@ -328,7 +341,7 @@ class Server:
         """
         Fonction qui récupère le contenu des dernières logs du serveur
         """
-        eulaLatestLogPath = pathlib.Path(self.serverPath) / "logs/latest.log"
+        eulaLatestLogPath = pathlib.Path(self.path) / "logs/latest.log"
         if not eulaLatestLogPath.exists():
             logger.error("Aucun fichier de logs n'a pu être récupéré")
             return
