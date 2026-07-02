@@ -39,14 +39,14 @@
     console.warn(tabName);
     switch (tabName) {
       case "Console":
-        goto("/panel/console");
+        goto(`/panel/console?uuid=${uuid}`);
         break;
       case "Fichiers":
         console.warn(serverPath);
         await Command.create("explorer", [serverPath]).execute();
         break;
       case "Parametres":
-        goto("/panel/parametres");
+        goto(`/panel/parametres?uuid=${uuid}`);
         break;
     }
   }
