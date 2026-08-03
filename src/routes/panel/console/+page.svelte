@@ -171,6 +171,7 @@
       metricsWs.close();
     }
   });
+
 </script>
 
 <div class="container">
@@ -200,6 +201,7 @@
         <DataDisplayer stat="Joueurs connectés" bind:value={onlinePlayers} />
         <DataDisplayer stat="Charge CPU" bind:value={cpuUsage} />
         <DataDisplayer stat="Ram utilisée" bind:value={ramUsage} />
+        
       </ul>
     </div>
   </div>

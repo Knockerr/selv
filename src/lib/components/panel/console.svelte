@@ -56,12 +56,12 @@
 </div>
 
 <style>
-:root {
-  --consoleBg: #0b1020;
-  --consoleInputBg: #070b17;
-  --consoleBorder: #1f2a44;
-  --consoleBorderShadow: #3b82f644;
-}
+  :root {
+    --consoleBg: #0b1020;
+    --consoleInputBg: #070b17;
+    --consoleBorder: #1f2a44;
+    --consoleBorderShadow: #ffffff3b;
+  }
 
   .component {
     display: flex;
@@ -69,9 +69,7 @@
     align-items: center;
     height: 80%;
     width: 70%;
-    box-shadow:
-      0 0 13px var(--consoleBorderShadow),
-      0 0 20px;
+    box-shadow: 0 0 5px var(--consoleBorderShadow);
     border-radius: 10px;
   }
 

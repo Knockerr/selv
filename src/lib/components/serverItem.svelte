@@ -161,7 +161,13 @@
   #quickButtons {
     display: flex;
     flex-direction: row;
-    gap: 5px;
+    gap: 12px;
+  }
+
+  #quickButtons button{
+    padding: 0;
+    height: fit-content;
+    width: fit-content;
   }
 
   #quickButtons:hover {

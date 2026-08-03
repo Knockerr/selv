@@ -80,7 +80,7 @@
       placeholder="Nouveau nom"
       iconPath={pathDb.pencil}
       label="Renommer le dossier"
-      className="max-w-[calc(100%-2rem)]"
+      className="max-w-[calc(100% - 2rem)]"
       bind:value={newName}
     />
     <div class="flex flex-row w-full justify-start">

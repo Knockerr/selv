@@ -3,6 +3,7 @@
   import { pathDb } from "$lib/icons/pathDb";
   import { path } from "@tauri-apps/api";
   import { Label, Select } from "bits-ui";
+  import { untrack } from "svelte";
 
   let {
     value = $bindable(""),
@@ -10,16 +11,23 @@
     label,
     contentProps,
     iconPath = pathDb.cross,
+    onchange = (v) => {},
     placeholder,
-    ...restProps
+    className,
+    style,
+    width = "100%",
+    ...others
   } = $props();
 </script>
 
-<div class="relative flex flex-col gap-1">
-  <p class="text-sm font-medium">{label}</p>
-  <Select.Root bind:value {...restProps} type="single">
+<div class="flex flex-col items-start gap-1 box-border" {...others}>
+  {#if label}
+    <p class="text-sm font-medium my-0">{label}</p>
+  {/if}
+  <Select.Root bind:value type="single">
     <Select.Trigger
-      class="h-input capitalize rounded-9px border-border-input bg-background data-placeholder:text-foreground-alt/50 text-white inline-flex w-74 touch-none select-none items-center border px-2.75 text-sm transition-colors"
+      style={`width: ${width}; ${style}`}
+      class={`h-input capitalize rounded-9px border-border-input bg-background data-placeholder:text-foreground-alt/50 text-white inline-flex touch-none select-none items-center border px-2.75 text-sm transition-colors ${className}`}
     >
       <Icon path={iconPath} size="22px" />
       <Select.Value {placeholder} class="pl-1" />

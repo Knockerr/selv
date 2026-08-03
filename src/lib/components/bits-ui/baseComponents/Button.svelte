@@ -9,20 +9,11 @@
     emphasize = false,
     style = "",
     onclick,
-    variant = 0,
     label,
-    className,
+    className = "",
     children,
     ...others
   } = $props();
-
-  const color = $derived(emphasize ? "#6e41e2" : "transparent");
-  const hoverColor = $derived(
-    emphasize ? "#8151f8" : "rgb(255, 255, 255, 0.1)",
-  );
-  const activeColor = $derived(
-    emphasize ? "#7140ee" : "rgb(255, 255, 255, 0.15)",
-  );
 </script>
 
 <div class="flex flex-col gap-1">
@@ -30,8 +21,8 @@
     <span class="text-sm font-semibold">{label}</span>
   {/if}
   <button
-    class="component ${className}"
-    style={`--bgColor: ${color}; --bgHoverColor: ${hoverColor}; --bgActiveColor: ${activeColor}; ${style}`}
+    class="component {className}"
+    class:emphasize
     {onclick}
     {...others}
   >
@@ -42,61 +33,66 @@
   </button>
 </div>
 
-{#if variant == 0}
-  <style>
-    .component {
-      --bgColor: #ddd;
-      --bgHoverColor: #ddd;
-      --bgActiveColor: #ddd;
-    }
+<style>
+  .component {
+    background-color: transparent;
+    border: 1px solid #1f2937;
+    border-radius: 7px;
+    color: white;
+    font-family: "Open Sans", sans-serif;
+    height: 37px;
+    font-size: 14px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition:
+      background-color 0.3s ease,
+      transform 0.3s ease;
+  }
 
-    .component {
-      background-color: var(--bgColor);
-      border: 1px solid #1f2937;
-      border-radius: 7px;
-      color: white;
-      font-family: "Open Sans", sans-serif;
-      height: 37px;
-      font-size: 14px;
-      padding: 8px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      transition:
-        background-color 0.3s ease,
-        transform 0.3s ease;
-    }
+  .component.emphasize {
+    background-color: #6e41e2;
+  }
 
-    .component:hover {
-      background-color: var(--bgHoverColor);
-      cursor: pointer;
-    }
+  .component:hover {
+    background-color: rgb(255, 255, 255, 0.1);
+    cursor: pointer;
+  }
 
-    .component:hover .iconContainer {
-      transform: scale(1.1);
-    }
+  .component.emphasize:hover {
+    background-color: #8151f8;
+  }
 
-    .component:hover p {
-      transform: scale(1);
-    }
+  .component:hover .iconContainer {
+    transform: scale(1.1);
+  }
 
-    .component:active {
-      transition: background-color 0s;
-      background-color: var(--bgActiveColor);
-    }
+  .component:hover p {
+    transform: scale(1);
+  }
 
-    .iconContainer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.3s ease;
-    }
+  .component:active {
+    transition: background-color 0s;
+    background-color: rgb(255, 255, 255, 0.15);
+  }
 
-    p,
-    .iconContainer {
-      margin: 0;
-    }
-  </style>
-{/if}
+  .component.emphasize:active {
+    transition: background-color 0s;
+    background-color: #8151f8;
+  }
+
+  .iconContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+
+  p,
+  .iconContainer {
+    margin: 0;
+  }
+</style>

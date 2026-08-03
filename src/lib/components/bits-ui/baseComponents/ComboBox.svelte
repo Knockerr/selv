@@ -42,7 +42,7 @@
 </script>
 
 <div class="relative flex flex-col gap-1">
-  <p class="text-sm font-medium">{label}</p>
+  <p class="text-sm font-medium my-0">{label}</p>
   <Combobox.Root {type} {items} bind:value bind:open {...mergedRootProps}>
     <div class="relative w-fit">
       <Icon

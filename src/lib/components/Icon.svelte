@@ -3,6 +3,7 @@
     path,
     color = "#ddd",
     size = "32",
+    style,
     className="",
     vb = "0 0 256 256",
     onclick = () => {},
@@ -15,5 +16,6 @@
   height={size}
   class={className}
   fill={color}
+  {style}
   viewBox={vb}><path d={path}></path></svg
 >

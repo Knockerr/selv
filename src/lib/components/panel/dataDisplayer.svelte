@@ -4,16 +4,16 @@
 
 <div class="component">
   <div class="label">{stat}</div>
-  <p class="displayer">{value ?? "TODO"}</p>
+  <p class="displayer">{value ?? "--"}</p>
 </div>
 
 <style>
   .component {
     height: 80px;
     width: 100%;
-    border: 1px solid #5581a5;
+    border: 1px solid #ffffff5e;
     border-radius: 10px;
-    background-color: rgb(41, 58, 104);;
+    background-color: rgba(255, 255, 255, 0.2);
     display: flex;
     flex-direction: column;
     justify-content: center;

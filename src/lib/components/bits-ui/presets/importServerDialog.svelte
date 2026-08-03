@@ -114,7 +114,7 @@
   <Input
     placeholder="Serveur du [userName] //TODO"
     label="Nom du serveur"
-    className="max-w-[calc(100%-2rem)]"
+    className="max-w-[calc(100% - 2rem)]"
     iconPath={pathDb.pencil}
     bind:value={currentName}
   ></Input>
@@ -138,7 +138,7 @@
   <Input
     placeholder="8"
     label="Ram allouée au serveur"
-    className="max-w-[calc(100%-2rem)]"
+    className="max-w-[calc(100% - 2rem)]"
     iconPath={pathDb.hardDrives}
     bind:value={currentRam}
   ></Input>
