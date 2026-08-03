@@ -102,13 +102,14 @@
     label="Type de serveur"
     placeholder="Choisissez le type de serveur"
     bind:value={currentType}
+    iconPath={pathDb.gears}
   ></Select>
 
   <ComboBox
     placeholder="Entrez la version"
     items={availableVersionItems}
     label="Version de votre serveur"
-    iconPath={pathDb.pencil}
+    iconPath={pathDb.hash}
     type="single"
     bind:value={currentVersion}
   />

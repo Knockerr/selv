@@ -27,7 +27,8 @@ export const settingsBank = [{
                 label: "Spectateur",
                 value: "spectator"
             }
-        ]
+        ],
+        iconPath: pathDb.controller
     },
     {
         name: "Forcer le mode de jeu",
@@ -58,7 +59,8 @@ export const settingsBank = [{
                 label: "Difficile",
                 value: "hard"
             },
-        ]
+        ],
+        iconPath: pathDb.shield
     },
     {
         name: "Hardcore",
@@ -81,7 +83,6 @@ export const settingsBank = [{
         category: "game",
         property: "view-distance",
         type: "number",
-        iconPath: pathDb.pencil
 
     },
     {
@@ -90,7 +91,7 @@ export const settingsBank = [{
         category: "world",
         property: "level-seed",
         type: "input",
-        iconPath: pathDb.pencil
+        iconPath: pathDb.drop
     },
     {
         name: "Structures",
@@ -112,7 +113,7 @@ export const settingsBank = [{
         category: "world",
         property: "max-build-height",
         type: "number",
-        iconPath: pathDb.pencil
+        iconPath: pathDb.ruler
     },
     {
         name: "Apparition des monstres",

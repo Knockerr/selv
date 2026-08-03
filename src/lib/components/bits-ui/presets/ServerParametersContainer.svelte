@@ -60,6 +60,7 @@
             items={setting.options}
             width="120px"
             style="max-height: 45px;"
+            iconPath={setting.iconPath}
           />
         {:else if setting.type === "bool"}
           <Switch bind:checked={values[setting.property].currentValue} />

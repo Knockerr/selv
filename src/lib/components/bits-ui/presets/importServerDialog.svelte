@@ -124,13 +124,14 @@
     label="Type de serveur"
     placeholder="Sélectionnez le type de votre serveur"
     bind:value={currentType}
+    iconPath={pathDb.gears}
   ></Select>
 
   <ComboBox
     placeholder="Entrez la version"
     items={availableVersionItems}
     label="Sélectionnez la version de votre serveur"
-    iconPath={pathDb.pencil}
+    iconPath={pathDb.hash}
     type="single"
     bind:value={currentVersion}
   />
@@ -144,6 +145,7 @@
   ></Input>
 
   <Button
+  iconPath={pathDb.folder}
     onclick={async () => {
       await selectFolderDir();
     }}>Dossier du serveur</Button
