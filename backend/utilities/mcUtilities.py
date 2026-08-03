@@ -32,8 +32,6 @@ def findSpecifiedFileByExtension(extension: str = None, folderPath: str = None) 
             if file.endswith(extension):
                 return os.path.join(root, file)
 
-    raise FileNotFoundError(f"Erreur : Aucun fichier avec l'extension '{extension}' trouvé dans {folderPath}.")
-
 
 async def executeFileAndTrackOutput(path: str = None, fileToExecute: str = None) -> Process:
     """
@@ -201,6 +199,31 @@ class ServerManager:
         else:
             logger.error("No max ram is indicated. One must be provided.")
 
+    def setProperty(self, property, value):
+        value = str(value).lower()
+        propertiesPath = (pathlib.Path(self.server.propertiesPath) or
+                          findSpecifiedFileByExtension(".properties", self.server.path))
+        if not propertiesPath.exists():
+            logger.error(f"Server.properties file path for {self.server.name} does not exist.")
+            return
+
+        with open(propertiesPath, "r") as file:
+            lines = file.readlines()
+
+        for i, line in enumerate(lines):
+            if line.startswith(property + r"="):
+                lines[i] = f"{property}={value}\n"
+                logger.debug(
+                    f"Replaced the value of property {property} to {value} for {self.server.name}"
+                )
+                break
+        else:
+            logger.error(f"Impossible to find property {property} in server.properties for {self.server.name}")
+            return
+
+        with open(propertiesPath, "w") as file:
+            file.writelines(lines)
+
 
 # ----------------------------------------
 # ----------------------------------------
@@ -272,8 +295,11 @@ class Server:
 
         if self.path is not None:
             self.batPath = findSpecifiedFileByExtension('.bat', self.path)
+            self.propertiesPath = findSpecifiedFileByExtension('.properties', self.path)
         else:
+            logger.warning(f"No path seems to exist for server {self.name}")
             self.batPath = None
+            self.propertiesPath = None
 
     def init(self) -> None:
         conn = db.getConnexion()
@@ -334,7 +360,6 @@ class Server:
                 except ValueError as e:
                     logger.error(f"Error while parsing properties.properties as dict -> {e}")
                 dict_[str(key).strip()] = str(value).strip()
-
         return dict_
 
     def getCurrentLogs(self):

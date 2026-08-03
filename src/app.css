@@ -15,7 +15,7 @@
 }
 
 
-@source not inline("container collapse");
+@source not inline("container collapse component");
 
 @plugin "tailwindcss-animate";
 
@@ -282,6 +282,6 @@
 	}
  
 	.link {
-		@apply hover:text-foreground/80 focus-visible:ring-foreground focus-visible:ring-offset-background rounded-xs focus-visible:outline-hidden inline-flex items-center gap-1 font-medium underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-offset-2;
+		@apply focus-visible:ring-foreground focus-visible:ring-offset-background rounded-xs focus-visible:outline-hidden inline-flex items-center gap-1 font-medium underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-offset-2;
 	}
 }

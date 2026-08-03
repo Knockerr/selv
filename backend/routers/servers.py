@@ -157,3 +157,20 @@ async def acceptEulaR(uuid: str):
     serverManager = result["serverManager"]
     await serverManager.acceptEula()
     return {"status": "accepted", "uuid": uuid}
+
+
+class propertyConfig(BaseModel):
+    datas: dict
+
+
+@router.post("/servers/{uuid}/editProperties")
+async def editPropertiesR(uuid: str, propertyConfig: propertyConfig):
+    result = cache.getCurrentServerAndSm(uuid)
+    serverManager = result["serverManager"]
+    datas = propertyConfig.datas
+    print(datas)
+    for property, value in datas.items():
+        serverManager.setProperty(property, value)
+    return {"status": "edited", "uuid": uuid}
+
+
