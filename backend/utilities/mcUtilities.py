@@ -230,6 +230,48 @@ class ServerManager:
 # ----------------------------------------
 
 
+def correctMissingProperties(properties, server):
+    """
+    Contexte: Certaines versions de serveur aléatoires ne contiennent pas toutes les propriétés (bien que celles-ci
+    fonctionnent malgré tout; elles ne sont juste plus dans la liste du server.properties initial.). Cette fonction
+    permet de corriger le fichier si il en manque
+    """
+
+    expectedProperties = {
+        "gamemode": "survival",
+        "force-gamemode": "false",
+        "difficulty": "easy",
+        "hardcore": "false",
+        "pvp": "true",
+        "view-distance": "10",
+        "level-seed": "",
+        "generate-structures": "true",
+        "allow-nether": "true",
+        "max-build-height": "256",
+        "spawn-monsters": "true",
+        "spawn-animals": "true",
+        "spawn-npcs": "true",
+        "max-players": "20",
+        "online-mode": "true",
+        "motd": "A Minecraft Server",
+        "white-list": "false"
+    }
+
+    missingProperties = []
+    if not all(expectedProperties.keys()) in properties.keys():
+        for expectedProperty in expectedProperties.keys():
+            if expectedProperty not in properties.keys():
+                missingProperties.append(expectedProperty)
+
+        for missingProperty in missingProperties:
+            with open(server.getPropertiesPath(), "a") as file:
+                file.write(f"{missingProperty}={expectedProperties[missingProperty]}\n")
+            properties[missingProperty] = expectedProperties[missingProperty]
+    return properties
+
+
+
+
 class Server:
     # DOC : Ok
     """
@@ -347,7 +389,11 @@ class Server:
         self.path: str = servers["path"]
 
     def getPropertiesAsDict(self) -> {str: str}:
-        dict_ = {}
+        propertiesPath = pathlib.Path(self.getPropertiesPath())
+        if not propertiesPath.exists():
+            # TODO : Handle case where the server isn't fully created in the frontend
+            return {}
+        properties = {}
         with open(self.getPropertiesPath(), 'r', encoding='utf-8') as file:
             for line in file:
                 line = line.strip()
@@ -359,8 +405,9 @@ class Server:
                     key, value = line.split("=", 1)
                 except ValueError as e:
                     logger.error(f"Error while parsing properties.properties as dict -> {e}")
-                dict_[str(key).strip()] = str(value).strip()
-        return dict_
+                properties[str(key).strip()] = str(value).strip()
+        properties = correctMissingProperties(properties, self)
+        return properties
 
     def getCurrentLogs(self):
         """

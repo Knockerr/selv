@@ -2,6 +2,9 @@ import {
     pathDb
 } from "$lib/icons/pathDb"
 
+// Warning: Any addition of removal of a property must be duplicated in the backend, in the 'expectedProperties' list
+//   of the correctMissingProperties() function
+
 export const settingsBank = [{
         name: "Mode de jeu",
         description: "Mode de jeu par défaut pour les nouveaux joueurs",
