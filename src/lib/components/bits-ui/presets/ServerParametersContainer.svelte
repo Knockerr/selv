@@ -3,30 +3,15 @@
   import Input from "../baseComponents/Input.svelte";
   import Select from "../baseComponents/select.svelte";
   import Switch from "../baseComponents/switch.svelte";
-  import SaveSnackbar from "../baseComponents/SaveSnackbar.svelte";
   import Number from "../baseComponents/number.svelte";
   import { onMount, untrack } from "svelte";
   import { error } from "@sveltejs/kit";
+  import { load } from "@tauri-apps/plugin-store";
 
   // Settings corresponds to an array of settings from settingsBank
-  const { uuid, settings, label } = $props();
+  let { uuid, settings, label, values = $bindable() } = $props();
 
-  let values = $state();
-
-  let isPageDirty = $derived.by(() => {
-    if (!values) return false;
-    return Object.values(values).some((value) => value.isDirty);
-  });
-  $inspect(isPageDirty).with(() => {
-    console.warn("isPageDirty", isPageDirty);
-  });
   let valuesInitialized = $state(false);
-
-  function formatType(val) {
-    if (val === "true") return true;
-    if (val === "false") return false;
-    return val;
-  }
 
   async function loadProperties() {
     let result = {};
@@ -35,7 +20,6 @@
       "http://localhost:8000/api/servers/" + uuid + "/properties",
     );
     const datas = await response.json();
-    console.warn(datas);
     const properties = datas.properties;
     settings.forEach((setting) => {
       const property = setting.property;
@@ -55,63 +39,11 @@
     return result;
   }
 
-  function cancelChanges() {
-    Object.keys(values).forEach((property) => {
-      values[property].currentValue = values[property].initValue;
-    });
-  }
-
   onMount(async () => {
-    values = await loadProperties();
+    const res = await loadProperties();
+    Object.assign(values, res)
     valuesInitialized = true;
   });
-
-  function redefineDirty() {
-    Object.keys(values).forEach((property) => {
-      const isValDirty =
-        values[property]["initValue"] !== values[property]["currentValue"];
-
-      untrack(() => {
-        values[property]["isDirty"] = isValDirty;
-      });
-    });
-  }
-
-  $effect(() => {
-    if (!values) return;
-    redefineDirty();
-  });
-
-  async function sendChanges() {
-    const dirtyProperties = Object.keys(values).filter(
-      (property) => values[property].isDirty,
-    );
-    if (!dirtyProperties) {
-      console.error("None of the values are dirty..");
-      return;
-    }
-    console.warn("dirtyProperties", dirtyProperties);
-    const dirtyPropertiesClean = Object.fromEntries(
-      dirtyProperties.map((property) => [
-        property,
-        values[property].currentValue,
-      ]),
-    );
-    console.warn("dirtyPropertiesClean", dirtyPropertiesClean);
-    const res = await fetch(
-      "http://localhost:8000/api/servers/" + uuid + "/editProperties",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          datas: dirtyPropertiesClean,
-        }),
-      },
-    );
-    values = await loadProperties();
-  }
 </script>
 
 <Container {label}>
@@ -150,14 +82,6 @@
     </div>
   {/each}
 </Container>
-
-<SaveSnackbar
-  label="Une ou plusieurs modifications ne sont pas sauvegardées!"
-  oncancel={cancelChanges}
-  onsave={sendChanges}
-  className="absolute bottom-20"
-  bind:visible={isPageDirty}
-/>
 
 <style>
   .itemContainer {
