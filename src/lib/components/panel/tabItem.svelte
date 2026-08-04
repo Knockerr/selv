@@ -13,6 +13,7 @@
   class="component"
   onclick={async () => {
     await onclick();
+
   }}
   class:selected={isSelected}
 >
@@ -35,7 +36,7 @@
     justify-content: flex-start;
     padding: 0;
     padding-left: 20px;
-    height: 45px;
+    height: fit-content;
     gap: 10px;
     border: 0;
     border-radius: 5px;

@@ -13,6 +13,7 @@
   import { onDestroy, onMount, untrack } from "svelte";
 
   let serverIp = $state("Récuperation...");
+  let serverName = $state("Récuperation...");
   let ramUsage = $state("Récuperation...");
   let cpuUsage = $state("Récuperation...");
   let uptime = $state("Récuperation...");
@@ -51,7 +52,7 @@
       {
         method: "POST",
       },
-    )
+    );
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
@@ -68,6 +69,21 @@
       .then((data) => {
         console.log("data", data.ip);
         serverIp = data.ip;
+      })
+      .catch((err) => console.error(err));
+  }
+
+  function capitalize(str) {
+    return String(str).charAt(0).toUpperCase() + String(str).slice(1);
+  }
+
+  function getServerName() {
+    fetch("http://localhost:8000/api/servers/" + uuid + "/name", {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        serverName = capitalize(data.name);
       })
       .catch((err) => console.error(err));
   }
@@ -170,6 +186,8 @@
       hookConsole();
       hookMetrics();
     }
+
+    getServerName();
   });
 
   onDestroy(() => {
@@ -181,6 +199,8 @@
 </script>
 
 <div class="container">
+  <h1 class="title">{serverName}</h1>
+
   <div class="rightSideElemsContainer">
     <Console {consoleContent} {uuid} bind:content={consoleContent} />
     <div class="executionPanel">
@@ -232,21 +252,31 @@
     height: 100vh;
     overflow: hidden;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     width: 100%;
+  }
+
+  .title {
+    width: 100%;
+    padding: 5px 50px;
+    box-sizing: border-box;
+    font-family: var(--robotFont);
+    font-size: 3rem;
+    font-weight: 500;
   }
 
   .rightSideElemsContainer {
     width: 80%;
-    height: 80%;
+    height: 100%;
     display: flex;
     flex-direction: row;
     align-self: flex-end;
     gap: 20px;
     margin: 0;
-    margin-left: 15%;
+    position: relative;
+    left: -5%;
     margin-bottom: 5%;
   }
 

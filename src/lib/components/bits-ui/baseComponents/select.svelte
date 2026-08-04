@@ -30,7 +30,9 @@
       class={`h-input capitalize rounded-9px border-border-input bg-background-dark data-placeholder:text-foreground-alt/50 text-white inline-flex touch-none select-none items-center border px-2.75 text-sm transition-colors ${className}`}
     >
       <Icon path={iconPath} size="22px" />
-      <Select.Value {placeholder} class="pl-1" />
+      <Select.Value {placeholder} class="pl-1">
+        {items.find((i) => i.value === value)?.label ?? placeholder}
+      </Select.Value>
     </Select.Trigger>
     <Select.Portal>
       <Select.Content
