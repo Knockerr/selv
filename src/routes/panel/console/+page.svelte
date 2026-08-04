@@ -8,6 +8,7 @@
   import PanelTabList from "$lib/components/panel/panelTabList.svelte";
   import EulaWindow from "$lib/components/windowsSystem/WindowsBank/eulaWIndow/eulaWindow.svelte";
   import { windowsManager } from "$lib/components/windowsSystem/windowsManager.svelte";
+  import { sidebarStore } from "$lib/sideBarsStore.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import { onDestroy, onMount, untrack } from "svelte";
 
@@ -24,6 +25,10 @@
 
   const params = new URLSearchParams(window.location.search);
   let uuid = params.get("uuid") ?? "demoUuid";
+
+  onMount(() => {
+    sidebarStore.setCurrentTab("panel", "Console")
+  });
 
   function startServer() {
     consoleContent = "";

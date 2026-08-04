@@ -28,7 +28,6 @@
   });
 
   const tabs = $state(["Console", "Fichiers", "Parametres"]);
-  const unselectableTabs = ["Fichiers"]
 
   const tabsIcons = {
     Console: pathDb.treeStructure,
@@ -64,7 +63,6 @@
         tabName={tab}
         tabIconPath={tabsIcons[tab]}
         onclick={() => handleTabClick(tab)}
-        unselectable={unselectableTabs.includes(tab)}
       />
     {/each}
   </div>

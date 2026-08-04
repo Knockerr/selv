@@ -13,9 +13,6 @@
   class="component"
   onclick={async () => {
     await onclick();
-    if (!unselectable) {
-      sidebarStore.setCurrentTab("panel", tabName);
-    }
   }}
   class:selected={isSelected}
 >
