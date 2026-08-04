@@ -2,6 +2,7 @@
   // @ts-nocheck
 
   import { goto } from "$app/navigation";
+  import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";
   import Console from "$lib/components/panel/console.svelte";
   import DataDisplayer from "$lib/components/panel/dataDisplayer.svelte";
   import PanelTabList from "$lib/components/panel/panelTabList.svelte";
@@ -25,7 +26,7 @@
   let uuid = params.get("uuid") ?? "demoUuid";
 
   function startServer() {
-    consoleContent = ""
+    consoleContent = "";
     fetch("http://localhost:8000/api/servers/" + uuid + "/start", {
       method: "POST",
     })
@@ -119,7 +120,7 @@
       .then((res) => res.json())
       .then((data) => {
         serverLogs = data.logs;
-        serverLogs.forEach(line => {
+        serverLogs.forEach((line) => {
           consoleContent += line;
         });
       })
@@ -172,27 +173,28 @@
       metricsWs.close();
     }
   });
-
 </script>
 
 <div class="container">
   <div class="rightSideElemsContainer">
-    <Console {consoleContent} {uuid} bind:content={consoleContent}/>
+    <Console {consoleContent} {uuid} bind:content={consoleContent} />
     <div class="executionPanel">
       <div class="buttonsRow">
-        <button
-          id="start"
+        <Button
           onclick={() => {
             startServer();
           }}
-          disabled={serverStatus === "on"}>START</button
+          style="width: 85px; height:45px; background-color:rgba(80, 80, 255, 0.9); letter-spacing:1px;"
+          disabled={serverStatus === "on"}
+          iconPath="">START</Button
         >
-        <button
-          id="stop"
+        <Button
           onclick={() => {
             stopServer();
           }}
-          disabled={serverStatus === "off"}>STOP</button
+          style="width: 85px; height:45px; background-color:rgba(255, 25, 25, 0.8); letter-spacing:1px;"
+          disabled={serverStatus === "off"}
+          iconPath="">STOP</Button
         >
       </div>
 
@@ -202,7 +204,6 @@
         <DataDisplayer stat="Joueurs connectés" bind:value={onlinePlayers} />
         <DataDisplayer stat="Charge CPU" bind:value={cpuUsage} />
         <DataDisplayer stat="Ram utilisée" bind:value={ramUsage} />
-        
       </ul>
     </div>
   </div>
@@ -252,6 +253,8 @@
     width: fit-content;
     min-width: 150px;
     max-width: 250px;
+    height: 80%;
+    padding-top: 10px;
   }
 
   .buttonsRow {
@@ -260,42 +263,6 @@
     justify-content: space-around;
     align-items: center;
     width: 100%;
-  }
-
-  .buttonsRow button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    outline: none;
-    border: none;
-    width: 40%;
-    height: 50px;
-    border-radius: 15px;
-  }
-
-  #start {
-    background-color: rgb(0, 255, 0);
-  }
-
-  #start:hover {
-    background-color: rgb(0, 224, 0);
-  }
-
-  #start:active {
-    background-color: rgb(0, 160, 0);
-  }
-
-  #stop {
-    background-color: rgb(255, 0, 0);
-  }
-
-  #stop:hover {
-    background-color: rgb(224, 0, 0);
-  }
-
-  #stop:active {
-    background-color: rgb(160, 0, 0);
   }
 
   .datasList {

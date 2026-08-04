@@ -11,6 +11,7 @@
     onclick,
     label,
     className = "",
+    disabled = false,
     children,
     ...others
   } = $props();
@@ -24,11 +25,15 @@
     class="component {className}"
     class:emphasize
     {onclick}
+    {style}
+    {disabled}
     {...others}
   >
-    <div class="iconContainer">
-      <Icon path={iconPath} size={iconSize} color="white" />
-    </div>
+    {#if iconPath}
+      <div class="iconContainer">
+        <Icon path={iconPath} size={iconSize} color="white" />
+      </div>
+    {/if}
     <p>{@render children?.()}</p>
   </button>
 </div>
@@ -50,19 +55,35 @@
     transition:
       background-color 0.3s ease,
       transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
   }
 
   .component.emphasize {
     background-color: #6e41e2;
   }
 
-  .component:hover {
+  .component::after {
+    content: "";
+    height: 125%;
+    width: 125%;
+    z-index: 999;
+    position: absolute;
+    background-color: transparent;
+    transition: 0.3s ease all;
+  }
+
+  .component:hover::after {
     background-color: rgb(255, 255, 255, 0.1);
     cursor: pointer;
   }
-
-  .component.emphasize:hover {
-    background-color: #8151f8;
+  
+  .component:disabled::after {
+    background-color: rgb(0, 0, 0, 0.5);
+    cursor: pointer;
+  }
+  .component:disabled {
+    border: none;
   }
 
   .component:hover .iconContainer {
