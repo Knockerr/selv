@@ -27,7 +27,7 @@
   let uuid = params.get("uuid") ?? "demoUuid";
 
   onMount(() => {
-    sidebarStore.setCurrentTab("panel", "Console")
+    sidebarStore.setCurrentTab("panel", "Console");
   });
 
   function startServer() {
@@ -39,15 +39,24 @@
       .then((data) => console.log("data -> ", data))
       .catch((error) => console.error(error));
     serverStatus = "on";
+    hookConsole();
+    hookMetrics();
   }
 
-  function stopServer() {
-    fetch("http://localhost:8000/api/servers/" + uuid + "/stop", {
-      method: "POST",
-    })
-      .then((res) => res.json())
-      .then((data) => console.log("data -> ", data))
-      .catch((error) => console.error(error));
+  async function stopServer() {
+    serverStatus = "closing";
+
+    let res = await fetch(
+      "http://localhost:8000/api/servers/" + uuid + "/stop",
+      {
+        method: "POST",
+      },
+    )
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    consoleWs?.close();
+    metricsWs?.close();
     serverStatus = "off";
   }
 
@@ -154,22 +163,13 @@
         if (serverStatus === "on") recovery = true;
       })
       .catch((err) => console.error(err));
-  });
 
-  $effect(() => {
-    let _ = serverStatus;
-    untrack(() => {
-      if (serverStatus === "on") {
-        console.info("Server status detected as on.");
-        if (recovery) recoverConsoleLogs();
-        hookConsole();
-        hookMetrics();
-      } else if (serverStatus === "off") {
-        console.info("Server status detected as off.");
-        consoleWs?.close();
-        metricsWs?.close();
-      }
-    });
+    if (serverStatus === "on") {
+      console.info("Server status detected as on.");
+      if (recovery) recoverConsoleLogs();
+      hookConsole();
+      hookMetrics();
+    }
   });
 
   onDestroy(() => {
@@ -190,7 +190,7 @@
             startServer();
           }}
           style="width: 85px; height:45px; background-color:rgba(80, 80, 255, 0.9); letter-spacing:1px;"
-          disabled={serverStatus === "on"}
+          disabled={!(serverStatus === "off")}
           iconPath="">START</Button
         >
         <Button
@@ -198,7 +198,7 @@
             stopServer();
           }}
           style="width: 85px; height:45px; background-color:rgba(255, 25, 25, 0.8); letter-spacing:1px;"
-          disabled={serverStatus === "off"}
+          disabled={!(serverStatus === "on")}
           iconPath="">STOP</Button
         >
       </div>

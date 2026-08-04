@@ -59,7 +59,7 @@ class ServerManager:
 
     def __init__(self, server: "Server" = None):
         self.server = server
-        self.process = None
+        self.process: Process | None = None
         if self.server is None or type(self.server) is not Server:
             raise ValueError("le serveur précisé n'est pas de type valide ou précisé.")
         self.onlineEvent = asyncio.Event()
@@ -69,7 +69,7 @@ class ServerManager:
 
     async def addLineInConsole(self, textToWrite: str):
         self.process.stdin.write(textToWrite.encode() + b"\n")
-        await self.process.stdin.drain()  # force l'envoi
+        await self.process.stdin.drain()
 
     async def startServer(self) -> None:
         """
@@ -116,17 +116,19 @@ class ServerManager:
 
         try:
             await self.sendCommand(command="stop")
+            await self.process.wait()
+            self.onlineEvent.clear()
+            self.server.isOnline = False
         except Exception as e:
             print(f"Unexpected exception encoutered while stopping server : {e}")
         else:
             logger.info("Server stopped correctly")
-            self.onlineEvent.clear()
-            self.server.isOnline = False
         return
 
     async def handleServerAutoStop(self):
         logger.info("Server stopped correctly")
         self.onlineEvent.clear()
+        await self.process.wait()
         self.server.isOnline = False
 
     async def restartServer(self):

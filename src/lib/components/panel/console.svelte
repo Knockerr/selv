@@ -4,7 +4,8 @@
 
   let currentCommand = $state("");
   let textareaEl = $state();
-  let isPinnedToBottom = $state(true);  const bottomLimit = 30;
+  let isPinnedToBottom = $state(true);
+  const bottomLimit = 30;
 
   function handleScroll() {
     if (!textareaEl) return;
@@ -21,12 +22,16 @@
     }
   });
 
-  function sendCommand() {
-    fetch("http://localhost:8000/api/servers/" + uuid + "/sendCommand", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ command: currentCommand }),
-    })
+  async function sendCommand() {
+    console.info("JE SEND" + $state.snapshot(currentCommand));
+    const _ = await fetch(
+      "http://localhost:8000/api/servers/" + uuid + "/sendCommand",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command: currentCommand }),
+      },
+    )
       .then((res) => res.json())
       .then((data) => console.log("data -> ", data))
       .catch((error) => console.error(error));

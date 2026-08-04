@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, HTTPException
 from utilities.serverUtilities import cache
 from utilities import mcUtilities
@@ -89,7 +91,7 @@ async def getServerCurrentLogs(uuid: str):
 async def startServerR(uuid: str):
     result = cache.getCurrentServerAndSm(uuid)
     serverManager = result["serverManager"]
-    await serverManager.startServer()
+    _ = asyncio.create_task(serverManager.startServer())
     return {"status": "started", "uuid": uuid}
 
 
@@ -110,7 +112,7 @@ async def sendCommandR(uuid: str, cmd: CommandModel):
     cmd = cmd.command
     result = cache.getCurrentServerAndSm(uuid)
     serverManager = result["serverManager"]
-    await serverManager.sendCommand(cmd)
+    _ = asyncio.create_task(serverManager.sendCommand(cmd))
     return {"status": "sent", "uuid": uuid}
 
 
@@ -173,5 +175,3 @@ async def editPropertiesR(uuid: str, propertyConfig: propertyConfig):
     for property, value in datas.items():
         serverManager.setProperty(property, value)
     return {"status": "edited", "uuid": uuid}
-
-

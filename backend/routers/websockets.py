@@ -41,8 +41,8 @@ async def consoleHook(webSocket: WebSocket, uuid: str):
 
         await curServerManager.handleServerAutoStop()
         await webSocket.send_text("Extinction du serveur exécutée avec succès.")
-        curServerManager.unsubscribeConsole(queue)
         await webSocket.close(1000, f"Le serveur {uuid} est fermé")
+        curServerManager.unsubscribeConsole(queue)
 
     except WebSocketDisconnect:
         curServerManager.unsubscribeConsole(queue)
@@ -86,11 +86,11 @@ async def metricsHook(webSocket: WebSocket, uuid: str):
             await asyncio.sleep(1)
 
         except WebSocketDisconnect:
-            logger.info(f"Console WebSocket disconnected for {uuid}")
+            logger.info(f"Metrics WebSocket disconnected for {uuid}")
             return
 
         except Exception as e:
-            logger.error(f"Error in console WebSocket: {e}")
+            logger.error(f"Error in metrics  WebSocket: {e}")
 
     await webSocket.send_json({
         "cpu": 0,
