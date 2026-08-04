@@ -22,7 +22,7 @@
   <div class="relative w-full">
     <input
       id={`input-${label}`}
-      class="h-input rounded-card-sm box-border border-border-input bg-background placeholder:text-foreground-alt/50 hover:border-dark-40 focus:ring-foreground focus:ring-offset-background focus:outline-hidden inline-flex w-full items-center border px-4 text-base focus:ring-2 focus:ring-offset-2 sm:text-sm text-white font-medium"
+      class="h-input rounded-card-sm box-border border-border-input bg-background-dark placeholder:text-foreground-alt/50 hover:border-dark-40 focus:ring-foreground focus:ring-offset-background focus:outline-hidden inline-flex w-full items-center border px-4 text-base focus:ring-2 focus:ring-offset-2 sm:text-sm text-white font-medium"
       {placeholder}
       bind:value
     />

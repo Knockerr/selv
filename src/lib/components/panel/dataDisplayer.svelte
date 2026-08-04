@@ -13,7 +13,7 @@
     width: 100%;
     border: 1px solid #ffffff5e;
     border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
     justify-content: center;

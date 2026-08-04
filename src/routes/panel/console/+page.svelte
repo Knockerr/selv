@@ -10,11 +10,11 @@
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import { onDestroy, onMount, untrack } from "svelte";
 
-  let serverIp = $state(10);
-  let ramUsage = $state(10);
-  let cpuUsage = $state(10);
-  let uptime = $state(10);
-  let onlinePlayers = $state(10);
+  let serverIp = $state("Récuperation...");
+  let ramUsage = $state("Récuperation...");
+  let cpuUsage = $state("Récuperation...");
+  let uptime = $state("Récuperation...");
+  let onlinePlayers = $state("Récuperation...");
   let serverStatus = $state("");
 
   let recovery = false;
@@ -25,6 +25,7 @@
   let uuid = params.get("uuid") ?? "demoUuid";
 
   function startServer() {
+    consoleContent = ""
     fetch("http://localhost:8000/api/servers/" + uuid + "/start", {
       method: "POST",
     })
@@ -176,7 +177,7 @@
 
 <div class="container">
   <div class="rightSideElemsContainer">
-    <Console {consoleContent} {uuid} />
+    <Console {consoleContent} {uuid} bind:content={consoleContent}/>
     <div class="executionPanel">
       <div class="buttonsRow">
         <button

@@ -52,7 +52,7 @@
       />
       <Combobox.Input
         {...mergedInputProps}
-        class="h-input pl-11 box-border capitalize rounded-9px border-border-input bg-background data-placeholder:text-foreground-alt/50 text-white inline-flex w-74 touch-none select-none items-center border px-2.75 text-sm transition-colors"
+        class="h-input pl-11 box-border capitalize rounded-9px border-border-input bg-background-dark data-placeholder:text-foreground-alt/50 text-white inline-flex w-74 touch-none select-none items-center border px-2.75 text-sm transition-colors"
         {placeholder}
       />
       <Combobox.Trigger
@@ -62,7 +62,7 @@
     </div>
     <Combobox.Portal>
       <Combobox.Content
-        class="no-scrollbar max-h-100 overflow-y-scroll border-muted bg-background shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 outline-hidden z-50 h-fit min-w-40 select-none rounded-xl border px-1 py-3 data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1 w-full"
+        class="no-scrollbar max-h-100 overflow-y-scroll border-muted bg-background-dark shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 outline-hidden z-50 h-fit min-w-40 select-none rounded-xl border px-1 py-3 data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1 w-full"
         {...contentProps}
       >
         {#each filteredItems as item, i (i + item.value)}

@@ -26,7 +26,7 @@
   }}
 >
   <Switch.Thumb
-    class="bg-background data-[state=unchecked]:shadow-miniborder-background/30 data-[state=checked]:bg-white/60 shadow-popover pointer-events-none block size-6 shrink-0 rounded-full transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0 border"
+    class="bg-background-dark data-[state=unchecked]:shadow-miniborder-background/30 data-[state=checked]:bg-white/60 shadow-popover pointer-events-none block size-6 shrink-0 rounded-full transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0 border"
   />
 </Switch.Root>
 {#if label}

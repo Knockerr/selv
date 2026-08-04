@@ -36,7 +36,7 @@
 <style>
   .component {
     background-color: transparent;
-    border: 1px solid #1f2937;
+    border: 1px solid var(--border-input);
     border-radius: 7px;
     color: white;
     font-family: "Open Sans", sans-serif;

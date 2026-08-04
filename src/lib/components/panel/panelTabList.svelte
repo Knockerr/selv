@@ -28,6 +28,7 @@
   });
 
   const tabs = $state(["Console", "Fichiers", "Parametres"]);
+  const unselectableTabs = ["Fichiers"]
 
   const tabsIcons = {
     Console: pathDb.treeStructure,
@@ -63,6 +64,7 @@
         tabName={tab}
         tabIconPath={tabsIcons[tab]}
         onclick={() => handleTabClick(tab)}
+        unselectable={unselectableTabs.includes(tab)}
       />
     {/each}
   </div>
@@ -78,6 +80,7 @@
     height: 100%;
     width: 300px;
     background-color: #111825;
+    border-right: 1.5px solid #1b2639;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -101,7 +104,7 @@
     font-size: 0.7rem;
     margin: 0;
     margin-left: 5px;
-    margin-bottom: 30px;
+    margin-bottom: 45px;
     align-self: flex-start;
     font-weight: 200;
   }
@@ -112,7 +115,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
     height: max-content;
   }
 </style>

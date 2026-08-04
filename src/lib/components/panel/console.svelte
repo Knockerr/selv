@@ -3,26 +3,47 @@
   const { consoleContent = $bindable(), uuid } = $props();
 
   let currentCommand = $state("");
+  let textareaEl = $state();
+  let isPinnedToBottom = $state(true);  const bottomLimit = 30;
+
+  function handleScroll() {
+    if (!textareaEl) return;
+    const { scrollTop, scrollHeight, clientHeight } = textareaEl;
+    isPinnedToBottom = scrollHeight - scrollTop - clientHeight < bottomLimit;
+  }
+
+  $effect(() => {
+    consoleContent;
+    if (isPinnedToBottom && textareaEl) {
+      requestAnimationFrame(() => {
+        textareaEl.scrollTop = textareaEl.scrollHeight;
+      });
+    }
+  });
 
   function sendCommand() {
     fetch("http://localhost:8000/api/servers/" + uuid + "/sendCommand", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        command: currentCommand,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ command: currentCommand }),
     })
       .then((res) => res.json())
       .then((data) => console.log("data -> ", data))
       .catch((error) => console.error(error));
+  }
+
+  function handleKeydown(e) {
+    if (e.key !== "Enter") return;
+    sendCommand();
+    currentCommand = "";
   }
 </script>
 
 <div class="component">
   <div class="console">
     <textarea
+      bind:this={textareaEl}
+      onscroll={handleScroll}
       id="consoleContent"
       class="consoleContent"
       spellcheck="false"
@@ -36,11 +57,7 @@
       id="commandTextInput"
       placeholder="Commande.."
       bind:value={currentCommand}
-      onkeydown={(e) => {
-        if (event.key !== "Enter") return;
-        sendCommand();
-        currentCommand = "";
-      }}
+      onkeydown={handleKeydown}
     />
     <button
       class="sendCommandButton"
@@ -56,29 +73,25 @@
 </div>
 
 <style>
-  :root {
-    --consoleBg: #0b1020;
-    --consoleInputBg: #070b17;
-    --consoleBorder: #1f2a44;
-    --consoleBorderShadow: #ffffff3b;
-  }
-
   .component {
+    --accent: #6e41e2;
+    --accent-hover: #8151f8;
     display: flex;
     flex-direction: column;
     align-items: center;
     height: 80%;
     width: 70%;
-    box-shadow: 0 0 5px var(--consoleBorderShadow);
+    box-shadow: 0 0 2px var(--dark-10);
     border-radius: 10px;
   }
 
   .console {
     width: 100%;
     height: 100%;
-    background-color: var(--consoleBg);
-    border: 2px var(--consoleBorder) solid;
+    background-color: var(--background-dark);
+    border: 2px solid var(--border-input);
     border-radius: 10px 10px 0 0;
+    border-bottom: none;
     padding: 10px;
     box-sizing: border-box;
     overflow: hidden;
@@ -91,12 +104,13 @@
     border: none;
     box-sizing: border-box;
     padding: 5px;
-    font-size: 0.8rem;
-    letter-spacing: 0.2px;
+    font-size: 0.85rem;
+    letter-spacing: 0.3px;
     font-weight: 200;
+    font-family: "Open Sans", sans-serif;
     background-color: transparent;
     cursor: default;
-    color: white;
+    color: var(--foreground);
     resize: none;
   }
 
@@ -109,42 +123,48 @@
   .commandTextInput {
     flex: 1;
     outline: none;
-    border: none;
+    border: 2px solid var(--border-input);
     height: 25px;
     padding: 10px;
     box-sizing: border-box;
-    background-color: var(--consoleInputBg);
-    color: white;
-    border: 2px var(--consoleBorder) solid;
-    border-top: none;
+    background-color: var(--background-dark);
+    color: var(--foreground);
     border-bottom-left-radius: 10px;
+    font-family: "Open Sans", sans-serif;
+    transition: border-color 0.2s ease;
+  }
+
+  .commandTextInput:focus {
+    border-color: var(--border-input-hover);
   }
 
   .sendCommandButton {
     height: 100%;
     width: 70px;
-    background-color: var(--consoleBorder);
-    color: white;
+    background-color: var(--muted);
+    color: var(--foreground);
     display: flex;
-    flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 0 20px;
-    border: 2px var(--consoleBorder) solid;
+    border: 2px solid var(--border-input);
     border-left: none;
     border-top: none;
     border-bottom-right-radius: 10px;
     cursor: pointer;
-    font-family: sans-serif;
+    font-family: "Open Sans", sans-serif;
     font-weight: 600;
-    transition: background-color 0.2s;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   .sendCommandButton:hover {
-    background-color: rgb(74, 71, 231);
+    background-color: var(--accent);
+    border-color: var(--accent);
   }
 
   .sendCommandButton:active {
-    background-color: rgb(29, 27, 148);
+    transition: background-color 0s;
+    background-color: var(--accent-hover);
   }
 </style>
