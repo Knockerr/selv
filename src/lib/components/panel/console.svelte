@@ -1,6 +1,5 @@
 <script>
-  // @ts-nocheck
-  const { consoleContent = $bindable(), uuid } = $props();
+  const { consoleWs, consoleContent = $bindable(), uuid } = $props();
 
   let currentCommand = $state("");
   let textareaEl = $state();
@@ -23,18 +22,8 @@
   });
 
   async function sendCommand() {
-    console.info("JE SEND" + $state.snapshot(currentCommand));
-    const _ = await fetch(
-      "http://localhost:8000/api/servers/" + uuid + "/sendCommand",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command: currentCommand }),
-      },
-    )
-      .then((res) => res.json())
-      .then((data) => console.log("data -> ", data))
-      .catch((error) => console.error(error));
+    if (consoleWs) consoleWs.send(currentCommand);
+    else console.warn("Console Ws is not binded")
   }
 
   function handleKeydown(e) {

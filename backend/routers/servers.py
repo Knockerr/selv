@@ -109,19 +109,6 @@ async def stopServerR(uuid: str):
     return {"status": "stopped", "uuid": uuid}
 
 
-class CommandModel(BaseModel):
-    command: str
-
-
-@router.post("/servers/{uuid}/sendCommand")
-async def sendCommandR(uuid: str, cmd: CommandModel):
-    cmd = cmd.command
-    result = cache.getCurrentServerAndSm(uuid)
-    serverManager = result["serverManager"]
-    _ = asyncio.create_task(serverManager.sendCommand(cmd))
-    return {"status": "sent", "uuid": uuid}
-
-
 class Configuration(BaseModel):
     name: str
     ram: int

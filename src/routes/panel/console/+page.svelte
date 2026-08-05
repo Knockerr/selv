@@ -88,7 +88,7 @@
       .catch((err) => console.error(err));
   }
 
-  let consoleWs;
+  let consoleWs = $state();
   function hookConsole() {
     consoleWs = new WebSocket(
       `ws://localhost:8000/ws/servers/${uuid}/hooks/console`,
@@ -202,7 +202,12 @@
   <h1 class="title">{serverName}</h1>
 
   <div class="rightSideElemsContainer">
-    <Console {consoleContent} {uuid} bind:content={consoleContent} />
+    <Console
+      {consoleWs}
+      {consoleContent}
+      {uuid}
+      bind:content={consoleContent}
+    />
     <div class="executionPanel">
       <div class="buttonsRow">
         <Button

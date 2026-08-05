@@ -32,12 +32,19 @@ async def consoleHook(webSocket: WebSocket, uuid: str):
         queue = asyncio.Queue()
         curServerManager.subscribeToConsole(queue)
 
-        while True:
-            line = await queue.get()
-            if webSocket.client_state != WebSocketState.CONNECTED:
-                logger.info("Websocket disconnected from ws")
-                break
-            await webSocket.send_text(line.strip())
+        async def sendLines():
+            while True:
+                line = await queue.get()
+                if webSocket.client_state != WebSocketState.CONNECTED:
+                    break
+                await webSocket.send_text(line.strip())
+
+        async def receiveCommands():
+            while True:
+                data = await webSocket.receive_text()
+                await curServerManager.sendCommand(data)
+
+        await asyncio.gather(sendLines(), receiveCommands())
 
         await curServerManager.handleServerAutoStop()
         await webSocket.send_text("Extinction du serveur exécutée avec succès.")
