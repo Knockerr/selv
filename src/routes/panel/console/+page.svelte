@@ -157,9 +157,9 @@
       .catch((err) => console.error(err));
   }
 
-  onMount(() => {
+  onMount(async () => {
     // Fetch IP (temp)
-    fetch("http://localhost:8000/api/servers/" + uuid + "/ip", {
+    let _ = await fetch("http://localhost:8000/api/servers/" + uuid + "/ip", {
       method: "GET",
     })
       .then((res) => res.json())
@@ -170,7 +170,7 @@
       .catch((err) => console.error(err));
 
     // Getting server state on Mount
-    fetch("http://localhost:8000/api/servers/" + uuid + "/status", {
+    _ = await fetch("http://localhost:8000/api/servers/" + uuid + "/status", {
       method: "GET",
     })
       .then((res) => res.json())
