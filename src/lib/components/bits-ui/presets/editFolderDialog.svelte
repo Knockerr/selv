@@ -12,6 +12,7 @@
   import Switch from "../baseComponents/switch.svelte";
   import { uiStore } from "../uiComponentsStore.svelte";
   import ServersManager from "./presetSpecificComponents/ServersManager.svelte";
+  import Confirm from "../baseComponents/Confirm.svelte";
 
   const componentName = `editFolderDialog`;
   const folderName = $derived(uiStore.currentEditedFolder);
@@ -91,8 +92,14 @@
   <ServersManager {folderName} />
 
   <div class="flex flex-rox justify-start">
-    <Button label="Supprimer le dossier" onclick={onDeleteClick}
-      >Supprimer</Button
+    <Confirm
+      onConfirm={onDeleteClick}
+      title="Supression de dossier"
+      description="Êtes vous sûr de vouloir supprimer ce dossier? Vous perdrez votre configuration actuelle."
     >
+      {#snippet triggerButton()}
+        <Button label="Supprimer le dossier">Supprimer</Button>
+      {/snippet}
+    </Confirm>
   </div>
 </Dialog>

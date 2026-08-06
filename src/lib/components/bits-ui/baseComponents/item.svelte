@@ -4,7 +4,7 @@
 
 <button class="component" {onclick}>
   <div class="infos">
-    <span class="title text-sm font-semibold tracking-wide">{title}</span>
+    <span class="title text-sm text-foreground font-semibold tracking-wide">{title}</span>
     <span class="description text-sm text-foreground-alt">{description}</span>
   </div>
   <div class="input">
@@ -18,9 +18,9 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 30px 15px;
+    padding: 12px 15px;
     box-sizing: border-box;
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.15);
     border: 1px solid #dddddd62;
     border-radius: 15px;
     outline: none;

@@ -19,7 +19,9 @@
 
 <div class="flex flex-col gap-1">
   {#if label}
-    <span class="text-sm font-semibold">{label}</span>
+    <span class="text-sm font-semibold text-foreground" onclick={(e) => {e.stopPropagation()}}
+      >{label}</span
+    >
   {/if}
   <button
     class="component {className}"
@@ -77,7 +79,7 @@
     background-color: rgb(255, 255, 255, 0.1);
     cursor: pointer;
   }
-  
+
   .component:disabled::after {
     background-color: rgb(0, 0, 0, 0.5);
     cursor: pointer;
