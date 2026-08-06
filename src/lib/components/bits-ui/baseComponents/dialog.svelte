@@ -31,7 +31,9 @@
       >
         {title}
       </Dialog.Title>
-      <Separator />
+      <div class="mt-5 mb-6">
+        <Separator />
+      </div>
 
       <div class="relative flex flex-col gap-5">
         <Dialog.Description class="text-foreground-alt text-sm">
