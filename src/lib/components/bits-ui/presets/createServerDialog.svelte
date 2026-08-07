@@ -82,6 +82,7 @@
 <Dialog
   title="Création de serveur"
   description="Entrez les specifications et les paramètres de votre serveur."
+  name="createServerDialog"
 >
   {#snippet triggerButton()}
     <Button iconPath={pathDb.plus} iconSize="18" emphasize={true}

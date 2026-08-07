@@ -104,6 +104,7 @@
 <Dialog
   title="Création de serveur"
   description="Entrez les specifications et les paramètres de votre serveur."
+  name="importServerDialog"
 >
   {#snippet triggerButton()}
     <Button iconPath={pathDb.download} iconSize="18" emphasize={false}

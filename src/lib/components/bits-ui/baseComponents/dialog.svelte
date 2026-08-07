@@ -2,6 +2,8 @@
   import { Dialog, Label } from "bits-ui";
   import Separator from "./Separator.svelte";
   import X from "phosphor-svelte/lib/X";
+  import { uiStore } from "../uiComponentsStore.svelte";
+  import { onDestroy, untrack } from "svelte";
   let {
     open = $bindable(false),
     triggerButton,
@@ -10,8 +12,27 @@
     title,
     description,
     children,
+    name,
     ...others
   } = $props();
+
+  // Open the dialog from the store
+  let dialogOpenTrigger = $derived(uiStore.isDialogOpen(name));
+  $effect(() => {
+    if (dialogOpenTrigger) {
+      open = true;
+    }
+  });
+
+  // Close the window in the store on standard closure
+  $effect(() => {
+    open;
+    untrack(() => {
+      if (!open) {
+        uiStore.closeDialog(name);
+      }
+    });
+  });
 </script>
 
 <Dialog.Root bind:open {...others}>

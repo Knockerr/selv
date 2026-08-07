@@ -17,27 +17,14 @@
   const componentName = `editFolderDialog`;
   const folderName = $derived(uiStore.currentEditedFolder);
 
+  let open = $state(false);
+
   $inspect(folderName).with(() => {
     console.info("folderName", folderName);
   });
 
   let switchRef = $state();
   let newName = $state("");
-
-  let dialogOpen = $state(false);
-  let dialogOpenTrigger = $derived(uiStore.isDialogOpen(componentName));
-  $effect(() => {
-    let _ = dialogOpenTrigger;
-    if (dialogOpenTrigger) {
-      dialogOpen = true;
-    }
-  });
-  $effect(() => {
-    let _ = dialogOpen;
-    if (!dialogOpen) {
-      uiStore.closeDialog(componentName);
-    }
-  });
 
   let isFolderFav = $derived(
     folderSystem.getFolderData(folderName)?.isFolderFav || false,
@@ -52,19 +39,20 @@
 
   async function onRenameClick() {
     await folderSystem.getFolder(folderName).rename(newName);
-    dialogOpen = false;
+    open = false;
   }
 
   async function onDeleteClick() {
     await folderSystem.delete(folderName);
-    dialogOpen = false;
+    open = false;
   }
 </script>
 
 <Dialog
   title="Édition de dossier"
   description="Entrez et/ou modifiez les paramètres de votre dossier à votre convenance."
-  bind:open={dialogOpen}
+  name={componentName}
+  bind:open
 >
   <Item
     title="Favori"
