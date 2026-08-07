@@ -1,4 +1,5 @@
 import utilities.mcUtilities as mcUtilities
+from uuid import UUID
 
 
 # Internal cache, for optimization purposes
@@ -17,10 +18,10 @@ class Cache:
             return
         self.storedServerManagers[serverManager.server.uuid] = serverManager
 
-    def isInStoredServers(self, uuid: str):
+    def isInStoredServers(self, uuid: UUID):
         return uuid in self.storedServers
 
-    def isInStoredServerManagers(self, uuid: str):
+    def isInStoredServerManagers(self, uuid: UUID):
         return uuid in self.storedServerManagers
 
     def clearCache(self):
@@ -30,7 +31,7 @@ class Cache:
         self.storedServers = {}
         self.storedServerManagers = {}
 
-    def getCurrentServerAndSm(self, uuid: str):
+    def getCurrentServerAndSm(self, uuid: UUID):
         """
         Get current Server and ServerManager, weither they are stored in cache or not
         :param uuid: uuid du serveur

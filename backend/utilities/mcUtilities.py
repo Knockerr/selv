@@ -6,11 +6,17 @@ from asyncio.subprocess import Process
 import psutil
 from loguru import logger
 import utilities.db as db
+from uuid import UUID
 
 
 # ----------------------------------------
 # ----------------------------------------
 # ----------------------------------------
+
+
+class Stats:
+    # Store currently running servers UUId
+    runningServers: list[UUID] = []
 
 
 def findSpecifiedFileByExtension(extension: str = None, folderPath: str = None) -> str:
@@ -103,6 +109,7 @@ class ServerManager:
         logger.info(f"Server started with PID: {self.pid}")
         self.server.isOnline = True
         self.onlineEvent.set()
+        Stats.runningServers.append(self.server.uuid)
 
     async def stopServer(self):
         """
@@ -123,6 +130,7 @@ class ServerManager:
             print(f"Unexpected exception encoutered while stopping server : {e}")
         else:
             logger.info("Server stopped correctly")
+            Stats.runningServers.remove(self.server.uuid)
         return
 
     async def handleServerAutoStop(self):
@@ -130,6 +138,7 @@ class ServerManager:
         self.onlineEvent.clear()
         await self.process.wait()
         self.server.isOnline = False
+        Stats.runningServers.remove(self.server.uuid)
 
     async def restartServer(self):
         await self.stopServer()
@@ -272,8 +281,6 @@ def correctMissingProperties(properties, server):
     return properties
 
 
-
-
 class Server:
     # DOC : Ok
     """
@@ -285,7 +292,7 @@ class Server:
      - version: str -> la version du serveur.
      - serverType: str -> le "type" de serveur (vanilla, forge, spigot, sponge).
      - path: str -> le chemin du serveur.
-     - uuid: str -> l'identifiant unique du serveur. C'est lui qu'on utilise pour représenter le fichier dans le Json.
+     - uuid: UUID -> l'identifiant unique du serveur. C'est lui qu'on utilise pour représenter le fichier dans le Json.
     \n
     Ses méthodes :
      - getdatas -> Retournes les données du serveur sous forme de dictionnaire. \n
@@ -308,9 +315,9 @@ class Server:
                  version: str = None,
                  serverType: str = None,
                  path: str = None,
-                 uuid: str = None):
+                 uuid: UUID = None):
 
-        self.uuid: str = uuid
+        self.uuid: UUID = uuid
         self.name: str = name
         self.creationDate = creationDate
         self.lastUseDate = lastUseDate
@@ -327,7 +334,7 @@ class Server:
             logger.debug("Aucune des valeurs ne sont définies. Tentative de récuperation des données automatique")
             conn = db.getConnexion()
             cursor = conn.cursor()
-            cursor.execute("SELECT 1 FROM servers WHERE uuid = ?", (self.uuid,))
+            cursor.execute("SELECT 1 FROM servers WHERE uuid = ?", (str(self.uuid),))
             serverInstance = cursor.fetchone()
             conn.close()
             if self.uuid is None or serverInstance is None:
@@ -351,7 +358,7 @@ class Server:
         cursor.execute(f"""
             INSERT INTO servers (uuid, name, lastUseDate, maxRam, version, serverType, path) 
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (self.uuid, self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path))
+        """, (str(self.uuid), self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path))
         conn.commit()
         conn.close()
 
@@ -361,7 +368,7 @@ class Server:
         cursor.execute(f"""
             UPDATE servers 
             SET name = ?, lastUseDate = ?, maxRam = ?,  version = ?, sTye = ?, path = ?
-            WHERE uuid = {self.uuid}
+            WHERE uuid = {str(self.uuid)}
         """, (self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path))
         conn.commit()
         conn.close()
@@ -378,7 +385,7 @@ class Server:
         """
         conn = db.getConnexion()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM servers WHERE uuid = ?", (self.uuid,))
+        cursor.execute("SELECT * FROM servers WHERE uuid = ?", (str(self.uuid),))
         servers = cursor.fetchone()
         conn.close()
 

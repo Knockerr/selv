@@ -1,6 +1,8 @@
 import asyncio
 
 from fastapi import APIRouter, HTTPException
+
+from utilities.mcUtilities import Stats
 from utilities.serverUtilities import cache
 from utilities import mcUtilities
 from pydantic import BaseModel
@@ -11,11 +13,25 @@ from loguru import logger
 import sys
 import platformdirs as plat
 import utilities.db as db
+from uuid import UUID
 
 appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
 
 # Create routeur
 router = APIRouter()
+
+
+# ==========================================
+# ================== GET ===================
+# ==========================================
+
+
+@router.get("/servers/runingServers")
+def getRuningServersR():
+    runingServersStr = []
+    for s in mcUtilities.Stats.runningServers:
+        runingServersStr.append(str(s))
+    return {"runingServers": runingServersStr}
 
 
 @router.get("/servers")
@@ -25,14 +41,14 @@ def getServersR():
     cursor.execute("SELECT * FROM servers")
     result = [dict(row) for row in cursor.fetchall()]
     conn.close()
-    return result
+    return {"servers": result}
 
 
 @router.get("/servers/{uuid}/serverListDatas")
-async def getServerDatas(uuid: str):
+async def getServerDatas(uuid: UUID):
     conn = db.getConnexion()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM servers WHERE UUID = ?", (uuid,))
+    cursor.execute("SELECT * FROM servers WHERE UUID = ?", (str(uuid),))
     curServerDatas = dict(cursor.fetchone())
     conn.close()
     name = curServerDatas['name']
@@ -53,7 +69,7 @@ async def getServerDatas(uuid: str):
 
 
 @router.get("/servers/{uuid}/ip")
-async def getServerIp(uuid: str):
+async def getServerIp(uuid: UUID):
     curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]
     ip = curServer.getPropertiesAsDict()["server-ip"]
     port = curServer.getPropertiesAsDict()["server-port"]
@@ -62,20 +78,20 @@ async def getServerIp(uuid: str):
 
 
 @router.get("/servers/{uuid}/name")
-async def getServerName(uuid: str):
+async def getServerName(uuid: UUID):
     curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]
     return {"name": curServer.name}
 
 
 @router.get("/servers/{uuid}/properties")
-async def getServerProperties(uuid: str):
+async def getServerProperties(uuid: UUID):
     curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]
     properties = curServer.getPropertiesAsDict()
     return {"properties": properties}
 
 
 @router.get("/servers/{uuid}/status")
-async def getServerStatus(uuid: str):
+async def getServerStatus(uuid: UUID):
     curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]
     serverOnline = curServer.isOnline
     if serverOnline:
@@ -85,7 +101,7 @@ async def getServerStatus(uuid: str):
 
 
 @router.get("/servers/{uuid}/logs")
-async def getServerCurrentLogs(uuid: str):
+async def getServerCurrentLogs(uuid: UUID):
     curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]
     if not curServer.isOnline:
         raise HTTPException(status_code=503, detail="Serveur éteint ou indisponible")
@@ -93,18 +109,33 @@ async def getServerCurrentLogs(uuid: str):
     return {"logs": serverLogs}
 
 
+# ==========================================
+# ================== POST ==================
+# ==========================================
+
+
+@router.post("/servers/closeAll")
+async def closeAllR():
+    for serverUuid in Stats.runningServers:
+        result = cache.getCurrentServerAndSm(serverUuid)
+        serverManager: mcUtilities.ServerManager = result["serverManager"]
+        if serverManager.server.isOnline:
+            _ = asyncio.create_task(serverManager.stopServer())
+    return {"status": "stopped"}
+
+
 @router.post("/servers/{uuid}/start")
-async def startServerR(uuid: str):
+async def startServerR(uuid: UUID):
     result = cache.getCurrentServerAndSm(uuid)
-    serverManager = result["serverManager"]
+    serverManager: mcUtilities.ServerManager = result["serverManager"]
     _ = asyncio.create_task(serverManager.startServer())
     return {"status": "started", "uuid": uuid}
 
 
 @router.post("/servers/{uuid}/stop")
-async def stopServerR(uuid: str):
+async def stopServerR(uuid: UUID):
     result = cache.getCurrentServerAndSm(uuid)
-    serverManager = result["serverManager"]
+    serverManager: mcUtilities.ServerManager = result["serverManager"]
     await serverManager.stopServer()
     return {"status": "stopped", "uuid": uuid}
 
@@ -120,7 +151,7 @@ class Configuration(BaseModel):
 async def createServerR(config: Configuration):
     logger.info("Server Creation Detected!")
     uuid = uuidLib.uuid4()
-    utilities.serverCreator.createServer(config.name, str(uuid), config.type, config.version, config.ram)
+    utilities.serverCreator.createServer(config.name, uuid, config.type, config.version, config.ram)
     return {"status": "created", "uuid": str(uuid)}
 
 
@@ -147,9 +178,9 @@ async def importServerR(config: importConfig):
 
 
 @router.post("/servers/{uuid}/acceptEula")
-async def acceptEulaR(uuid: str):
+async def acceptEulaR(uuid: UUID):
     result = cache.getCurrentServerAndSm(uuid)
-    serverManager = result["serverManager"]
+    serverManager: mcUtilities.ServerManager = result["serverManager"]
     await serverManager.acceptEula()
     await serverManager.handleServerAutoStop()
     return {"status": "accepted", "uuid": uuid}
@@ -160,9 +191,9 @@ class propertyConfig(BaseModel):
 
 
 @router.post("/servers/{uuid}/editProperties")
-async def editPropertiesR(uuid: str, propertyConfig: propertyConfig):
+async def editPropertiesR(uuid: UUID, propertyConfig: propertyConfig):
     result = cache.getCurrentServerAndSm(uuid)
-    serverManager = result["serverManager"]
+    serverManager: mcUtilities.ServerManager = result["serverManager"]
     datas = propertyConfig.datas
     print(datas)
     for property, value in datas.items():

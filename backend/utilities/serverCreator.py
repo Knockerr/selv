@@ -1,18 +1,17 @@
 import datetime
 import json
 import os
+import pathlib
+import shutil
 import subprocess
 import sys
+from uuid import UUID
 
-import pathlib
-import uuid
-
-from loguru import logger
-import requests
-import shutil
-import utilities.mcUtilities as mcUtilities
 import platformdirs as plat
-import re
+import requests
+from loguru import logger
+
+import utilities.mcUtilities as mcUtilities
 
 logger.remove()
 logger.add(
@@ -134,7 +133,7 @@ def handleSpigotDownload(version: str):
         file.write(jarFile.content)
 
 
-def handleSpigotCreation(name: str, uuid: str, type_: str, version: str, ram: int):
+def handleSpigotCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
     # Vérification : Si le fichier n'est pas déja téléchargé, l'installer.
     serverFile = jarsDir / 'spigot' / f"Spigot-{version}.jar"
     if not serverFile.exists():
@@ -205,7 +204,7 @@ def handleVanillaDownload(version: str) -> None:
         file.write(jarFile.content)
 
 
-def handleVanillaCreation(name: str, uuid: str, type_: str, version: str, ram: int):
+def handleVanillaCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
     # Vérification : Si le fichier n'est pas déja téléchargé, l'installer.
     serverFile = jarsDir / 'vanilla' / f"Vanilla-{version}.jar"
     if not serverFile.exists():
@@ -256,7 +255,7 @@ def handlePaperDownload(version: str) -> None:
         file.write(jarFile.content)
 
 
-def handlePaperCreation(name: str, uuid: str, type_: str, version: str, ram: int):
+def handlePaperCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
     # Shield qui empeche le téléchargement de versions non prises en charge
     if version.split('.')[1] < '12':
         logger.error("Seul les versions supérieur a la 1.12 sont stable et suportées par paper.")
@@ -329,7 +328,7 @@ def handleForgeDownload(version: str):
         file.write(jarFile.content)
 
 
-def handleForgeCreation(name: str, uuid: str, type_: str, version: str, ram: int):
+def handleForgeCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
     # Vérification : Si le fichier n'est pas déja téléchargé, l'installer.
     serverFile = jarsDir / 'forge' / f"ForgeInstaller-{version}.jar"
     if not serverFile.exists():
@@ -367,7 +366,7 @@ def handleForgeCreation(name: str, uuid: str, type_: str, version: str, ram: int
     logger.debug(f"Objet Server de {name} créé et sauvegardé.")
 
 
-def createServer(name: str, uuid: str, type_: str, version: str, ram: int):
+def createServer(name: str, uuid: UUID, type_: str, version: str, ram: int):
     match type_:
         case "vanilla":
             handleVanillaCreation(name, uuid, type_, version, ram)
