@@ -1,36 +1,38 @@
 import asyncio
+import time
+
 import psutil
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from starlette.websockets import WebSocketState
+from uvicorn.protocols.utils import ClientDisconnected
+
 import utilities.mcUtilities as mcUtilities
 from utilities.serverUtilities import cache
 from loguru import logger
-
+from uuid import UUID
 
 # Create routeur
 router = APIRouter()
 
 
 @router.websocket("/servers/{uuid}/hooks/console")
-async def consoleHook(webSocket: WebSocket, uuid: str):
+async def consoleHook(webSocket: WebSocket, uuid: UUID):
     await webSocket.accept()
 
     curServerManager: mcUtilities.ServerManager = cache.getCurrentServerAndSm(uuid)["serverManager"]
 
     await curServerManager.onlineEvent.wait()
-    queue = asyncio.Queue()
-    curServerManager.subscribeToConsole(queue)
+
+    logger.info("Server detected as online")
+
     try:
-        logger.info("Server detected as online")
-
         if not curServerManager.server.isOnline:
-            logger.error("Server is offline, cannot hook console")
-            return
-
-        logger.info(f"{uuid} successfully hooked to newLineInConsole")
+            raise ConnectionError("Server is offline, cannot hook console")
 
         queue = asyncio.Queue()
         curServerManager.subscribeToConsole(queue)
+
+        logger.info(f"{uuid} successfully hooked to console")
 
         async def sendLines():
             while True:
@@ -61,7 +63,7 @@ async def consoleHook(webSocket: WebSocket, uuid: str):
 
 
 @router.websocket("/servers/{uuid}/hooks/metrics")
-async def metricsHook(webSocket: WebSocket, uuid: str):
+async def metricsHook(webSocket: WebSocket, uuid: UUID):
     await webSocket.accept()
 
     curServerManager = cache.getCurrentServerAndSm(uuid)["serverManager"]
@@ -80,7 +82,7 @@ async def metricsHook(webSocket: WebSocket, uuid: str):
 
     while curServerManager.server.isOnline and p.is_running():
         try:
-            cpu = round(p.cpu_percent(interval=1), 1)
+            cpu = round(p.cpu_percent(interval=None), 1)
 
             mem_info = p.memory_info()
             mem_gb = mem_info.rss / (1024 * 1024 * 1024)
@@ -90,7 +92,12 @@ async def metricsHook(webSocket: WebSocket, uuid: str):
                 "cpu": cpu,
                 "ram": ram
             })
+
             await asyncio.sleep(1)
+
+        except ClientDisconnected:
+            logger.info(f"Metrics WebSocket disconnected for {uuid}")
+            return
 
         except WebSocketDisconnect:
             logger.info(f"Metrics WebSocket disconnected for {uuid}")
