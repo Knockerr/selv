@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 from uuid import UUID
+from datetime import datetime, timezone
 
 import platformdirs as plat
 import requests
@@ -146,8 +147,7 @@ def handleSpigotCreation(name: str, uuid: UUID, type_: str, version: str, ram: i
     shutil.copy(jarsDir / 'spigot' / f'Spigot-{version}.jar', serversDir / name / f'SpigotServer-{version}.jar')
 
     # Récuperer la date
-    now = datetime.datetime.now()
-    creationDate: str = f'{now.year}{now.month}{now.day}{now.hour}{now.minute}'
+    creationDate: str = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     # Créer le fichier start.bat de lancement du serveur
     createStartBatFile(name, version, ram, f'SpigotServer-{version}.jar')
@@ -217,8 +217,7 @@ def handleVanillaCreation(name: str, uuid: UUID, type_: str, version: str, ram: 
     shutil.copy(jarsDir / 'vanilla' / f'Vanilla-{version}.jar', serversDir / name / f'VanillaServer-{version}.jar')
 
     # Récuperer la date
-    now = datetime.datetime.now()
-    creationDate: str = f'{now.year}{now.month}{now.day}{now.hour}{now.minute}'
+    creationDate: str = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     # Créer le fichier start.bat de lancement du serveur
     createStartBatFile(name, version, ram, f'VanillaServer-{version}.jar')
@@ -272,8 +271,7 @@ def handlePaperCreation(name: str, uuid: UUID, type_: str, version: str, ram: in
     shutil.copy(jarsDir / 'paper' / f'Paper-{version}.jar', serversDir / name / f'PaperServer-{version}.jar')
 
     # Récuperer la date
-    now = datetime.datetime.now()
-    creationDate: str = f'{now.year}{now.month}{now.day}{now.hour}{now.minute}'
+    creationDate: str = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     # Créer le fichier start.bat de lancement du serveur
     createStartBatFile(name, version, ram, f'PaperServer-{version}.jar')
@@ -356,8 +354,7 @@ def handleForgeCreation(name: str, uuid: UUID, type_: str, version: str, ram: in
         editAutoForgeBatFile(name, version)
 
     # Récuperer la date
-    now = datetime.datetime.now()
-    creationDate: str = f'{now.year}{now.month}{now.day}{now.hour}{now.minute}'
+    creationDate: str = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     # Créer le serveur
     logger.debug("Création du serveur")
@@ -397,8 +394,7 @@ def getServerRam(name, path):
 def importServer(name: str, path: str | pathlib.Path, ram, version, serverType, uuid):
     # TODO: Create a system that automatically gets servers datas
     # Récuperer la date
-    now = datetime.datetime.now()
-    creationDate: str = f'{now.year}{now.month}{now.day}{now.hour}{now.minute}'
+    creationDate: str = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     logger.debug("Création du serveur")
     # Créer le serveur

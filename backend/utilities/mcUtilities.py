@@ -7,6 +7,7 @@ import psutil
 from loguru import logger
 import utilities.db as db
 from uuid import UUID
+from datetime import datetime, timezone
 
 
 # ----------------------------------------
@@ -81,6 +82,8 @@ class ServerManager:
         """
         Démarre le serveur auquel le ServerManager est affecté.
         """
+        self.server.lastUseDate = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        self.server.save()
         if self.server.isOnline:
             logger.warning("Impossible to start the server - it is already online")
             return
@@ -122,10 +125,10 @@ class ServerManager:
             return
 
         try:
+            self.server.isOnline = False
             await self.sendCommand(command="stop")
             await self.process.wait()
             self.onlineEvent.clear()
-            self.server.isOnline = False
         except Exception as e:
             print(f"Unexpected exception encoutered while stopping server : {e}")
         else:
@@ -365,11 +368,12 @@ class Server:
     def save(self) -> None:
         conn = db.getConnexion()
         cursor = conn.cursor()
+        uuidStr = str(self.uuid)
         cursor.execute(f"""
             UPDATE servers 
-            SET name = ?, lastUseDate = ?, maxRam = ?,  version = ?, sTye = ?, path = ?
-            WHERE uuid = {str(self.uuid)}
-        """, (self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path))
+            SET name = ?, lastUseDate = ?, maxRam = ?,  version = ?, serverType = ?, path = ?
+            WHERE uuid = ?
+        """, (self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path, uuidStr))
         conn.commit()
         conn.close()
 
