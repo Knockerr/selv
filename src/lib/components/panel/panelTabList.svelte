@@ -54,7 +54,7 @@
 </script>
 
 <div class="component">
-  <h1 id="title"><a href="/core/serverList">Panel</a></h1>
+  <h1 id="title"><a href="/core/dashboard">Panel</a></h1>
   <h2 class="topDatas" id="serverUuid">
     {uuid}
   </h2>

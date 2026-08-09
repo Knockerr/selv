@@ -12,7 +12,7 @@
 
   onMount(() => {
     visible = true;
-    goto("/core/serverList");
+    goto("/core/dashboard");
   });
 </script>
 

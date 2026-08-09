@@ -10,6 +10,7 @@
   import { windowsManager } from "$lib/components/windowsSystem/windowsManager.svelte";
   import { sidebarStore } from "$lib/sideBarsStore.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
+  import { stats } from "$lib/stores/stats.svelte";
   import { onDestroy, onMount, untrack } from "svelte";
 
   let serverIp = $state("Récuperation...");
@@ -158,6 +159,9 @@
   }
 
   onMount(async () => {
+    stats.setLastVisitedServer(uuid);
+    stats.addRecentServer(uuid);
+
     // Fetch IP (temp)
     let _ = await fetch("http://localhost:8000/api/servers/" + uuid + "/ip", {
       method: "GET",

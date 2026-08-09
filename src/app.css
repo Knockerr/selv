@@ -45,7 +45,16 @@
   --dark-40: hsla(222, 20%, 90%, 0.4);
   --dark-10: hsla(222, 20%, 90%, 0.1);
   --dark-04: hsla(222, 20%, 90%, 0.04);
+
+  .lc-root-container {
+    --color-primary: var(--color-blue-400);
+    --color-surface-100: var(--color-gray-900);
+    --color-surface-200: var(--color-gray-800);
+    --color-surface-300: var(--color-gray-700);
+    --color-surface-content: var(--color-gray-100);
+  }
 }
+
 
 @theme inline {
   --color-background: var(--background);
@@ -248,8 +257,7 @@
   }
 
   ::selection {
-    background: #fdffa4;
+    background: #2c55a0;
     color: black;
   }
 }
-

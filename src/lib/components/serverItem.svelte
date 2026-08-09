@@ -44,7 +44,8 @@
         if (!data) return;
         name = data.name ?? "";
         serverType = data.type ?? "";
-        lastUse = data.lastUse ?? "";
+        const lastUseUtc = new Date(data.lastUse) || "";
+        lastUse = lastUseUtc.toLocaleString();
         serverVersion = data.version ?? "";
       })
       .catch((err) => console.error("fetch error:", err));
@@ -164,7 +165,7 @@
     gap: 12px;
   }
 
-  #quickButtons button{
+  #quickButtons button {
     padding: 0;
     height: fit-content;
     width: fit-content;

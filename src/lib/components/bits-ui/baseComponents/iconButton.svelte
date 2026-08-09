@@ -1,15 +1,35 @@
 <script>
   import Icon from "$lib/components/Icon.svelte";
 
-  const { iconPath="16", iconSize, onClick } = $props();
+  const {
+    iconPath = "16",
+    iconSize,
+    color = "#998fbb",
+    onclick = () => {},
+    spinOnClick = false,
+    style,
+  } = $props();
+
+  let rotate = $state(false);
 </script>
 
-<button class="composant" onclick={onClick}>
-  <Icon path={iconPath} size={iconSize} color="#998fbb" />
+<button
+  class="component"
+  onclick={(e) => {
+    if (spinOnClick) rotate = true;
+    onclick(e);
+  }}
+  onanimationend={() => {
+    rotate = false;
+  }}
+  class:spin={rotate}
+  {style}
+>
+  <Icon path={iconPath} size={iconSize} {color} />
 </button>
 
 <style>
-  .composant {
+  .component {
     --containerEditButtonSize: 30px;
     background-color: transparent;
     border: 0px solid;
@@ -24,15 +44,29 @@
     transition: background-color 0.2s ease;
   }
 
-  .composant:hover {
-    background-color: #1d2735;
+  .component:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
   }
 
-  .composant:active {
+  .component:active {
     transition:
       background-color 0s ease,
       color 0s ease;
     background-color: #121820;
     color: #998fbb;
+  }
+
+  .component.spin {
+    animation: spin 0.4s ease;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>

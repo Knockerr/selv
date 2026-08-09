@@ -12,15 +12,20 @@
     label,
     className = "",
     disabled = false,
+    width = "fit-content",
+    height = "37px",
     children,
     ...others
   } = $props();
 </script>
 
-<div class="flex flex-col gap-1">
+<div class="flex flex-col gap-1" style:width style:height>
   {#if label}
-    <span class="text-sm font-semibold text-foreground" onclick={(e) => {e.stopPropagation()}}
-      >{label}</span
+    <span
+      class="text-sm font-semibold text-foreground"
+      onclick={(e) => {
+        e.stopPropagation();
+      }}>{label}</span
     >
   {/if}
   <button
@@ -47,7 +52,6 @@
     border-radius: 7px;
     color: white;
     font-family: "Open Sans", sans-serif;
-    height: 37px;
     font-size: 14px;
     padding: 8px 16px;
     display: flex;

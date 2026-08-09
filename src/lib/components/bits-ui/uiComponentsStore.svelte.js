@@ -7,6 +7,7 @@ function createUiComponentStore() {
     return {
         openDialog(dialogName) {
             store.openDialogs.push(dialogName);
+            console.info("Opening dialog " + dialogName);
         },
         closeDialog(dialogName) {
             store.openDialogs.splice(store.openDialogs.indexOf(dialogName));

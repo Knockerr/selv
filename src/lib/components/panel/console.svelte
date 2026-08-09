@@ -1,5 +1,5 @@
 <script>
-  const { consoleWs, consoleContent = $bindable(), uuid } = $props();
+  const { consoleWs, consoleContent = $bindable(""), uuid } = $props();
 
   let currentCommand = $state("");
   let textareaEl = $state();

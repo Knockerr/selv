@@ -102,7 +102,7 @@
 </script>
 
 <Dialog
-  title="Création de serveur"
+  title="Import de serveur"
   description="Entrez les specifications et les paramètres de votre serveur."
   name="importServerDialog"
 >

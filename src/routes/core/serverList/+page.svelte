@@ -91,7 +91,7 @@
   </div>
 </div>
 
-<EditFolderDialog/>
+<EditFolderDialog />
 <ServerCreationWindow refreshFoldersFunction={folderSystemRef.displayFolders} />
 
 <style>
@@ -108,8 +108,9 @@
     background-color: var(--mainBackgroundColor);
     height: 100%;
     margin: 10px 55px;
-    padding: 10px;
-    padding-top: 0;
+    padding-top: 20px;
+    padding: 30px;
+    box-sizing: border-box;
   }
 
   .titleBar {
