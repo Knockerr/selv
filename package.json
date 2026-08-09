@@ -13,6 +13,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@svelte-plugins/tooltips": "^4.0.0-beta.1",
     "@tailwindcss/postcss": "^4.3.1",
     "@tailwindcss/vite": "^4.3.1",
     "@tauri-apps/api": "^2",
@@ -21,6 +22,7 @@
     "@tauri-apps/plugin-shell": "^2.3.5",
     "@tauri-apps/plugin-store": "^2.4.3",
     "bits-ui": "^2.18.1",
+    "layerchart": "^2.1.0",
     "postcss": "^8.5.16",
     "tailwindcss": "^4.3.1"
   },
