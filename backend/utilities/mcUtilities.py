@@ -15,11 +15,6 @@ from datetime import datetime, timezone
 # ----------------------------------------
 
 
-class Stats:
-    # Store currently running servers UUId
-    runningServers: list[UUID] = []
-
-
 def findSpecifiedFileByExtension(extension: str = None, folderPath: str = None) -> str:
     # ETAT : Ok
     # DOC : Ok
@@ -73,6 +68,7 @@ class ServerManager:
         self.pid: int = 0
         self.consoleSubscribers: list = []
         self.updateMaxRam()
+        self.psutilsProcess: psutil.Process | None = None
 
     async def addLineInConsole(self, textToWrite: str):
         self.process.stdin.write(textToWrite.encode() + b"\n")
@@ -82,6 +78,7 @@ class ServerManager:
         """
         Démarre le serveur auquel le ServerManager est affecté.
         """
+        from utilities.miscellaneous import Stats
         self.server.lastUseDate = datetime.now(timezone.utc).isoformat(timespec="seconds")
         self.server.save()
         if self.server.isOnline:
@@ -110,11 +107,13 @@ class ServerManager:
             self.pid = java_pid
 
         logger.info(f"Server started with PID: {self.pid}")
+        self.psutilsProcess = psutil.Process(self.pid)
         self.server.isOnline = True
         self.onlineEvent.set()
         Stats.runningServers.append(self.server.uuid)
 
     async def stopServer(self):
+        from utilities.miscellaneous import Stats
         """
         Méthode pour arreter le serveur auquel le ServerManager est affecté.
         :return:
@@ -134,9 +133,12 @@ class ServerManager:
         else:
             logger.info("Server stopped correctly")
             Stats.runningServers.remove(self.server.uuid)
+        self.psutilsProcess = None
+        self.pid = None
         return
 
     async def handleServerAutoStop(self):
+        from utilities.miscellaneous import Stats
         logger.info("Server stopped correctly")
         self.onlineEvent.clear()
         await self.process.wait()
@@ -237,6 +239,21 @@ class ServerManager:
 
         with open(propertiesPath, "w") as file:
             file.writelines(lines)
+
+    def getPerfs(self):
+        if not self.psutilsProcess:
+            raise ConnectionError("Can't get perfs of offline server")
+
+        cpu = round(self.psutilsProcess.cpu_percent(interval=None), 1)
+
+        mem_info = self.psutilsProcess.memory_info()
+        mem_gb = mem_info.rss / (1024 * 1024 * 1024)
+        mem_form = f"{mem_gb:.2f}"
+
+        return {
+            "cpu": cpu,
+            "ram": mem_form,
+        }
 
 
 # ----------------------------------------

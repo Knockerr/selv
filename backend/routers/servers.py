@@ -2,8 +2,8 @@ import asyncio
 
 from fastapi import APIRouter, HTTPException
 
-from utilities.mcUtilities import Stats
 from utilities.serverUtilities import cache
+from utilities.miscellaneous import Stats
 from utilities import mcUtilities
 from pydantic import BaseModel
 import utilities.serverCreator
@@ -16,6 +16,7 @@ import utilities.db as db
 from uuid import UUID
 
 appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
+serversPath = appDir.user_data_path / "servers"
 
 # Create routeur
 router = APIRouter()
@@ -25,13 +26,22 @@ router = APIRouter()
 # ================== GET ===================
 # ==========================================
 
+@router.get("/serversPerfs")
+def getServersPerfsR():
+    return {"perfs": Stats.averagePerfs}
 
-@router.get("/servers/runingServers")
-def getRuningServersR():
+
+@router.get("/servers/runningServers")
+def getRunningServersR():
     runingServersStr = []
-    for s in mcUtilities.Stats.runningServers:
+    for s in Stats.runningServers:
         runingServersStr.append(str(s))
-    return {"runingServers": runingServersStr}
+    return {"runningServers": runingServersStr}
+
+
+@router.get("/servers/localPath")
+def getLocalPathR():
+    return {"serversPath": str(serversPath)}
 
 
 @router.get("/servers")
@@ -114,8 +124,8 @@ async def getServerCurrentLogs(uuid: UUID):
 # ==========================================
 
 
-@router.post("/servers/closeAll")
-async def closeAllR():
+@router.post("/servers/stopAll")
+async def stopAllR():
     for serverUuid in Stats.runningServers:
         result = cache.getCurrentServerAndSm(serverUuid)
         serverManager: mcUtilities.ServerManager = result["serverManager"]

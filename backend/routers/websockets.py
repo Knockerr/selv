@@ -66,7 +66,7 @@ async def consoleHook(webSocket: WebSocket, uuid: UUID):
 async def metricsHook(webSocket: WebSocket, uuid: UUID):
     await webSocket.accept()
 
-    curServerManager = cache.getCurrentServerAndSm(uuid)["serverManager"]
+    curServerManager: mcUtilities.ServerManager = cache.getCurrentServerAndSm(uuid)["serverManager"]
 
     await curServerManager.onlineEvent.wait()
 
@@ -78,26 +78,37 @@ async def metricsHook(webSocket: WebSocket, uuid: UUID):
 
     logger.info(f"{uuid} successfully hooked to metrics")
 
-    p = psutil.Process(curServerManager.pid)
-
-    while curServerManager.server.isOnline and p.is_running():
+    while curServerManager.server.isOnline:
         try:
-            cpu = round(p.cpu_percent(interval=None), 1)
-
-            mem_info = p.memory_info()
-            mem_gb = mem_info.rss / (1024 * 1024 * 1024)
-            ram = f"{mem_gb:.2f}Go"
-
-            await webSocket.send_json({
-                "cpu": cpu,
-                "ram": ram
-            })
-
+            perfs = curServerManager.getPerfs()
+            await webSocket.send_json(perfs)
             await asyncio.sleep(1)
 
         except ClientDisconnected:
             logger.info(f"Metrics WebSocket disconnected for {uuid}")
             return
+
+        except WebSocketDisconnect:
+            logger.info(f"Metrics WebSocket disconnected for {uuid}")
+            return
+
+        except Exception as e:
+            logger.error(f"Error in metrics  WebSocket: {e}")
+
+    await webSocket.send_json({
+        "cpu": 0,
+        "ram": 0
+    })
+    await webSocket.close(1000, f"Le serveur {uuid} est fermé")
+
+
+@router.websocket("/servers/{uuid}/hooks/metrics")
+async def metricsHook(webSocket: WebSocket, uuid: UUID):
+    await webSocket.accept()
+
+    while True:
+        try:
+            Ellipsis
 
         except WebSocketDisconnect:
             logger.info(f"Metrics WebSocket disconnected for {uuid}")

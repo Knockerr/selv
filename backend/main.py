@@ -1,3 +1,5 @@
+import asyncio
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from routers import servers, websockets
 from starlette.middleware import Middleware
@@ -5,11 +7,20 @@ from starlette.middleware.cors import CORSMiddleware
 import utilities.db as dbManager
 import uvicorn
 import utilities.miscellaneous
+from utilities.miscellaneous import Stats
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    _ = asyncio.create_task(Stats.startPerfsLoop())
+    yield
+
 
 app = FastAPI(
     title="Minecraft Panel API",
     description="API pour gérer vos serveurs Minecraft",
     version="1.0.0",
+    lifespan=lifespan,
     middleware=[
         Middleware(
             CORSMiddleware,

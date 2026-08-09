@@ -1,4 +1,5 @@
-import utilities.mcUtilities as mcUtilities
+from utilities.mcUtilities import Server, ServerManager
+import asyncio
 from uuid import UUID
 
 
@@ -8,12 +9,12 @@ class Cache:
         self.storedServers = {}
         self.storedServerManagers = {}
 
-    def storeServer(self, server: mcUtilities.Server) -> None:
+    def storeServer(self, server: Server) -> None:
         if server.uuid in self.storedServers:
             return
         self.storedServers[server.uuid] = server
 
-    def storeServerManager(self, serverManager: mcUtilities.ServerManager) -> None:
+    def storeServerManager(self, serverManager: ServerManager) -> None:
         if serverManager.server.uuid in self.storedServerManagers:
             return
         self.storedServerManagers[serverManager.server.uuid] = serverManager
@@ -38,11 +39,11 @@ class Cache:
         :return: {"server": Server, "serverManager": ServerManager}
         """
         if not self.isInStoredServers(uuid):
-            server = mcUtilities.Server(uuid=uuid)
+            server = Server(uuid=uuid)
             self.storeServer(server)
 
         if not self.isInStoredServerManagers(uuid):
-            SM: mcUtilities.ServerManager = mcUtilities.ServerManager(server=self.storedServers[uuid])
+            SM: ServerManager = ServerManager(server=self.storedServers[uuid])
             self.storeServerManager(SM)
 
         return {
