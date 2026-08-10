@@ -75,12 +75,6 @@
   }
 
   const isOpen = $derived(windowsManager.openWindows.has(windowId));
-  $effect(() => {
-    isOpen;
-    untrack(() => {
-      console.error("JE veux m'ouvrir!");
-    });
-  });
 </script>
 
 {#if isOpen}

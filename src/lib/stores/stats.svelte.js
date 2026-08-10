@@ -77,7 +77,6 @@ function createStatsStore() {
 
         reloadDashboard() {
             store.dashboardReloadTrigger += 1;
-            console.warn(store.dashboardReloadTrigger)
         },
 
     }
