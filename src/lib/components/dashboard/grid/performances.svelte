@@ -10,6 +10,32 @@
   let cpu = $state("--");
   let ram = $state("--");
 
+  let ws;
+  function hookServersPerfs() {
+    ws = new WebSocket(
+      "ws://localhost:8000/ws/servers/hooks/stats/serversPerfs",
+    );
+
+    ws.onopen = () => {
+      console.info("Connected to servers perfs hook");
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.warn("data " + data);
+      cpu = data.cpu;
+      ram = data.ram;
+    };
+
+    ws.onerror = (err) => {
+      console.error("Error : ", err);
+    };
+
+    ws.onclose = () => {
+      console.info("Closed servers perfs webSocket.");
+    };
+  }
+
   async function updateDatas() {
     const res = await fetch("http://127.0.0.1:8000/api/serversPerfs");
     const data = await res.json();
@@ -20,15 +46,13 @@
       cpu: perf.cpu,
       ram: perf.ram,
     }));
-
-    cpu = datas.at(-1).cpu;
-    ram = datas.at(-1).ram;
   }
 
   onMount(() => {
     updateDatas();
+    hookServersPerfs();
     // Update every min
-    setInterval(updateDatas, 60000);
+    setInterval(updateDatas, 5000);
   });
 
   $effect(() => {

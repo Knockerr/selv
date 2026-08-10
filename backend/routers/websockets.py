@@ -5,6 +5,7 @@ import psutil
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from starlette.websockets import WebSocketState
 from uvicorn.protocols.utils import ClientDisconnected
+from utilities.miscellaneous import Stats
 
 import utilities.mcUtilities as mcUtilities
 from utilities.serverUtilities import cache
@@ -102,23 +103,18 @@ async def metricsHook(webSocket: WebSocket, uuid: UUID):
     await webSocket.close(1000, f"Le serveur {uuid} est fermé")
 
 
-@router.websocket("/servers/{uuid}/hooks/metrics")
-async def metricsHook(webSocket: WebSocket, uuid: UUID):
+@router.websocket("/servers/hooks/stats/serversPerfs")
+async def serversPerfsHook(webSocket: WebSocket):
     await webSocket.accept()
 
-    while True:
+    async for perf in Stats.trackPerfs(delay=1):
         try:
-            Ellipsis
+            await webSocket.send_json(perf)
 
         except WebSocketDisconnect:
-            logger.info(f"Metrics WebSocket disconnected for {uuid}")
-            return
+            logger.info(f"ServersPerfs WebSocket disconnected")
+            break
 
         except Exception as e:
-            logger.error(f"Error in metrics  WebSocket: {e}")
-
-    await webSocket.send_json({
-        "cpu": 0,
-        "ram": 0
-    })
-    await webSocket.close(1000, f"Le serveur {uuid} est fermé")
+            logger.info(f"ServersPerfs WebSocket disconnected with exception : {e}")
+            break

@@ -22,33 +22,36 @@ def initLogger():
 class Stats:
     # Store currently running servers UUId
     runningServers: list[UUID] = []
-    # TODO: Change to 30 if I forgot
     delay = 5
     averagePerfs: list[dict | None] = [{"cpu": 0, "ram": 0}] * int((60 / delay) * 30)
 
     @classmethod
-    async def startPerfsLoop(cls):
-        while True:
-            totalRam = 0
-            totalCpu = 0
+    async def getAveragePerfs(cls):
+        totalRam = 0
+        totalCpu = 0
 
-            if cls.runningServers:
-                for runningServer in cls.runningServers:
-                    curServerManager = cache.getCurrentServerAndSm(runningServer)[
-                        "serverManager"]
-                    perfs = curServerManager.getPerfs()
-                    totalCpu += float(perfs["cpu"])
-                    totalRam += float(perfs["ram"])
-
-                cls.averagePerfs.append({
+        if cls.runningServers:
+            for runningServer in cls.runningServers:
+                curServerManager = cache.getCurrentServerAndSm(runningServer)[
+                    "serverManager"]
+                perfs = curServerManager.getPerfs()
+                totalCpu += float(perfs["cpu"])
+                totalRam += float(perfs["ram"])
+            return {
                     "cpu": totalCpu / len(cls.runningServers),
                     "ram": totalRam / len(cls.runningServers),
-                })
-            else:
-                cls.averagePerfs.append({
+                }
+        else:
+            return {
                     "cpu": 0,
                     "ram": 0,
-                })
+                }
+
+    @classmethod
+    async def startPerfsLoop(cls):
+        while True:
+            averagePerfs = await cls.getAveragePerfs()
+            cls.averagePerfs.append(averagePerfs)
 
             # max lists elem fills last 30 mins
             while len(cls.averagePerfs) > (60 / cls.delay) * 30:
@@ -58,6 +61,13 @@ class Stats:
                 perf["label"] = i
 
             await asyncio.sleep(cls.delay)
+
+    @classmethod
+    async def trackPerfs(cls, delay=5):
+        while True:
+            perf = await cls.getAveragePerfs()
+            yield perf
+            await asyncio.sleep(delay)
 
     @classmethod
     def getServersDatas(cls):
