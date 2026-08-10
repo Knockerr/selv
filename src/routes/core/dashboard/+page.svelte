@@ -12,8 +12,12 @@
   import IconButton from "$lib/components/bits-ui/baseComponents/iconButton.svelte";
   import { pathDb } from "$lib/icons/pathDb";
   import { stats } from "$lib/stores/stats.svelte";
+
   onMount(() => {
     sidebarStore.setCurrentTab("main", "Dashboard");
+    
+    // Reloading all datas automatically all 5s
+    setInterval(stats.reloadDashboard, 5000);
   });
 </script>
 
