@@ -20,9 +20,9 @@
   </div>
   <div class="containerRight">
     {#if isInFolder}
-      <IconButton iconSize="18" iconPath={pathDb.minus} onClick={onSwitchStateButtonClick} />
+      <IconButton iconSize="18" iconPath={pathDb.minus} onclick={onSwitchStateButtonClick} />
     {:else}
-      <IconButton iconSize="18" iconPath={pathDb.plus} onClick={onSwitchStateButtonClick} />
+      <IconButton iconSize="18" iconPath={pathDb.plus} onclick={onSwitchStateButtonClick} />
     {/if}
   </div>
 </div>

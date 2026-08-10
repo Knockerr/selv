@@ -53,7 +53,7 @@
 
     {#if !removeEditButton}
       <IconButton
-        onClick={() => {
+        onclick={() => {
           uiStore.setCurrentEditedFolder(folderName);
           uiStore.openDialog("editFolderDialog");
         }}
