@@ -7,6 +7,8 @@
   import FolderContextMenu from "./contextMenuSystem/ContextMenusBank/FolderContextMenu/FolderContextMenu.svelte";
   import { windowsManager } from "./windowsSystem/windowsManager.svelte";
   import { contextManager } from "./contextMenuSystem/contextMenuManager.svelte";
+  import IconButton from "./bits-ui/baseComponents/iconButton.svelte";
+  import Dropdown from "./bits-ui/baseComponents/Dropdown.svelte";
 
   const { uuid = "" } = $props();
 
@@ -61,6 +63,32 @@
     contextManager.open("folderContextMenu-" + uuid);
     event.stopPropagation();
   }
+
+  const moreDropdownItems = $state([
+    { icon: pathDb.console, label: "Console", onclick: "" },
+    {
+      icon: pathDb.console,
+      label: "Check test",
+      type: "checkItem",
+      value: false,
+      onclick: "",
+    },
+    {
+      type: "separator"
+    },
+    {
+      icon: pathDb.hardDrives,
+      label: "sub test",
+      type: "subContent",
+      onclick: "",
+      childItems: [
+        { icon: pathDb.console, label: "Console", onclick: "" },
+        { icon: pathDb.console, label: "Console", onclick: "" },
+      ],
+    },
+  ]);
+
+  $inspect(moreDropdownItems);
 </script>
 
 <tr>
@@ -103,11 +131,12 @@
   </td>
   <td id="lastUse">{lastUse}</td>
   <td>
-    <button id="moreOptionsButton" class="buttonPreset1">
-      <Icon path={pathDb.threeDotsVertical} size="13" />
-    </button>
+    <Dropdown items={moreDropdownItems}>
+      {#snippet triggerSnippet()}
+        <IconButton iconSize="20" iconPath={pathDb.threeDotsVertical} />
+      {/snippet}
+    </Dropdown>
   </td>
-  <td id="serverUUID" style="display: none">{uuid}</td>
 </tr>
 
 <FolderContextMenu
@@ -196,20 +225,6 @@
     transform: scale(1.6);
     position: relative;
     margin-right: 80px;
-  }
-
-  #moreOptionsButton {
-    text-align: center;
-  }
-
-  #moreOptionsButton:hover {
-    transition: background-color 0.3s ease;
-    background-color: rgb(50, 59, 80);
-  }
-
-  #moreOptionsButton:active {
-    transition: background-color 0s ease;
-    background-color: rgb(32, 38, 54);
   }
 
   @media (max-width: 1225px) {

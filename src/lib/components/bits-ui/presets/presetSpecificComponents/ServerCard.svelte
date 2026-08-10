@@ -16,13 +16,23 @@
 
 <div class="container">
   <div class="containerLeft">
-    <h3 id="folderName">{serverName}</h3>
+    <div class="folderNameContainer">
+      <h3 id="folderName">{serverName}</h3>
+    </div>
   </div>
   <div class="containerRight">
     {#if isInFolder}
-      <IconButton iconSize="18" iconPath={pathDb.minus} onclick={onSwitchStateButtonClick} />
+      <IconButton
+        iconSize="14"
+        iconPath={pathDb.minus}
+        onclick={onSwitchStateButtonClick}
+      />
     {:else}
-      <IconButton iconSize="18" iconPath={pathDb.plus} onclick={onSwitchStateButtonClick} />
+      <IconButton
+        iconSize="14"
+        iconPath={pathDb.plus}
+        onclick={onSwitchStateButtonClick}
+      />
     {/if}
   </div>
 </div>
@@ -57,6 +67,15 @@
     gap: 5px;
     align-items: center;
     margin: 0 5px;
+    margin-right: 15px;
+  }
+
+  .containerLeft {
+    flex: 1;
+  }
+
+  .folderNameContainer {
+    width: 100%;
   }
 
   .containerLeft h3 {
@@ -64,7 +83,8 @@
     font-weight: 400;
     font-size: 15px;
     padding-left: 10px;
+    width: 100%;
+    max-width: 270px;
+    overflow-x: hidden;
   }
-
- 
 </style>

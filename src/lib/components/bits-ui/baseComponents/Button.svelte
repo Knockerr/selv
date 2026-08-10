@@ -19,7 +19,7 @@
   } = $props();
 </script>
 
-<div class="flex flex-col gap-1" style:width style:height>
+<div class="flex flex-col gap-1">
   {#if label}
     <span
       class="text-sm font-semibold text-foreground"
@@ -31,6 +31,8 @@
   <button
     class="component {className}"
     class:emphasize
+    style:width
+    style:height
     {onclick}
     {style}
     {disabled}

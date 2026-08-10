@@ -55,6 +55,10 @@
   }
 }
 
+:root ::-webkit-scrollbar {
+    display: none;
+}
+
 
 @theme inline {
   --color-background: var(--background);
