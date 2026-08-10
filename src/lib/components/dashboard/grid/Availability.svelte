@@ -1,6 +1,7 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import GridElem from "./gridElem.svelte";
+  import { stats } from "$lib/stores/stats.svelte";
 
   // TODO : Set colors to the state span automatically
   let state = $state("Opérationnel");
@@ -13,6 +14,12 @@
     updateValue();
   });
 
+  $effect(() => {
+    stats.dashboardReloadTrigger;
+    untrack(() => {
+      updateValue();
+    });
+  });
 </script>
 
 <GridElem title="Disponibilité" reloadable onReload={updateValue}>

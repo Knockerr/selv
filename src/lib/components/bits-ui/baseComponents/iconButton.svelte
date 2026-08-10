@@ -3,7 +3,7 @@
 
   const {
     iconPath = "16",
-    iconSize,
+    iconSize = "30px",
     color = "#998fbb",
     onclick = () => {},
     spinOnClick = false,
@@ -15,6 +15,7 @@
 
 <button
   class="component"
+  style={`--containerEditButtonSize: ${iconSize}; ${style}`}
   onclick={(e) => {
     if (spinOnClick) rotate = true;
     onclick(e);
@@ -23,17 +24,17 @@
     rotate = false;
   }}
   class:spin={rotate}
-  {style}
 >
   <Icon path={iconPath} size={iconSize} {color} />
 </button>
 
 <style>
   .component {
-    --containerEditButtonSize: 30px;
+    --containerEditButtonSize: 30;
     background-color: transparent;
     border: 0px solid;
     border-radius: 100%;
+    padding: 6px;
     display: flex;
     align-items: center;
     justify-content: center;

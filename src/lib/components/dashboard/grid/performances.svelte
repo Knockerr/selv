@@ -1,11 +1,14 @@
 <script>
   import Select from "$lib/components/bits-ui/baseComponents/select.svelte";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import Linechart from "../dashboardUtilities/Linechart.svelte";
   import StatDisplayer from "../dashboardUtilities/statDisplayer.svelte";
   import GridElem from "./gridElem.svelte";
+  import { stats } from "$lib/stores/stats.svelte";
 
   let datas = $state([]);
+  let cpu = $state("--");
+  let ram = $state("--");
 
   async function updateDatas() {
     const res = await fetch("http://127.0.0.1:8000/api/serversPerfs");
@@ -17,6 +20,9 @@
       cpu: perf.cpu,
       ram: perf.ram,
     }));
+
+    cpu = datas.at(-1).cpu;
+    ram = datas.at(-1).ram;
   }
 
   onMount(() => {
@@ -24,13 +30,20 @@
     // Update every min
     setInterval(updateDatas, 60000);
   });
+
+  $effect(() => {
+    stats.dashboardReloadTrigger;
+    untrack(() => {
+      updateDatas();
+    });
+  });
 </script>
 
 <GridElem title="Performances des serveurs" reloadable onReload={updateDatas}>
   <div class="card">
     <div class="valuesContainer">
-      <StatDisplayer title="RAM utilisée" value="8.6" unit="Go" />
-      <StatDisplayer title="CPU utilisé" value="80" unit="%" />
+      <StatDisplayer title="RAM utilisée" value={ram} unit="Go" />
+      <StatDisplayer title="CPU utilisé" value={cpu} unit="%" />
       <StatDisplayer title="Débit descendant" value="10" unit="Mo.s" />
       <StatDisplayer title="Débit ascendant" value="2" unit="Mo.s" />
     </div>

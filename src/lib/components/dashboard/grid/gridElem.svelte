@@ -16,10 +16,10 @@
   {#if reloadable}
     <IconButton
       iconPath={pathDb.arrowClockwise}
-      iconSize="20"
+      iconSize="18"
       onclick={onReload}
       color="white"
-      style="position: absolute; top: 10px; right: 10px;"
+      style="position: absolute; top: 13px; right: 13px;"
       spinOnClick
     />
   {/if}

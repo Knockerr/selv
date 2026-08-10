@@ -9,14 +9,28 @@
   import Availability from "$lib/components/dashboard/grid/Availability.svelte";
   import { onMount } from "svelte";
   import { sidebarStore } from "$lib/sideBarsStore.svelte";
+  import IconButton from "$lib/components/bits-ui/baseComponents/iconButton.svelte";
+  import { pathDb } from "$lib/icons/pathDb";
+  import { stats } from "$lib/stores/stats.svelte";
   onMount(() => {
-    sidebarStore.setCurrentTab("main", "Dashboard")
-  })
+    sidebarStore.setCurrentTab("main", "Dashboard");
+  });
 </script>
 
 <div class="page">
   <div class="dashContainer">
-    <h1 class="title">Dashboard</h1>
+    <div class="titleSection">
+      <h1 class="title">Dashboard</h1>
+      <div class="mr-20 flex align">
+        <IconButton
+          iconPath={pathDb.arrowClockwise}
+          iconSize="40px"
+          onclick={stats.reloadDashboard}
+          spinOnClick
+          color="#ddd"
+        />
+      </div>
+    </div>
     <div class="gridContainer">
       <div class="userId"><UserInfos /></div>
       <div class="serversNumber"><ServersNumber /></div>
@@ -48,10 +62,19 @@
     flex-direction: column;
   }
 
-  h1 {
+  .titleSection {
+    width: 100%;
+    height: fit-content;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .title {
     margin: 0;
     margin-left: 10px;
-    margin-bottom: 25px;
     font-size: 2.5rem;
   }
 

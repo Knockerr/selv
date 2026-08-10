@@ -1,6 +1,5 @@
 <script>
   import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";
-  import CustomDropdown from "$lib/components/CustomDropdown.svelte";
   import { pathDb } from "$lib/icons/pathDb";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
 
@@ -11,8 +10,6 @@
 
 <div class="page">
   <h1>Settings</h1>
-
-  <CustomDropdown></CustomDropdown>
 
   <h2 id="dangerZoneTitle">Danger zone</h2>
 

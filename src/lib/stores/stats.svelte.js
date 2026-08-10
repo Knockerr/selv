@@ -9,13 +9,13 @@ function createStatsStore() {
     let store = $state({
         lastVisitedServer: false,
         recentServers: new SvelteSet([]),
+        dashboardReloadTrigger: 0,
     });
 
     function save() {
         localStorage.setItem("statsStore", JSON.stringify({
             lastVisitedServer: store.lastVisitedServer,
             recentServers: [...store.recentServers],
-            serversPerfs: [],
         }));
     }
 
@@ -30,7 +30,8 @@ function createStatsStore() {
 
         return {
             lastVisitedServer: parsed.lastVisitedServer,
-            recentServers: new SvelteSet(parsed.recentServers ?? [])
+            recentServers: new SvelteSet(parsed.recentServers ?? []),
+            dashboardReloadTrigger: 0,
         };
     }
 
@@ -69,7 +70,16 @@ function createStatsStore() {
             }
             save();
         },
-        
+
+        get dashboardReloadTrigger() {
+            return store.dashboardReloadTrigger;
+        },
+
+        reloadDashboard() {
+            store.dashboardReloadTrigger += 1;
+            console.warn(store.dashboardReloadTrigger)
+        },
+
     }
 }
 

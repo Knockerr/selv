@@ -1,9 +1,10 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import GridElem from "./gridElem.svelte";
   import Separator from "$lib/components/bits-ui/baseComponents/Separator.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import StatDisplayer from "../dashboardUtilities/statDisplayer.svelte";
+  import { stats } from "$lib/stores/stats.svelte";
 
   let totalServers = $state("-");
   let runnigServers = $state("-");
@@ -26,6 +27,13 @@
     // Shield to prevent loading too soon
     await new Promise((res) => setTimeout(res, 150));
     updateValue();
+  });
+
+  $effect(() => {
+    stats.dashboardReloadTrigger;
+    untrack(() => {
+      updateValue();
+    });
   });
 </script>
 
