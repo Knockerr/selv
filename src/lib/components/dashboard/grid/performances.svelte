@@ -1,6 +1,6 @@
 <script>
   import Select from "$lib/components/bits-ui/baseComponents/select.svelte";
-  import { onMount, untrack } from "svelte";
+  import { onDestroy, onMount, untrack } from "svelte";
   import Linechart from "../dashboardUtilities/Linechart.svelte";
   import StatDisplayer from "../dashboardUtilities/statDisplayer.svelte";
   import GridElem from "./gridElem.svelte";
@@ -22,7 +22,6 @@
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.warn("data " + data);
       cpu = data.cpu;
       ram = data.ram;
     };
@@ -35,6 +34,10 @@
       console.info("Closed servers perfs webSocket.");
     };
   }
+
+  onDestroy(() => {
+    ws.close();
+  });
 
   async function updateDatas() {
     const res = await fetch("http://127.0.0.1:8000/api/serversPerfs");
