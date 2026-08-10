@@ -31,6 +31,16 @@ def getServersPerfsR():
     return {"perfs": Stats.averagePerfs}
 
 
+@router.get("/servers")
+def getServersR():
+    conn = db.getConnexion()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM servers")
+    result = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return {"servers": result}
+
+
 @router.get("/servers/runningServers")
 def getRunningServersR():
     runingServersStr = []
@@ -44,14 +54,22 @@ def getLocalPathR():
     return {"serversPath": str(serversPath)}
 
 
-@router.get("/servers")
-def getServersR():
-    conn = db.getConnexion()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM servers")
-    result = [dict(row) for row in cursor.fetchall()]
-    conn.close()
-    return {"servers": result}
+@router.get("/servers/stats/serversTypes")
+def getServersTypesR():
+    serversTypes = Stats.getServersTypesDstrib()
+    return {"serversTypes": serversTypes}
+
+
+@router.get("/servers/stats/totalUptime")
+def getServersTotalUptimeR():
+    totalUptime = Stats.getServersTotalUptime()
+    return {"totalUptime": totalUptime}
+
+
+@router.get("/servers/stats/serversUptimes")
+def getServersUptimeR():
+    serversUptimes = Stats.getServersUptime()
+    return {"serversUptimes": serversUptimes}
 
 
 @router.get("/servers/{uuid}/serverListDatas")

@@ -32,3 +32,13 @@ def getConnexion() -> sqlite3.Connection:
     conn = sqlite3.connect(appDir.user_data_path / "datas.db")
     conn.row_factory = sqlite3.Row
     return conn
+
+
+def addColumn(name, type, default):
+    """
+    Methods specifically for devs and maintenance (i.e. update that causes db edits)
+    """
+    conn = getConnexion()
+    cursor = conn.cursor()
+    cursor.execute(f"ALTER TABLE servers ADD COLUMN {name} {type} DEFAULT {default}")
+    conn.close()

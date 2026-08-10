@@ -4,6 +4,7 @@ from uuid import UUID
 
 from loguru import logger
 
+from utilities import db
 from utilities.serverUtilities import cache
 
 
@@ -57,3 +58,40 @@ class Stats:
                 perf["label"] = i
 
             await asyncio.sleep(cls.delay)
+
+    @classmethod
+    def getServersDatas(cls):
+        conn = db.getConnexion()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM servers")
+        servers: list[dict] = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return servers
+
+    @classmethod
+    def getServersTypesDstrib(cls):
+        types = {}
+        servers = cls.getServersDatas()
+        for server in servers:
+            serverType = server["serverType"]
+            if serverType in types:
+                types[serverType] += 1
+            else:
+                types[serverType] = 1
+        return types
+
+    @classmethod
+    def getServersTotalUptime(cls):
+        totalUptime: int = 0
+        allServersDatas = cls.getServersDatas()
+        for server in allServersDatas:
+            totalUptime += server["uptime"] or 0
+        return totalUptime
+
+    @classmethod
+    def getServersUptime(cls):
+        uptimes = {}
+        allServersDatas = cls.getServersDatas()
+        for server in allServersDatas:
+            uptimes[server["name"]] = server["uptime"] or 0
+        return uptimes

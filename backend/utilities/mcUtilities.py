@@ -70,6 +70,11 @@ class ServerManager:
         self.updateMaxRam()
         self.psutilsProcess: psutil.Process | None = None
 
+        try:
+            self.cpuCores: int = os.cpu_count()
+        except Exception as e:
+            logger.error(f"Unable to get n of cpus : {e}")
+
     async def addLineInConsole(self, textToWrite: str):
         self.process.stdin.write(textToWrite.encode() + b"\n")
         await self.process.stdin.drain()
@@ -107,6 +112,7 @@ class ServerManager:
             self.pid = java_pid
 
         logger.info(f"Server started with PID: {self.pid}")
+        self.server.startTime = datetime.now(timezone.utc)
         self.psutilsProcess = psutil.Process(self.pid)
         self.server.isOnline = True
         self.onlineEvent.set()
@@ -125,6 +131,7 @@ class ServerManager:
 
         try:
             self.server.isOnline = False
+            self.server.updateUptime()
             await self.sendCommand(command="stop")
             await self.process.wait()
             self.onlineEvent.clear()
@@ -245,14 +252,16 @@ class ServerManager:
             raise ConnectionError("Can't get perfs of offline server")
 
         cpu = round(self.psutilsProcess.cpu_percent(interval=None), 1)
+        # Formatting cpu usage to be a percentage (1-100). TODO : Give the option to choose format in settings
+        cpuForm = round(cpu / self.cpuCores, 2)
 
         mem_info = self.psutilsProcess.memory_info()
         mem_gb = mem_info.rss / (1024 * 1024 * 1024)
-        mem_form = f"{mem_gb:.2f}"
+        memForm = f"{mem_gb:.2f}"
 
         return {
-            "cpu": cpu,
-            "ram": mem_form,
+            "cpu": cpuForm,
+            "ram": memForm,
         }
 
 
@@ -346,6 +355,8 @@ class Server:
         self.serverType: str = serverType
         self.path: str = path
         self.isOnline: bool = False
+        self.uptime: int = 0
+        self.startTime = None
 
         self.batPath: str
         self.propertiesPath: str
@@ -376,9 +387,9 @@ class Server:
         conn = db.getConnexion()
         cursor = conn.cursor()
         cursor.execute(f"""
-            INSERT INTO servers (uuid, name, lastUseDate, maxRam, version, serverType, path) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (str(self.uuid), self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path))
+            INSERT INTO servers (uuid, name, lastUseDate, maxRam, version, serverType, path, uptime) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (str(self.uuid), self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path, self.uptime))
         conn.commit()
         conn.close()
 
@@ -388,14 +399,26 @@ class Server:
         uuidStr = str(self.uuid)
         cursor.execute(f"""
             UPDATE servers 
-            SET name = ?, lastUseDate = ?, maxRam = ?,  version = ?, serverType = ?, path = ?
+            SET name = ?, lastUseDate = ?, maxRam = ?,  version = ?, serverType = ?, path = ?, uptime = ?
             WHERE uuid = ?
-        """, (self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path, uuidStr))
+        """, (self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path, self.uptime, uuidStr))
         conn.commit()
         conn.close()
 
     def getPropertiesPath(self):
         return findSpecifiedFileByExtension('.properties', self.path)
+
+    def updateUptime(self):
+        logger.warning("TRYING TO UPDATE UPTIME")
+        if not self.startTime:
+            # Prevents case of error on start that would risk to reset datas
+            return
+        diff: int = round((datetime.now(timezone.utc) - self.startTime).total_seconds())
+        logger.warning(f"{self.startTime=}")
+        logger.warning(f"{diff=}")
+        self.uptime += diff
+        logger.warning(f"{self.uptime=}")
+        self.save()
 
     def loadDatas(self) -> None:
         # ETAT : Ok
@@ -407,16 +430,17 @@ class Server:
         conn = db.getConnexion()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM servers WHERE uuid = ?", (str(self.uuid),))
-        servers = cursor.fetchone()
+        server = cursor.fetchone()
         conn.close()
 
-        self.name: str = servers["name"]
-        self.creationDate = servers["creationDate"]
-        self.lastUseDate = servers["lastUseDate"]
-        self.maxRam: int = servers["maxRam"]
-        self.version: str = servers["version"]
-        self.serverType: str = servers["serverType"]
-        self.path: str = servers["path"]
+        self.name: str = server["name"]
+        self.creationDate = server["creationDate"]
+        self.lastUseDate = server["lastUseDate"]
+        self.maxRam: int = server["maxRam"]
+        self.version: str = server["version"]
+        self.serverType: str = server["serverType"]
+        self.path: str = server["path"]
+        self.uptime: int = server["uptime"]
 
     def getPropertiesAsDict(self) -> {str: str}:
         propertiesPath = pathlib.Path(self.getPropertiesPath())
