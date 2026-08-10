@@ -29,7 +29,7 @@
 :root {
   --background: #030712;
   --background-alt: #111825;
-  --background-dark: hsl(222, 60%, 2%);
+  --background-dark: hsl(222, 58%, 2.5%);
 
   --foreground: hsl(222, 20%, 95%);
   --foreground-alt: hsl(220, 12%, 68%);
