@@ -3,7 +3,7 @@ import sys
 from uuid import UUID
 
 from loguru import logger
-
+from typing import Literal
 from utilities import db
 from utilities.serverUtilities import cache
 
@@ -63,14 +63,23 @@ class Stats:
             await asyncio.sleep(cls.delay)
 
     @classmethod
-    async def trackPerfs(cls, delay=5):
+    async def trackPerfs(cls, delay=5, sendLabel: bool = False, content: Literal["all", "last"] = "all"):
         while True:
-            perf = await cls.getAveragePerfs()
-            yield perf
+            if content == "all":
+                perfs = cls.averagePerfs
+                if not sendLabel:
+                    for perf in perfs:
+                        if "label" in perf:
+                            del perf["label"]
+                yield perfs
+            else:
+                currentPerf = await cls.getAveragePerfs()
+                yield currentPerf
+
             await asyncio.sleep(delay)
 
     @classmethod
-    def getServersDatas(cls):
+    def _getServersDatas(cls):
         conn = db.getConnexion()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM servers")
@@ -81,7 +90,7 @@ class Stats:
     @classmethod
     def getServersTypesDstrib(cls):
         types = {}
-        servers = cls.getServersDatas()
+        servers = cls._getServersDatas()
         for server in servers:
             serverType = server["serverType"]
             if serverType in types:
@@ -93,7 +102,7 @@ class Stats:
     @classmethod
     def getServersTotalUptime(cls):
         totalUptime: int = 0
-        allServersDatas = cls.getServersDatas()
+        allServersDatas = cls._getServersDatas()
         for server in allServersDatas:
             totalUptime += server["uptime"] or 0
         return totalUptime
@@ -101,7 +110,7 @@ class Stats:
     @classmethod
     def getServersUptime(cls):
         uptimes = {}
-        allServersDatas = cls.getServersDatas()
+        allServersDatas = cls._getServersDatas()
         for server in allServersDatas:
             uptimes[server["name"]] = server["uptime"] or 0
         return uptimes

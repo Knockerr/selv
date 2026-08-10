@@ -1,8 +1,8 @@
 import asyncio
 import time
 
-import psutil
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from typing import Literal
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 from starlette.websockets import WebSocketState
 from uvicorn.protocols.utils import ClientDisconnected
 from utilities.miscellaneous import Stats
@@ -104,10 +104,12 @@ async def metricsHook(webSocket: WebSocket, uuid: UUID):
 
 
 @router.websocket("/servers/hooks/stats/serversPerfs")
-async def serversPerfsHook(webSocket: WebSocket):
+async def serversPerfsHook(webSocket: WebSocket, delay: int = Query(1), label: bool = Query(False),
+                           content: Literal["all", "last"] = Query("all")):
+
     await webSocket.accept()
 
-    async for perf in Stats.trackPerfs(delay=1):
+    async for perf in Stats.trackPerfs(delay=delay, sendLabel=label, content=content):
         try:
             await webSocket.send_json(perf)
 

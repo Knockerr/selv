@@ -6,80 +6,94 @@
   import GridElem from "./gridElem.svelte";
   import { stats } from "$lib/stores/stats.svelte";
 
+  let componentKey = $state(0);
+
   let datas = $state([]);
   let cpu = $state("--");
   let ram = $state("--");
 
-  let ws;
-  function hookServersPerfs() {
-    ws = new WebSocket(
-      "ws://localhost:8000/ws/servers/hooks/stats/serversPerfs",
+  let datasWs;
+  function hookServersPerfsDatas() {
+    datasWs = new WebSocket(
+      "ws://localhost:8000/ws/servers/hooks/stats/serversPerfs?delay=1&content=last",
     );
 
-    ws.onopen = () => {
-      console.info("Connected to servers perfs hook");
+    datasWs.onopen = () => {
+      console.info("Connected to servers perfs (datas) hook");
     };
 
-    ws.onmessage = (event) => {
+    datasWs.onmessage = (event) => {
       const data = JSON.parse(event.data);
       cpu = data.cpu;
       ram = data.ram;
     };
 
-    ws.onerror = (err) => {
+    datasWs.onerror = (err) => {
       console.error("Error : ", err);
     };
 
-    ws.onclose = () => {
-      console.info("Closed servers perfs webSocket.");
+    datasWs.onclose = () => {
+      console.info("Closed servers perfs (datas) webSocket.");
     };
   }
 
-  onDestroy(() => {
-    ws.close();
-  });
+  let graphWs;
+  function hookServersPerfsGraph() {
+    graphWs = new WebSocket(
+      "ws://localhost:8000/ws/servers/hooks/stats/serversPerfs?delay=2&label=true",
+    );
 
-  async function updateDatas() {
-    const res = await fetch("http://127.0.0.1:8000/api/serversPerfs");
-    const data = await res.json();
-    const perfs = data.perfs;
+    graphWs.onopen = () => {
+      console.info("Connected to servers perfs (graph) hook");
+    };
 
-    datas = perfs.map((perf) => ({
-      time: perf.label,
-      cpu: perf.cpu,
-      ram: perf.ram,
-    }));
+    graphWs.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      datas = data.map((perf) => ({
+        time: perf.label,
+        cpu: perf.cpu,
+        ram: perf.ram,
+      }));
+    };
+
+    graphWs.onerror = (err) => {
+      console.error("Error : ", err);
+    };
+
+    graphWs.onclose = () => {
+      console.info("Closed servers perfs (graph) webSocket.");
+    };
   }
 
-  onMount(() => {
-    updateDatas();
-    hookServersPerfs();
-    // Update every min
-    setInterval(updateDatas, 5000);
+  const reloadKey = () => (componentKey += 1);
+
+  onDestroy(() => {
+    datasWs.close();
+    graphWs.close();
   });
 
-  $effect(() => {
-    stats.dashboardReloadTrigger;
-    untrack(() => {
-      updateDatas();
-    });
+  onMount(() => {
+    hookServersPerfsDatas();
+    hookServersPerfsGraph();
   });
 </script>
 
-<GridElem title="Performances des serveurs" reloadable onReload={updateDatas}>
-  <div class="card">
-    <div class="valuesContainer">
-      <StatDisplayer title="RAM utilisée" value={ram} unit="Go" />
-      <StatDisplayer title="CPU utilisé" value={cpu} unit="%" />
-      <StatDisplayer title="Débit descendant" value="10" unit="Mo.s" />
-      <StatDisplayer title="Débit ascendant" value="2" unit="Mo.s" />
+{#key componentKey}
+  <GridElem title="Performances des serveurs" reloadable onReload={reloadKey}>
+    <div class="card">
+      <div class="valuesContainer">
+        <StatDisplayer title="RAM utilisée" value={ram} unit="Go" />
+        <StatDisplayer title="CPU utilisé" value={cpu} unit="%" />
+        <StatDisplayer title="Débit descendant" value="10" unit="Mo.s" />
+        <StatDisplayer title="Débit ascendant" value="2" unit="Mo.s" />
+      </div>
+      <div class="graphContainer">
+        <span class="graphTitle">Dernière demie-heure</span>
+        <Linechart {datas} />
+      </div>
     </div>
-    <div class="graphContainer">
-      <span class="graphTitle">Dernière demie-heure</span>
-      <Linechart {datas} />
-    </div>
-  </div>
-</GridElem>
+  </GridElem>
+{/key}
 
 <style>
   .card {
