@@ -26,6 +26,8 @@
   $effect(() => {
     if (dialogOpenTrigger) {
       open = true;
+    } else {
+      open = false;
     }
   });
 
@@ -73,7 +75,13 @@
         >
           <Button iconPath="">{cancelLabel}</Button>
         </Dialog.Close>
-        <Button emphasize onclick={onConfirm} iconPath="">{confirmLabel}</Button
+        <Button
+          emphasize
+          onclick={() => {
+            onConfirm();
+            open = false;
+          }}
+          iconPath="">{confirmLabel}</Button
         >
       </div>
 
