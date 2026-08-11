@@ -11,6 +11,7 @@ import utilities.mcUtilities as mcUtilities
 from utilities.serverUtilities import cache
 from loguru import logger
 from uuid import UUID
+import utilities.eventBuses as eventBuses
 
 # Create routeur
 router = APIRouter()
@@ -106,7 +107,6 @@ async def metricsHook(webSocket: WebSocket, uuid: UUID):
 @router.websocket("/servers/hooks/stats/serversPerfs")
 async def serversPerfsHook(webSocket: WebSocket, delay: int = Query(1), label: bool = Query(False),
                            content: Literal["all", "last"] = Query("all")):
-
     await webSocket.accept()
 
     async for perf in Stats.trackPerfs(delay=delay, sendLabel=label, content=content):
@@ -120,3 +120,26 @@ async def serversPerfsHook(webSocket: WebSocket, delay: int = Query(1), label: b
         except Exception as e:
             logger.info(f"ServersPerfs WebSocket disconnected with exception : {e}")
             break
+
+
+@router.websocket("/servers/{uuid}/state")
+async def serverState(webSocket: WebSocket, uuid: UUID):
+    await webSocket.accept()
+
+    # Force creation of SM for server to have default value initialized
+    result = cache.getCurrentServerAndSm(uuid)
+
+    async def sendToClient(msg):
+        await webSocket.send_text(msg)
+
+    eventBus = eventBuses.getServerBus(uuid)
+    eventBus.subscribe(sendToClient)
+
+    try:
+        while True:
+            await webSocket.receive_text()
+    except WebSocketDisconnect:
+        eventBus.unsubscribe(sendToClient)
+        logger.debug(f"Disconnected state ws for {uuid}")
+    except Exception as e:
+        logger.error(f"Error in state ws for {uuid} : {e}")
