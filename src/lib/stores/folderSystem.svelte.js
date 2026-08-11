@@ -120,8 +120,17 @@ function createFolderSystem() {
             await saveDatas();
         },
 
-        async addServer(uuid){
+        async addServer(uuid) {
             allServers.add(uuid);
+            await saveDatas();
+        },
+
+        async removeServer(uuid) {
+            allServers.delete(uuid);
+            // Remove server from existing folders
+            foldersDatas.forEach(([key, val]) => {
+                val.servers = val.servers.filter(server => server !== uuid);
+            });
             await saveDatas();
         },
 

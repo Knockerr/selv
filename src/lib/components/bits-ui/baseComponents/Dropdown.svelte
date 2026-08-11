@@ -6,11 +6,18 @@
 
   let { triggerSnippet, items } = $props();
   /* items should follow the following format: 
-  [{ icon, label, type, onclick?, value?, childItems? }] with type in ["item", "checkItem", "subContent", "separator"]
+  [{ icon, label, type, onclick?, value?, childItems?, dangerous? }] with type in ["item", "checkItem", "subContent", "separator"]
   value concerns only checkItem, and childItems is for subContent type (childItems follow items pattern but only supports "item" type)
   */
   const itemsClass =
     "flex h-fit rounded-[8px] select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium hover:bg-muted hover:cursor-pointer";
+
+  function getLabelColor(dangerous) {
+    if (!dangerous) return "var(--text-foreground)";
+    else return "var(--dangerous)";
+  }
+
+  const iconSize = "17";
 </script>
 
 <DropdownMenu.Root>
@@ -35,12 +42,15 @@
               <div class="flex items-center justify-center relative -top-px">
                 <Icon
                   path={item.icon}
-                  size="20"
+                  size={iconSize}
                   color="var(--foreground-alt)"
                 />
               </div>
             {/if}
-            <span class="ml-2 font-medium flex items-center">
+            <span
+              class="ml-2 font-medium flex items-center"
+              style:color={getLabelColor(item.dangerous)}
+            >
               {item.label}
             </span>
           </DropdownMenu.Item>
@@ -57,12 +67,15 @@
                   >
                     <Icon
                       path={item.icon}
-                      size="20"
+                      size={iconSize}
                       color="var(--foreground-alt)"
                     />
                   </div>
                 {/if}
-                <span class="ml-2 font-medium flex items-center">
+                <span
+                  class="ml-2 font-medium flex items-center"
+                  style:color={getLabelColor(item.dangerous)}
+                >
                   {item.label}
                 </span>
               </div>
@@ -87,12 +100,15 @@
                     >
                       <Icon
                         path={item.icon}
-                        size="20"
+                        size={iconSize}
                         color="var(--foreground-alt)"
                       />
                     </div>
                   {/if}
-                  <span class="ml-2 font-medium flex items-center">
+                  <span
+                    class="ml-2 font-medium flex items-center"
+                    style:color={getLabelColor(item.dangerous)}
+                  >
                     {item.label}
                   </span>
                 </div>
@@ -121,12 +137,15 @@
                       >
                         <Icon
                           path={item.icon}
-                          size="20"
+                          size={iconSize}
                           color="var(--foreground-alt)"
                         />
                       </div>
                     {/if}
-                    <span class="ml-2 font-medium flex items-center">
+                    <span
+                      class="ml-2 font-medium flex items-center"
+                      style:color={getLabelColor(item.dangerous)}
+                    >
                       {item.label}
                     </span>
                   </DropdownMenu.Item>

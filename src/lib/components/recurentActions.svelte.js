@@ -43,3 +43,22 @@ export const postServer = async (uuid, action, body) => {
         console.error(error);
     }
 };
+
+export const getServer = async (uuid, endpoint) => {
+    try {
+        const res = await fetch(
+            `http://localhost:8000/api/servers/${uuid}/${endpoint}`, {
+                method: "GET"
+            }
+        );
+
+        const data = await res.json();
+
+        console.log("data -> ", data);
+
+        return data;
+
+    } catch (error) {
+        console.error(error);
+    }
+};
