@@ -227,3 +227,32 @@ async def editPropertiesR(uuid: UUID, propertyConfig: propertyConfig):
     for property, value in datas.items():
         serverManager.setProperty(property, value)
     return {"status": "edited", "uuid": uuid}
+
+
+class RenameConfig(BaseModel):
+    newName: str
+
+
+@router.post("/servers/{uuid}/rename")
+async def renameR(uuid: UUID, renameConfig: RenameConfig):
+    result = cache.getCurrentServerAndSm(uuid)
+    server: mcUtilities.Server = result["server"]
+    newName = renameConfig.newName
+    # TODO : Give choice to user to rename files or not
+    server.rename(newName, deep=True)
+    return {"status": "renamed", "uuid": uuid}
+
+
+class DuplicateConfig(BaseModel):
+    dupName: str
+
+
+@router.post("/servers/{uuid}/duplicate")
+async def duplicateR(uuid: UUID, duplicateConfig: DuplicateConfig):
+    result = cache.getCurrentServerAndSm(uuid)
+    server: mcUtilities.Server = result["server"]
+    dupName = duplicateConfig.dupName
+    newServerUuid = server.duplicate(dupName)
+    return {"status": "duplicated", "uuid": uuid, "newServerUuid": newServerUuid}
+
+

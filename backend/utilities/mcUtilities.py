@@ -6,8 +6,10 @@ from asyncio.subprocess import Process
 import psutil
 from loguru import logger
 import utilities.db as db
-from uuid import UUID
+from uuid import UUID, uuid4
 from datetime import datetime, timezone
+import shutil
+import utilities.eventBuses as eventBuses
 
 
 # ----------------------------------------
@@ -69,6 +71,8 @@ class ServerManager:
         self.consoleSubscribers: list = []
         self.updateMaxRam()
         self.psutilsProcess: psutil.Process | None = None
+        self.stateBus = eventBuses.getServerBus(self.server.uuid)
+        self.stateBus.setValue("stopped")
 
         try:
             self.cpuCores: int = os.cpu_count()
@@ -93,6 +97,7 @@ class ServerManager:
         serverBat = findSpecifiedFileByExtension("bat", self.server.path)
         self.process = await executeFileAndTrackOutput(self.server.path, serverBat)
         _ = asyncio.create_task(self.trackConsole())
+        _ = asyncio.create_task(self.stateBus.broadcast("running"))
 
         await asyncio.sleep(1)
 
@@ -131,6 +136,7 @@ class ServerManager:
 
         try:
             self.server.isOnline = False
+            _ = asyncio.create_task(self.stateBus.broadcast("stopped"))
             self.server.updateUptime()
             await self.sendCommand(command="stop")
             await self.process.wait()
@@ -147,8 +153,10 @@ class ServerManager:
     async def handleServerAutoStop(self):
         from utilities.miscellaneous import Stats
         logger.info("Server stopped correctly")
+        self.server.updateUptime()
         self.onlineEvent.clear()
         await self.process.wait()
+        self.stateBus.broadcast("stopped")
         self.server.isOnline = False
         Stats.runningServers.remove(self.server.uuid)
 
@@ -315,8 +323,8 @@ class Server:
     """
     Cet objet représente un serveur minecraft. Elle possède comme attributs :
      - name: str -> le nom du serveur.
-     - creationDate: str -> date de création du serveur // Format AAAAMMDDHHMM
-     - lastUseDate: str -> date de dernière utilisation ddu server // Format AAAAMMDDHHMM
+     - creationDate: str -> date de création du serveur // Format ISO
+     - lastUseDate: str -> date de dernière utilisation ddu server // Format ISO
      - maxRam: str -> la ram allouée au serveur.
      - version: str -> la version du serveur.
      - serverType: str -> le "type" de serveur (vanilla, forge, spigot, sponge).
@@ -389,7 +397,8 @@ class Server:
         cursor.execute(f"""
             INSERT INTO servers (uuid, name, lastUseDate, maxRam, version, serverType, path, uptime) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (str(self.uuid), self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path, self.uptime))
+        """, (str(self.uuid), self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path,
+              self.uptime))
         conn.commit()
         conn.close()
 
@@ -401,7 +410,8 @@ class Server:
             UPDATE servers 
             SET name = ?, lastUseDate = ?, maxRam = ?,  version = ?, serverType = ?, path = ?, uptime = ?
             WHERE uuid = ?
-        """, (self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path, self.uptime, uuidStr))
+        """, (
+        self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, str(self.path), self.uptime, uuidStr))
         conn.commit()
         conn.close()
 
@@ -409,13 +419,10 @@ class Server:
         return findSpecifiedFileByExtension('.properties', self.path)
 
     def updateUptime(self):
-        logger.warning("TRYING TO UPDATE UPTIME")
         if not self.startTime:
             # Prevents case of error on start that would risk to reset datas
             return
         diff: int = round((datetime.now(timezone.utc) - self.startTime).total_seconds())
-        logger.warning(f"{self.startTime=}")
-        logger.warning(f"{diff=}")
         self.uptime += diff
         logger.warning(f"{self.uptime=}")
         self.save()
@@ -474,6 +481,58 @@ class Server:
         with open(eulaLatestLogPath) as file:
             logs = file.readlines()
         return logs
+
+    def rename(self, newName: str, deep: bool = True):
+        """
+        Deep means that the name of the server will be changed in the files too
+        """
+        if not newName:
+            return
+        # Old name kept in memory in case of error in renaming of the files (allow to cancel everything, makes method)
+        #  atomic
+        oldName = self.name
+        self.name = newName
+        self.save()
+        if deep:
+            oldPath = self.path
+            # Constructing new path
+            newPath = self.path.split("\\")
+            newPath[-1] = newName
+            newPath = pathlib.Path("\\".join(newPath))
+            # Renaming file
+            try:
+                os.rename(oldPath, newPath)
+            except Exception as e:
+                logger.error(f"Impossible to rename server {self.uuid} files : {e}")
+                self.name = oldName
+                return
+            self.path = newPath
+            self.save()
+
+    def duplicate(self, duplicateName):
+        """
+        Returns: The duplicated server uuid
+        """
+        creationDate: str = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        source = self.path
+        # Constructing new server path
+        dest = self.path.split("\\")
+        dest[-1] = duplicateName
+        dest = pathlib.Path("\\".join(dest))
+
+        # Creating new server
+        try:
+            shutil.copytree(source, dest, dirs_exist_ok=True)
+        except Exception as e:
+            logger.error(f"Impossible to duplicate server {self.uuid} files : {e}")
+            return
+
+        newServerPath = str(dest)
+        newServerUuid = uuid4()
+        newServer: Server = Server(duplicateName, creationDate, creationDate, self.maxRam, self.version,
+                                   self.serverType, newServerPath, newServerUuid)
+        newServer.init()
+        return newServerUuid
 
 
 # --DEPRECATED
