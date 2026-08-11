@@ -10,6 +10,7 @@ from uuid import UUID, uuid4
 from datetime import datetime, timezone
 import shutil
 import utilities.eventBuses as eventBuses
+from utilities import softDelete
 
 
 # ----------------------------------------
@@ -373,7 +374,7 @@ class Server:
             logger.debug("Aucune des valeurs ne sont définies. Tentative de récuperation des données automatique")
             conn = db.getConnexion()
             cursor = conn.cursor()
-            cursor.execute("SELECT 1 FROM servers WHERE uuid = ?", (str(self.uuid),))
+            cursor.execute("SELECT 1 FROM activeServers WHERE uuid = ?", (str(self.uuid),))
             serverInstance = cursor.fetchone()
             conn.close()
             if self.uuid is None or serverInstance is None:
@@ -411,7 +412,8 @@ class Server:
             SET name = ?, lastUseDate = ?, maxRam = ?,  version = ?, serverType = ?, path = ?, uptime = ?
             WHERE uuid = ?
         """, (
-        self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, str(self.path), self.uptime, uuidStr))
+            self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, str(self.path), self.uptime,
+            uuidStr))
         conn.commit()
         conn.close()
 
@@ -436,7 +438,7 @@ class Server:
         """
         conn = db.getConnexion()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM servers WHERE uuid = ?", (str(self.uuid),))
+        cursor.execute("SELECT * FROM activeServers WHERE uuid = ?", (str(self.uuid),))
         server = cursor.fetchone()
         conn.close()
 

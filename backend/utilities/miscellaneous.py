@@ -82,7 +82,7 @@ class Stats:
     def _getServersDatas(cls):
         conn = db.getConnexion()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM servers")
+        cursor.execute("SELECT * FROM activeServers")
         servers: list[dict] = [dict(row) for row in cursor.fetchall()]
         conn.close()
         return servers

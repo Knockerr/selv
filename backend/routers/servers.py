@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 
 from utilities.serverUtilities import cache
 from utilities.miscellaneous import Stats
-from utilities import mcUtilities
+from utilities import mcUtilities, softDelete
 from pydantic import BaseModel
 import utilities.serverCreator
 import sqlite3
@@ -31,11 +31,21 @@ def getServersPerfsR():
     return {"perfs": Stats.averagePerfs}
 
 
+@router.get("/deletedServers")
+def getServersR():
+    conn = db.getConnexion()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM deletedServers")
+    result = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return {"deletedServers": result}
+
+
 @router.get("/servers")
 def getServersR():
     conn = db.getConnexion()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM servers")
+    cursor.execute("SELECT * FROM activeServers")
     result = [dict(row) for row in cursor.fetchall()]
     conn.close()
     return {"servers": result}
@@ -76,7 +86,7 @@ def getServersUptimeR():
 async def getServerDatas(uuid: UUID):
     conn = db.getConnexion()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM servers WHERE UUID = ?", (str(uuid),))
+    cursor.execute("SELECT * FROM activeServers WHERE UUID = ?", (str(uuid),))
     curServerDatas = dict(cursor.fetchone())
     conn.close()
     name = curServerDatas['name']
@@ -256,3 +266,19 @@ async def duplicateR(uuid: UUID, duplicateConfig: DuplicateConfig):
     return {"status": "duplicated", "uuid": uuid, "newServerUuid": newServerUuid}
 
 
+@router.post("/servers/{uuid}/softDelete")
+async def softDelR(uuid: UUID):
+    softDelete.softDelete(uuid)
+    return {"status": "softDeleted", "uuid": uuid}
+
+
+@router.post("/deletedServers/{uuid}/fullDelete")
+async def fullDeleteR(uuid: UUID):
+    softDelete.fullDelete(uuid)
+    return {"status": "softDeleted", "uuid": uuid}
+
+
+@router.post("/deletedServers/{uuid}/restore")
+async def restoreR(uuid: UUID):
+    softDelete.restore(uuid)
+    return {"status": "softDeleted", "uuid": uuid}

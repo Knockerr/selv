@@ -147,11 +147,23 @@
       },
     },
     {
-      icon: pathDb.cross,
+      icon: pathDb.copy,
       label: "Dupliquer",
       onclick: () => {
         uiStore.setCurrentUuid(uuid);
         uiStore.openDialog("serverDuplicateDialog");
+      },
+    },
+    {
+      type: "separator"
+    },
+    {
+      icon: pathDb.garbage,
+      label: "Supprimer",
+      dangerous: true,
+      onclick: () => {
+        uiStore.setCurrentUuid(uuid);
+        uiStore.openDialog("serverDeletionConfirm");
       },
     },
   ]);
@@ -212,6 +224,8 @@
   posx={folderButtonPosX}
   posy={folderButtonPosY}
 />
+
+
 
 <style>
   * {
