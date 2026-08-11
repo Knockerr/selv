@@ -17,6 +17,27 @@
     children,
     ...others
   } = $props();
+
+
+  // Open the dialog from the store
+  let dialogOpenTrigger = $derived(uiStore.isDialogOpen(name));
+  $effect(() => {
+    if (dialogOpenTrigger) {
+      open = true;
+    }
+  });
+
+  // Close the window in the store on standard closure
+  $effect(() => {
+    open;
+    untrack(() => {
+      if (!open) {
+        uiStore.closeDialog(name);
+      }
+    });
+  });
+
+
 </script>
 
 <Dialog.Root bind:open {...others}>
