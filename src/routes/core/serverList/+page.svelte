@@ -23,7 +23,10 @@
   import CreateServerDialog from "$lib/components/bits-ui/presets/createServerDialog.svelte";
   import ImportServerDialog from "$lib/components/bits-ui/presets/importServerDialog.svelte";
   import EditFolderDialog from "$lib/components/bits-ui/presets/editFolderDialog.svelte";
+  import ServerRenameDialog from "$lib/components/bits-ui/presets/ServerRenameDialog.svelte";
+  import ServerDuplicateDialog from "$lib/components/bits-ui/presets/ServerDuplicateDialog.svelte";
 
+  
   let folderSystemRef = $state();
 </script>
 
@@ -92,6 +95,8 @@
 </div>
 
 <EditFolderDialog />
+<ServerRenameDialog />
+<ServerDuplicateDialog />
 <ServerCreationWindow refreshFoldersFunction={folderSystemRef.displayFolders} />
 
 <style>

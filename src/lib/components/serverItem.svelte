@@ -2,13 +2,19 @@
   // @ts-nocheck
   import { goto } from "$app/navigation";
   import { pathDb } from "$lib/icons/pathDb";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import Icon from "./Icon.svelte";
   import FolderContextMenu from "./contextMenuSystem/ContextMenusBank/FolderContextMenu/FolderContextMenu.svelte";
   import { windowsManager } from "./windowsSystem/windowsManager.svelte";
   import { contextManager } from "./contextMenuSystem/contextMenuManager.svelte";
   import IconButton from "./bits-ui/baseComponents/iconButton.svelte";
   import Dropdown from "./bits-ui/baseComponents/Dropdown.svelte";
+  import {
+    postServer,
+    startServer,
+    stopServer,
+  } from "./recurentActions.svelte";
+  import { uiStore } from "./bits-ui/uiComponentsStore.svelte";
 
   const { uuid = "" } = $props();
 
@@ -18,8 +24,60 @@
   let lastUse = $state("");
   let state = $state("");
 
+  $inspect(state);
+
+  let suggestedActionInfos = $state({});
+
+  let stateWs;
+  function trackServerState() {
+    stateWs = new WebSocket(`ws://127.0.0.1:8000/ws/servers/${uuid}/state`);
+
+    stateWs.onopen = () => {
+      console.info("Succesfully connected to state ws for ", uuid);
+    };
+
+    stateWs.onmessage = (event) => {
+      state = event.data;
+      switch (state) {
+        case "stopped":
+          suggestedActionInfos = {
+            label: "Démarrer",
+            icon: pathDb.start,
+            execute: () => {
+              startServer(uuid);
+            },
+          };
+          break;
+        case "running":
+          suggestedActionInfos = {
+            label: "Arrêter",
+            icon: pathDb.stop,
+            execute: () => {
+              stopServer(uuid);
+            },
+          };
+          break;
+        default:
+          console.warn("Couldn't match " + state + " state");
+      }
+    };
+
+    stateWs.onerror = (err) => {
+      console.error("Error in state ws for " + uuid + " : " + "err");
+    };
+
+    stateWs.onclose = () => {
+      console.debug("Closed state ws for " + uuid);
+    };
+  }
+
+  onDestroy(() => {
+    if (stateWs && stateWs.OPEN) stateWs.close();
+  });
+
   onMount(() => {
     console.log("mounting");
+    trackServerState();
     fetch(`http://127.0.0.1:8000/api/servers/${uuid}/serverListDatas`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -64,27 +122,37 @@
     event.stopPropagation();
   }
 
-  const moreDropdownItems = $state([
-    { icon: pathDb.console, label: "Console", onclick: "" },
+  const moreDropdownItems = $derived([
+    {
+      icon: suggestedActionInfos.icon,
+      label: suggestedActionInfos.label,
+      onclick: suggestedActionInfos.execute,
+    },
     {
       icon: pathDb.console,
-      label: "Check test",
-      type: "checkItem",
-      value: false,
-      onclick: "",
+      label: "Console",
+      onclick: () => {
+        goto("/panel/console?uuid=" + uuid);
+      },
     },
     {
-      type: "separator"
+      type: "separator",
     },
     {
-      icon: pathDb.hardDrives,
-      label: "sub test",
-      type: "subContent",
-      onclick: "",
-      childItems: [
-        { icon: pathDb.console, label: "Console", onclick: "" },
-        { icon: pathDb.console, label: "Console", onclick: "" },
-      ],
+      icon: pathDb.pencil,
+      label: "Renommer",
+      onclick: () => {
+        uiStore.setCurrentUuid(uuid);
+        uiStore.openDialog("serverRenameDialog");
+      },
+    },
+    {
+      icon: pathDb.cross,
+      label: "Dupliquer",
+      onclick: () => {
+        uiStore.setCurrentUuid(uuid);
+        uiStore.openDialog("serverDuplicateDialog");
+      },
     },
   ]);
 

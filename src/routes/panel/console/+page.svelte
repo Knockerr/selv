@@ -6,12 +6,15 @@
   import Console from "$lib/components/panel/console.svelte";
   import DataDisplayer from "$lib/components/panel/dataDisplayer.svelte";
   import PanelTabList from "$lib/components/panel/panelTabList.svelte";
+  import { startServer as startServerFn, stopServer as stopServerFn } from "$lib/components/recurentActions.svelte";
   import EulaWindow from "$lib/components/windowsSystem/WindowsBank/eulaWIndow/eulaWindow.svelte";
   import { windowsManager } from "$lib/components/windowsSystem/windowsManager.svelte";
   import { sidebarStore } from "$lib/sideBarsStore.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import { stats } from "$lib/stores/stats.svelte";
   import { onDestroy, onMount, untrack } from "svelte";
+
+  
 
   let serverIp = $state("Récuperation...");
   let serverName = $state("Récuperation...");
@@ -34,28 +37,17 @@
 
   function startServer() {
     consoleContent = "";
-    fetch("http://localhost:8000/api/servers/" + uuid + "/start", {
-      method: "POST",
-    })
-      .then((res) => res.json())
-      .then((data) => console.log("data -> ", data))
-      .catch((error) => console.error(error));
+    startServerFn(uuid)
     serverStatus = "on";
     hookConsole();
     hookMetrics();
   }
 
+  
   async function stopServer() {
     serverStatus = "closing";
 
-    let res = await fetch(
-      "http://localhost:8000/api/servers/" + uuid + "/stop",
-      {
-        method: "POST",
-      },
-    );
-
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    stopServerFn(uuid)
 
     consoleWs?.close();
     metricsWs?.close();

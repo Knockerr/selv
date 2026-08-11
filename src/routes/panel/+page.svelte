@@ -5,6 +5,7 @@
   import Console from "$lib/components/panel/console.svelte";
   import DataDisplayer from "$lib/components/panel/dataDisplayer.svelte";
   import PanelTabList from "$lib/components/panel/panelTabList.svelte";
+  import { startServer, stopServer } from "$lib/components/recurentActions.svelte";
   import EulaWindow from "$lib/components/windowsSystem/WindowsBank/eulaWIndow/eulaWindow.svelte";
   import { windowsManager } from "$lib/components/windowsSystem/windowsManager.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
@@ -19,23 +20,7 @@
   const params = new URLSearchParams(window.location.search);
   let uuid = params.get("uuid") ?? "demoUuid";
 
-  function startServer() {
-    fetch("http://localhost:8000/api/servers/" + uuid + "/start", {
-      method: "POST",
-    })
-      .then((res) => res.json())
-      .then((data) => console.log("data -> ", data))
-      .catch((error) => console.error(error));
-  }
 
-  function stopServer() {
-    fetch("http://localhost:8000/api/servers/" + uuid + "/stop", {
-      method: "POST",
-    })
-      .then((res) => res.json())
-      .then((data) => console.log("data -> ", data))
-      .catch((error) => console.error(error));
-  }
 
   function getServerIp() {
     serverIp = fetch("http://localhost:8000/api/servers/" + uuid + "/ip", {
@@ -112,7 +97,7 @@
           <button
             id="start"
             onclick={() => {
-              startServer();
+              startServer(uuid);
               hookConsole();
               hookMetrics();
             }}>START</button
@@ -120,7 +105,7 @@
           <button
             id="stop"
             onclick={() => {
-              stopServer();
+              stopServer(uuid);
             }}>STOP</button
           >
         </div>

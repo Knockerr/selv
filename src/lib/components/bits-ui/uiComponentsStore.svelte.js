@@ -2,6 +2,7 @@ function createUiComponentStore() {
     let store = $state({
         openDialogs: [],
         currentEditedFolder: "",
+        currentUuid: "",
     });
 
     return {
@@ -20,6 +21,12 @@ function createUiComponentStore() {
         },
         get currentEditedFolder() {
             return store.currentEditedFolder;
+        },
+        setCurrentUuid(uuid) {
+            store.currentUuid = uuid;
+        },
+        get currentUuid() {
+            return store.currentUuid;
         },
     }
 }

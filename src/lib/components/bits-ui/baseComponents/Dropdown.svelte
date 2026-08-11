@@ -79,30 +79,30 @@
         {:else if item.type == "subContent"}
           <DropdownMenu.Sub>
             <DropdownMenu.SubTrigger class={itemsClass}>
-            <div class="flex flex-row justify-between w-full">
-              <div class="flex items-center justify-center">
-                {#if item.icon}
-                  <div
-                    class="flex items-center justify-center relative -top-px"
-                  >
-                    <Icon
-                      path={item.icon}
-                      size="20"
-                      color="var(--foreground-alt)"
-                    />
-                  </div>
-                {/if}
-                <span class="ml-2 font-medium flex items-center">
-                  {item.label}
-                </span>
-              </div>
+              <div class="flex flex-row justify-between w-full">
+                <div class="flex items-center justify-center">
+                  {#if item.icon}
+                    <div
+                      class="flex items-center justify-center relative -top-px"
+                    >
+                      <Icon
+                        path={item.icon}
+                        size="20"
+                        color="var(--foreground-alt)"
+                      />
+                    </div>
+                  {/if}
+                  <span class="ml-2 font-medium flex items-center">
+                    {item.label}
+                  </span>
+                </div>
                 <Icon
                   path={pathDb.caretRight}
                   color="var(--foreground)"
                   size="15"
                   className="mr-2"
                 />
-            </div>
+              </div>
             </DropdownMenu.SubTrigger>
             <DropdownMenu.Portal>
               <DropdownMenu.SubContent

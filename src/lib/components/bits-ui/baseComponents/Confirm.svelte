@@ -3,9 +3,12 @@
   import Separator from "./Separator.svelte";
   import X from "phosphor-svelte/lib/X";
   import Button from "./Button.svelte";
+  import { uiStore } from "../uiComponentsStore.svelte";
+  import { untrack } from "svelte";
 
   let {
     open = $bindable(false),
+    name,
     triggerButton,
     closeButton,
     contentProps,
@@ -17,7 +20,6 @@
     children,
     ...others
   } = $props();
-
 
   // Open the dialog from the store
   let dialogOpenTrigger = $derived(uiStore.isDialogOpen(name));
@@ -36,8 +38,6 @@
       }
     });
   });
-
-
 </script>
 
 <Dialog.Root bind:open {...others}>
