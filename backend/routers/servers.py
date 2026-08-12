@@ -32,13 +32,23 @@ def getServersPerfsR():
 
 
 @router.get("/deletedServers")
-def getServersR():
+def getDeletedServers():
     conn = db.getConnexion()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM deletedServers")
     result = [dict(row) for row in cursor.fetchall()]
     conn.close()
     return {"deletedServers": result}
+
+
+@router.get("/deletedServers/{uuid}/datas")
+def getDeletedServersR(uuid: UUID):
+    conn = db.getConnexion()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM deletedServers WHERE uuid=?", (str(uuid),))
+    result = cursor.fetchone()
+    conn.close()
+    return {"datas": result}
 
 
 @router.get("/servers")
