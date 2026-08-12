@@ -1,7 +1,8 @@
 function createSidebarsStore() {
     let currentTabsState = $state({
         main: "Servers",
-        panel: "Console"
+        panel: "Console",
+        settings: "Compte",
     })
 
     return {

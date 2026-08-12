@@ -28,7 +28,7 @@
 		/>
 
 		<SideBarButton
-			href="/core/settings"
+			href="/core/settings/account"
 			title="Paramètres"
 			path={pathDb.wrench}
 			classes="topOptions"
