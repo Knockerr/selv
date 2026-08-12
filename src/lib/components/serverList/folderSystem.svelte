@@ -25,11 +25,13 @@
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import FolderManagement from "../formSystem/forms/folderManagement.svelte";
   import FolderWindowsContainer from "../windowsSystem/WindowsBank/FolderWindow/FolderWindowsContainer.svelte";
+  import InputDialog from "../bits-ui/baseComponents/InputDialog.svelte";
+  import { uiStore } from "../bits-ui/uiComponentsStore.svelte";
 
   let foldersToRender = $state([]);
   let favfoldersToRender = $state([]);
 
-  let folderName = $state("all"); //TODO auto create
+  let folderName = $state("all");
 
   onMount(() => {
     displayFolders();
@@ -61,9 +63,8 @@
     });
   }
 
-  function createFolder() {
+  function createFolder(folderName) {
     console.log("Creating folder..");
-    const folderName = prompt("Folder name");
 
     if (folderSystem.folderDatas.hasOwnProperty(folderName)) {
       alert(folderName + " already exists in db! Aborting..");
@@ -81,6 +82,8 @@
       displayFolders();
     });
   });
+
+  // TODO : Switch buttons to IconButtons..
 </script>
 
 <div class="folderSystem">
@@ -99,7 +102,9 @@
         id="createFolderButton"
         class="folderSystemButton"
         aria-label="TODO"
-        onclick={createFolder}
+        onclick={() => {
+          uiStore.openDialog("createFolderDialog");
+        }}
       >
         <Icon path={pathDb.folderPlus} size="18" />
       </button>
@@ -107,12 +112,12 @@
   </div>
   <div class="foldersContainer">
     <div class="favoriteFolders" id="favoriteFoldersContainer">
-    <FolderItem
-          folderName="all"
-          numberOfServers={[...folderSystem.getAllServers].length}
-          isFavorite="true"
-          removeEditButton={true}
-        />
+      <FolderItem
+        folderName="all"
+        numberOfServers={[...folderSystem.getAllServers].length}
+        isFavorite="true"
+        removeEditButton={true}
+      />
       {#each favfoldersToRender as favFolder (favFolder)}
         <FolderItem
           folderName={favFolder}
@@ -135,6 +140,17 @@
     </div>
   </div>
 </div>
+
+<InputDialog
+  title="Création de dossier"
+  description="Entrez le nom de votre dossier"
+  placeholder="Nom du dossier"
+  onConfirm={(value) => {
+    createFolder(value);
+    uiStore.closeDialog("createFolderDialog");
+  }}
+  name="createFolderDialog"
+/>
 
 <style>
   button {

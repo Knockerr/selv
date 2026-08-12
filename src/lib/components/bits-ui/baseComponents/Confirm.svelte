@@ -43,9 +43,11 @@
 </script>
 
 <Dialog.Root bind:open {...others}>
-  <Dialog.Trigger class="bg-transparent h-fit w-fit p-0 border-none">
-    {@render triggerButton?.()}
-  </Dialog.Trigger>
+  {#if triggerButton}
+    <Dialog.Trigger class="bg-transparent h-fit w-fit p-0 border-none">
+      {@render triggerButton?.()}
+    </Dialog.Trigger>
+  {/if}
   <Dialog.Portal>
     <Dialog.Overlay
       class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/80"

@@ -9,7 +9,7 @@
     className,
     style,
     width = "100%",
-    value = $bindable(""),
+    value = $bindable(),
     ...others
   } = $props();
 </script>
