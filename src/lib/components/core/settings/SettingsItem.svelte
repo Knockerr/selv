@@ -29,7 +29,7 @@
   .left {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    align-self: flex-start;
     gap: 10px;
     width: 40%;
   }

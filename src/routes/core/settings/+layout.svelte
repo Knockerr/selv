@@ -60,7 +60,7 @@
     justify-content: center;
   }
 
-  .child{
+  .child {
     width: 85%;
     height: 500%;
   }

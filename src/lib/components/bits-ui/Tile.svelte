@@ -13,6 +13,7 @@
     fontSize = "1rem",
     labelStyle,
     onclick,
+    noHover=false,
   } = $props();
 </script>
 
@@ -21,7 +22,7 @@
   style:height
   style:width
   class:selected
-  {style}
+  class:preventCursor={noHover}
   {onclick}
 >
   <div class="labelContainer">
@@ -64,6 +65,10 @@
     background-color: #283446;
     cursor: pointer;
     color: var(--foreground);
+  }
+
+  .component.preventCursor:hover {
+    cursor: default;
   }
 
   .component.selected {

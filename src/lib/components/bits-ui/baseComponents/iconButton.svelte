@@ -8,13 +8,14 @@
     onclick = () => {},
     spinOnClick = false,
     style,
+    className,
   } = $props();
 
   let rotate = $state(false);
 </script>
 
 <button
-  class="component"
+  class={`component ${className}`}
   style={`--containerEditButtonSize: ${iconSize}; ${style}`}
   onclick={(e) => {
     if (spinOnClick) rotate = true;
