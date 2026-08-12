@@ -56,7 +56,7 @@ def restore(uuid):
         SELECT * FROM deletedServers WHERE uuid=?;
         """, (str(uuid),))
     serversDatas = dict(cursor.fetchone())
-    serverDeletedPath = (deletedServersDir / serversDatas["path"]) or None
+    serverDeletedPath = (deletedServersDir / serversDatas["name"]) or None
     if not serversDatas or not serverDeletedPath:
         logger.error(f"Impossible to restore server {uuid} : Could not get its path")
         return
@@ -89,7 +89,8 @@ def fullDelete(uuid):
     logger.info(f"Full deleting {uuid}")
 
     # Completly deleting folder
-    serverPath = pathlib.Path(deletedServer["path"])
+    serverPath = pathlib.Path(deletedServersDir / deletedServer["name"])
+
     # Check that server is in deletedServers folder to prevent datas loss if path is corrupted
     if not serverPath.resolve().is_relative_to(deletedServersDir.resolve()):
         logger.error(f"Le chemin du serveur {uuid} n'est pas dans le dossier deletedServers :  {serverPath}")
@@ -103,7 +104,7 @@ def fullDelete(uuid):
 
     # Delete from db
     cursor.execute(f"""
-        DELETE FROM server WHERE uuid=?;
+        DELETE FROM servers WHERE uuid=?;
     """, (str(uuid),))
     conn.commit()
     conn.close()
