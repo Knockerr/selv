@@ -2,7 +2,7 @@
   // @ts-nocheck
   import { goto } from "$app/navigation";
   import { pathDb } from "$lib/icons/pathDb";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, untrack } from "svelte";
   import Icon from "./Icon.svelte";
   import FolderContextMenu from "./contextMenuSystem/ContextMenusBank/FolderContextMenu/FolderContextMenu.svelte";
   import { windowsManager } from "./windowsSystem/windowsManager.svelte";
@@ -15,6 +15,8 @@
     stopServer,
   } from "./recurentActions.svelte";
   import { uiStore } from "./bits-ui/uiComponentsStore.svelte";
+  import { folderSystem } from "$lib/stores/folderSystem.svelte";
+  import FolderSystem from "./serverList/folderSystem.svelte";
 
   const { uuid = "" } = $props();
 
@@ -155,7 +157,7 @@
       },
     },
     {
-      type: "separator"
+      type: "separator",
     },
     {
       icon: pathDb.garbage,
@@ -168,7 +170,26 @@
     },
   ]);
 
-  $inspect(moreDropdownItems);
+  let foldersDropdownItems = $state([]);
+
+  $effect(() => {
+    // Trick to use a deeply reactive state for foldersDropdownItems (to allow binding to item.value)
+    folderSystem.folderDatas;
+    untrack(() => {
+      Object.entries(folderSystem.folderDatas).forEach(
+        ([folderName, folderDatas]) =>
+          foldersDropdownItems.push({
+            label: folderName,
+            type: "checkItem",
+            value: folderSystem.getFolder(folderName).getServers.includes(uuid),
+            onclick: (checked) => {
+              if (checked) folderSystem.getFolder(folderName).addServer(uuid);
+              else folderSystem.getFolder(folderName).removeServer(uuid);
+            },
+          }),
+      );
+    });
+  });
 </script>
 
 <tr>
@@ -201,13 +222,11 @@
   <td id="serverType">{serverType}</td>
   <td id="serverVersion">{serverVersion}</td>
   <td>
-    <button
-      class="folderButton buttonPreset1"
-      id="folderButton"
-      onclick={onFolderButtonClick}
-    >
-      <Icon path={pathDb.bookmarks} size="13" />
-    </button>
+    <Dropdown items={foldersDropdownItems}>
+      {#snippet triggerSnippet()}
+        <IconButton iconSize="20" iconPath={pathDb.bookmarks} />
+      {/snippet}
+    </Dropdown>
   </td>
   <td id="lastUse">{lastUse}</td>
   <td>
@@ -224,8 +243,6 @@
   posx={folderButtonPosX}
   posy={folderButtonPosY}
 />
-
-
 
 <style>
   * {

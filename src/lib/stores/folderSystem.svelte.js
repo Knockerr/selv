@@ -220,11 +220,12 @@ function createFolderSystem() {
                 },
                 addServer(serverToAdd) {
                     foldersDatas[folder].servers.push(serverToAdd);
+                    saveDatas();
                     return folder;
                 },
                 removeServer(serverUuid) {
                     foldersDatas[folder].servers = foldersDatas[folder].servers.filter((uuid) => uuid !== serverUuid);
-
+                    saveDatas();
                     return folder;
                 },
                 async toggleServerPresence(serverUuid) {

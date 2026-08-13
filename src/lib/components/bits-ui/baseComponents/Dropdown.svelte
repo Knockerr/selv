@@ -58,6 +58,10 @@
           <DropdownMenu.CheckboxItem
             bind:checked={item.value}
             class={itemsClass}
+            onclick={(() => {
+              // TODO : This function could be made better
+              item.onclick(!item.value);
+            }) || (() => {})}
           >
             <div class="flex flex-row justify-between w-full">
               <div class="flex items-center justify-center">
