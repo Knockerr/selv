@@ -1,6 +1,4 @@
 <script>
-  
-
   import { goto } from "$app/navigation";
   import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";
   import Confirm from "$lib/components/bits-ui/baseComponents/Confirm.svelte";
@@ -9,6 +7,7 @@
   import DataDisplayer from "$lib/components/panel/dataDisplayer.svelte";
   import PanelTabList from "$lib/components/panel/panelTabList.svelte";
   import {
+    getServer,
     postServer,
     startServer as startServerFn,
     stopServer as stopServerFn,
@@ -37,7 +36,13 @@
     sidebarStore.setCurrentTab("panel", "Console");
   });
 
-  function startServer() {
+  async function startServer() {
+    const data = await getServer(uuid, "creationStep");
+    console.warn(data);
+    if (data.creationStep == "waitingEula") {
+      uiStore.openDialog("eulaConfirm");
+      return;
+    }
     consoleContent = "";
     startServerFn(uuid);
     serverStatus = "on";
@@ -94,13 +99,6 @@
 
     consoleWs.onmessage = (event) => {
       consoleContent += event.data + "\n";
-      // TODO (urgent) : Switch EULA check to backend side (auto check at each start of eula.txt content, prevents players opening windows by typing the str below)
-      if (
-        event.data.includes(
-          "You need to agree to the EULA in order to run the server. Go to eula.txt for more info.",
-        )
-      )
-        uiStore.openDialog("eulaConfirm");
     };
 
     consoleWs.onerror = (err) => {
@@ -161,9 +159,12 @@
     // TODO : Fetch IP
 
     // Getting server state on Mount
-    _ = await fetch("http://localhost:8000/api/servers/" + uuid + "/status", {
-      method: "GET",
-    })
+    const _ = await fetch(
+      "http://localhost:8000/api/servers/" + uuid + "/status",
+      {
+        method: "GET",
+      },
+    )
       .then((res) => res.json())
       .then((data) => {
         serverStatus = data.status;
@@ -230,8 +231,11 @@
 
 <Confirm
   title="EULA"
-  description="En cliquant sur 'accepter', vous confirmez accepter l'EULA de Minecraft (https://aka.ms/MinecraftEULA)"
-  onConfirm={() => postServer(uuid, "acceptEula")}
+  description="En cliquant sur 'accepter', vous confirmez accepter l'EULA de Minecraft (https://aka.ms/MinecraftEULA)."
+  onConfirm={async () => {
+    await postServer(uuid, "acceptEula");
+    startServer();
+  }}
   name="eulaConfirm"
 />
 

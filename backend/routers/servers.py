@@ -246,7 +246,6 @@ async def acceptEulaR(uuid: UUID):
     result = cache.getCurrentServerAndSm(uuid)
     serverManager: mcUtilities.ServerManager = result["serverManager"]
     await serverManager.acceptEula()
-    await serverManager.handleServerAutoStop()
     return {"status": "accepted", "uuid": uuid}
 
 

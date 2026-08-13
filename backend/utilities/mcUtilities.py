@@ -100,9 +100,10 @@ class ServerManager:
         serverBat = findSpecifiedFileByExtension("bat", self.server.path)
         self.process = await executeFileAndTrackOutput(self.server.path, serverBat)
         _ = asyncio.create_task(self.trackConsole())
+        _ = asyncio.create_task(self.trackUnexpectedStop())
         _ = asyncio.create_task(self.stateBus.broadcast("running"))
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.05)
 
         parent = psutil.Process(self.process.pid)
         java_pid = None
@@ -149,18 +150,28 @@ class ServerManager:
         else:
             logger.info("Server stopped correctly")
             Stats.runningServers.remove(self.server.uuid)
+        self.process = None
         self.psutilsProcess = None
         self.pid = None
         return
 
+    async def trackUnexpectedStop(self):
+        await self.process.wait()
+        # This fn will still give priority to stopServer as stopServer sets server.isOnline to False before really
+        #  sending the stop command
+        if self.server.isOnline:
+            await self.handleServerAutoStop()
+
     async def handleServerAutoStop(self):
         from utilities.miscellaneous import Stats
         logger.info("Server stopped correctly")
+        self.server.isOnline = False
         self.server.updateUptime()
         self.onlineEvent.clear()
-        await self.process.wait()
+        if self.process:
+            await self.process.wait()
+            self.process = None
         self.stateBus.broadcast("stopped")
-        self.server.isOnline = False
         Stats.runningServers.remove(self.server.uuid)
 
     async def restartServer(self):
@@ -194,7 +205,12 @@ class ServerManager:
         return line.strip()
 
     async def acceptEula(self):
-        with open(pathlib.Path(self.server.path) / "eula.txt", "r") as file:
+        eulaPath = pathlib.Path(self.server.path) / "eula.txt"
+        if not eulaPath.exists():
+            eulaComment = ("# By changing the setting below to TRUE you are indicating your agreement to our EULA "
+                           "(https://aka.ms/MinecraftEULA).")
+            eulaPath.write_text(f"{eulaComment}\neula=false")
+        with open(eulaPath, "r") as file:
             lines = file.readlines()
 
         for i, line in enumerate(lines):
@@ -202,7 +218,7 @@ class ServerManager:
                 lines[i] = "eula=true\n"
                 break
 
-        with open(pathlib.Path(self.server.path) / "eula.txt", "w") as file:
+        with open(eulaPath, "w") as file:
             file.writelines(lines)
 
     async def trackConsole(self):
@@ -541,13 +557,15 @@ class Server:
     def _isEulaAccepted(self):
         # Check if Eula file
         eulaPath = pathlib.Path(self.path) / "eula.txt"
+
         if not eulaPath.exists():
             return False
         with open(eulaPath, "r") as file:
             for line in file.readlines():
                 if line.startswith("eula"):
-                    line.split("=")
-                    valueText = line[1].lower()
+                    line = line.split("=")
+                    valueText = line[1].lower().strip()
+                    logger.warning(f"{valueText = }")
                     if valueText == "true":
                         value = True
                     else:
@@ -559,12 +577,11 @@ class Server:
         if len(os.listdir(self.path)) < 4:
             # If there are 3 files only (or less) server is considered as not even started
             step = "serverFile"
-        elif not self._isEulaAccepted:
+        elif not self._isEulaAccepted():
             step = "waitingEula"
         else:
             step = "created"
-
-        self.creationStep = step
+        return step
 
 
 # --DEPRECATED
