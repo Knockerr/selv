@@ -8,7 +8,7 @@
     iconSize = "18px",
     emphasize = false,
     style = "",
-    onclick,
+    onclick = () => {},
     label,
     className = "",
     disabled = false,

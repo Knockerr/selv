@@ -8,6 +8,7 @@
     { name: "Compte", href: "/core/settings/account" },
     { name: "Sécurité", href: "/core/settings/security" },
     { name: "Serveurs", href: "/core/settings/servers" },
+    { name: "Débug", href: "/core/settings/debug" },
   ];
 </script>
 
