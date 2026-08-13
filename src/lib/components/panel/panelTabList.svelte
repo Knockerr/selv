@@ -8,10 +8,20 @@
   import { Command } from "@tauri-apps/plugin-shell";
   import { path } from "@tauri-apps/api";
   import { goto } from "$app/navigation";
+  import { getServer } from "../recurentActions.svelte";
+  import { uiStore } from "../bits-ui/uiComponentsStore.svelte";
+  import Confirm from "../bits-ui/baseComponents/Confirm.svelte";
 
   const { uuid, name } = $props();
 
   let serverPath = $state("/");
+
+  let propertiesExist = $state();
+
+  const doPropertiesExist = async () => {
+    const data = await getServer(uuid, "propertiesInfos");
+    propertiesExist = data.exist;
+  };
 
   onMount(() => {
     console.log("mounting");
@@ -28,7 +38,7 @@
   });
 
   const tabs = $state(["Console", "Fichiers", "Parametres"]);
-  const unselectableTabs = ["Fichiers"]
+  const unselectableTabs = ["Fichiers"];
 
   const tabsIcons = {
     Console: pathDb.treeStructure,
@@ -47,6 +57,10 @@
         await Command.create("explorer", [serverPath]).execute();
         break;
       case "Parametres":
+        if (!propertiesExist) {
+          uiStore.openDialog("propertiesWarning");
+          return;
+        }
         goto(`/panel/parametres?uuid=${uuid}`);
         break;
     }
@@ -69,6 +83,13 @@
     {/each}
   </div>
 </div>
+
+<Confirm
+  title="Propriétés du serveur"
+  description="Le fichier permettant de définir les propriétés du serveur n'existe pas tant que le serveur n'a pas été lancé au moins une fois après avoir accepté l'EULA."
+  confirmLabel="Compris"
+  name="propertiesWarning"
+/>
 
 <style>
   * {

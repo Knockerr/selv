@@ -3,6 +3,7 @@
   import CustomTabs from "$lib/components/bits-ui/baseComponents/Tabs.svelte";
   import ServerParametersContainer from "$lib/components/bits-ui/presets/ServerParametersContainer.svelte";
   import { settingsBank } from "$lib/components/panel/settings/settingsBank.svelte";
+  import { getServer } from "$lib/components/recurentActions.svelte";
   import { sidebarStore } from "$lib/sideBarsStore.svelte";
   import { Tabs } from "bits-ui";
   import { onMount, untrack } from "svelte";
@@ -10,8 +11,11 @@
   const params = new URLSearchParams(window.location.search);
   let uuid = params.get("uuid") ?? "demoUuid";
 
+  let serverCreationStep = $state("")
+
   onMount(() => {
     sidebarStore.setCurrentTab("panel", "Parametres");
+    serverCreationStep = getServer(uuid, "creationStep")
   });
 
   let values = $state({});

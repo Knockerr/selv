@@ -1,4 +1,5 @@
 import asyncio
+import pathlib
 
 from fastapi import APIRouter, HTTPException
 
@@ -114,6 +115,21 @@ async def getServerDatas(uuid: UUID):
         'version': version,
         'path': path
     }
+
+
+@router.get("/servers/{uuid}/creationStep")
+async def getCreationStep(uuid: UUID):
+    curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]
+    creationStep = curServer.getCreationStep()
+    return {"creationStep": creationStep}
+
+
+@router.get("/servers/{uuid}/propertiesInfos")
+async def getPropertiesInfos(uuid: UUID):
+    curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]
+    path = curServer.propertiesPath
+    exist = path and pathlib.Path(path).exists()
+    return {"path": path, "exist": exist}
 
 
 @router.get("/servers/{uuid}/ip")

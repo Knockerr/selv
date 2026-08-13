@@ -3,6 +3,8 @@ import os
 import pathlib
 import sys
 from asyncio.subprocess import Process
+from typing import Literal
+
 import psutil
 from loguru import logger
 import utilities.db as db
@@ -388,7 +390,7 @@ class Server:
             self.batPath = findSpecifiedFileByExtension('.bat', self.path)
             self.propertiesPath = findSpecifiedFileByExtension('.properties', self.path)
         else:
-            logger.warning(f"No path seems to exist for server {self.name}")
+            logger.warning(f"No bat or properties path seems to exist for server {self.name}")
             self.batPath = None
             self.propertiesPath = None
 
@@ -535,6 +537,34 @@ class Server:
                                    self.serverType, newServerPath, newServerUuid)
         newServer.init()
         return newServerUuid
+
+    def _isEulaAccepted(self):
+        # Check if Eula file
+        eulaPath = pathlib.Path(self.path) / "eula.txt"
+        if not eulaPath.exists():
+            return False
+        with open(eulaPath, "r") as file:
+            for line in file.readlines():
+                if line.startswith("eula"):
+                    line.split("=")
+                    valueText = line[1].lower()
+                    if valueText == "true":
+                        value = True
+                    else:
+                        value = False
+                    return value
+
+    def getCreationStep(self):
+        step: Literal["serverFile", "waitingEula", "created"]
+        if len(os.listdir(self.path)) < 4:
+            # If there are 3 files only (or less) server is considered as not even started
+            step = "serverFile"
+        elif not self._isEulaAccepted:
+            step = "waitingEula"
+        else:
+            step = "created"
+
+        self.creationStep = step
 
 
 # --DEPRECATED
