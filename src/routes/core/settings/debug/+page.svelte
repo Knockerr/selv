@@ -7,10 +7,12 @@
   import SettingsPageBase from "$lib/components/core/settings/SettingsPageBase.svelte";
   import { pathDb } from "$lib/icons/pathDb";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
+  import { stats } from "$lib/stores/stats.svelte";
 
   function fullDatasReset() {
     console.info("Resetting datas on user command");
     folderSystem.resetDatas();
+    stats.resetDatas();
   }
 </script>
 
@@ -24,9 +26,8 @@
       title="Réinitialisation des données"
       description="Cette action effacera tous les serveurs de l'interface et supprimera vos dossiers. Vos serveurs ne seront pas supprimés mais il faudra les réimporter si vous souhaitez les utiliser."
     >
-      <Button
-        iconPath={pathDb.arrowClockwise}
-        onclick={fullDatasReset}>Réinitialiser</Button
+      <Button iconPath={pathDb.arrowClockwise} onclick={fullDatasReset}
+        >Réinitialiser</Button
       >
     </SettingsItem>
   </SettingsBlock>

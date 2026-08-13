@@ -7,7 +7,7 @@ import {
 
 function createStatsStore() {
     let store = $state({
-        lastVisitedServer: false,
+        lastVisitedServer: null,
         recentServers: new SvelteSet([]),
         dashboardReloadTrigger: 0,
     });
@@ -77,6 +77,16 @@ function createStatsStore() {
 
         reloadDashboard() {
             store.dashboardReloadTrigger += 1;
+        },
+
+        resetDatas() {
+            store = {
+                lastVisitedServer: null,
+                recentServers: new SvelteSet([]),
+                dashboardReloadTrigger: 0,
+            };
+            save();
+            console.info("Succesfully reseted stats datas.")
         },
 
     }

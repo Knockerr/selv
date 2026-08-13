@@ -9,7 +9,7 @@
   import DataDisplayer from "$lib/components/panel/dataDisplayer.svelte";
   import PanelTabList from "$lib/components/panel/panelTabList.svelte";
   import {
-  postServer,
+    postServer,
     startServer as startServerFn,
     stopServer as stopServerFn,
   } from "$lib/components/recurentActions.svelte";
@@ -18,12 +18,12 @@
   import { stats } from "$lib/stores/stats.svelte";
   import { onDestroy, onMount, untrack } from "svelte";
 
-  let serverIp = $state("Récuperation...");
   let serverName = $state("Récuperation...");
-  let ramUsage = $state("Récuperation...");
-  let cpuUsage = $state("Récuperation...");
-  let uptime = $state("Récuperation...");
-  let onlinePlayers = $state("Récuperation...");
+  let serverIp = $state("");
+  let ramUsage = $state("");
+  let cpuUsage = $state("");
+  let uptime = $state("");
+  let onlinePlayers = $state("");
   let serverStatus = $state("");
 
   let recovery = false;
@@ -156,16 +156,9 @@
     stats.setLastVisitedServer(uuid);
     stats.addRecentServer(uuid);
 
-    // Fetch IP (temp)
-    let _ = await fetch("http://localhost:8000/api/servers/" + uuid + "/ip", {
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("data", data.ip);
-        serverIp = data.ip;
-      })
-      .catch((err) => console.error(err));
+    getServerName();
+
+    // TODO : Fetch IP
 
     // Getting server state on Mount
     _ = await fetch("http://localhost:8000/api/servers/" + uuid + "/status", {
@@ -184,8 +177,6 @@
       hookConsole();
       hookMetrics();
     }
-
-    getServerName();
   });
 
   onDestroy(() => {
@@ -237,7 +228,7 @@
   </div>
 </div>
 
-<Confirm 
+<Confirm
   title="EULA"
   description="En cliquant sur 'accepter', vous confirmez accepter l'EULA de Minecraft (https://aka.ms/MinecraftEULA)"
   onConfirm={() => postServer(uuid, "acceptEula")}
