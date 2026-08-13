@@ -1,5 +1,5 @@
 <script>
-  // @ts-nocheck
+  
   import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";
   import FolderManagement from "$lib/components/formSystem/forms/folderManagement.svelte";
   import Icon from "$lib/components/Icon.svelte";

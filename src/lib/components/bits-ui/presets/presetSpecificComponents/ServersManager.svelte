@@ -1,5 +1,5 @@
 <script>
-  // @ts-nocheck
+  
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import { online } from "svelte/reactivity/window";
   import ServerCard from "./ServerCard.svelte";

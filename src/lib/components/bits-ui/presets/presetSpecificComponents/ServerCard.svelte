@@ -1,5 +1,5 @@
 <script>
-  // @ts-nocheck
+  
   import Icon from "$lib/components/Icon.svelte";
   import { pathDb } from "$lib/icons/pathDb";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";

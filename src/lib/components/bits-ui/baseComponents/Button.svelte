@@ -1,5 +1,5 @@
 <script>
-  // @ts-nocheck
+  
   import { pathDb } from "$lib/icons/pathDb";
   import Icon from "../../Icon.svelte";
 

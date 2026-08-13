@@ -1,5 +1,5 @@
 <script>
-  // @ts-nocheck
+  
   import { pathDb } from "$lib/icons/pathDb";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import { onMount } from "svelte";

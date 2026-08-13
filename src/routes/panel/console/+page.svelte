@@ -1,5 +1,5 @@
 <script>
-  // @ts-nocheck
+  
 
   import { goto } from "$app/navigation";
   import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";

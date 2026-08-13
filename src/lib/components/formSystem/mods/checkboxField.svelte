@@ -1,5 +1,5 @@
 <script>
-  // @ts-nocheck
+  
   let { inputs = [], onChangeFn, valueGetter = (x) => x } = $props();
 
   function changeHandler(e, input) {

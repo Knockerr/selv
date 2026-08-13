@@ -1,5 +1,5 @@
 <script>
-	// @ts-nocheck
+	
 	import SideBarButton from '$lib/components/sideBarButton.svelte';
 	import { pathDb } from '$lib/icons/pathDb.js';
 	import logoProvisoire from '$lib/assets/logo-provisoire.png';

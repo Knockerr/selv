@@ -1,5 +1,5 @@
 <script>
-  // @ts-nocheck
+  
   import { goto } from "$app/navigation";
   import { pathDb } from "$lib/icons/pathDb";
   import { onDestroy, onMount, untrack } from "svelte";

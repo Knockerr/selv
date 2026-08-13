@@ -1,5 +1,5 @@
 <script>
-  // @ts-nocheck
+  
 
   import { goto } from "$app/navigation";
   import Console from "$lib/components/panel/console.svelte";
