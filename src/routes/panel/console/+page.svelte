@@ -55,8 +55,6 @@
 
     stopServerFn(uuid);
 
-    consoleWs?.close();
-    metricsWs?.close();
     serverStatus = "off";
   }
 

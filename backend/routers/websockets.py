@@ -27,19 +27,19 @@ async def consoleHook(webSocket: WebSocket, uuid: UUID):
 
     logger.info("Server detected as online")
 
+    queue = asyncio.Queue()
+    curServerManager.subscribeToConsole(queue)
+
     try:
         if not curServerManager.server.isOnline:
             raise ConnectionError("Server is offline, cannot hook console")
-
-        queue = asyncio.Queue()
-        curServerManager.subscribeToConsole(queue)
 
         logger.info(f"{uuid} successfully hooked to console")
 
         async def sendLines():
             while True:
                 line = await queue.get()
-                if webSocket.client_state != WebSocketState.CONNECTED:
+                if webSocket.client_state != WebSocketState.CONNECTED or not curServerManager.process:
                     break
                 await webSocket.send_text(line.strip())
 
@@ -50,8 +50,6 @@ async def consoleHook(webSocket: WebSocket, uuid: UUID):
 
         await asyncio.gather(sendLines(), receiveCommands())
 
-        await curServerManager.handleServerAutoStop()
-        await webSocket.send_text("Extinction du serveur exécutée avec succès.")
         await webSocket.close(1000, f"Le serveur {uuid} est fermé")
         curServerManager.unsubscribeConsole(queue)
 
@@ -80,7 +78,7 @@ async def metricsHook(webSocket: WebSocket, uuid: UUID):
 
     logger.info(f"{uuid} successfully hooked to metrics")
 
-    while curServerManager.server.isOnline:
+    while curServerManager.process:
         try:
             perfs = curServerManager.getPerfs()
             await webSocket.send_json(perfs)

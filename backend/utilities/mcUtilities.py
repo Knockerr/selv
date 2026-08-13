@@ -144,14 +144,14 @@ class ServerManager:
             self.server.updateUptime()
             await self.sendCommand(command="stop")
             await self.process.wait()
+            self.process = None
             self.onlineEvent.clear()
         except Exception as e:
             print(f"Unexpected exception encoutered while stopping server : {e}")
         else:
             logger.info("Server stopped correctly")
             Stats.runningServers.remove(self.server.uuid)
-        self.process = None
-        self.psutilsProcess = None
+            self.psutilsProcess = None
         self.pid = None
         return
 
@@ -171,7 +171,7 @@ class ServerManager:
         if self.process:
             await self.process.wait()
             self.process = None
-        self.stateBus.broadcast("stopped")
+            await self.stateBus.broadcast("stopped")
         Stats.runningServers.remove(self.server.uuid)
 
     async def restartServer(self):
@@ -444,7 +444,6 @@ class Server:
             return
         diff: int = round((datetime.now(timezone.utc) - self.startTime).total_seconds())
         self.uptime += diff
-        logger.warning(f"{self.uptime=}")
         self.save()
 
     def loadDatas(self) -> None:
@@ -565,7 +564,6 @@ class Server:
                 if line.startswith("eula"):
                     line = line.split("=")
                     valueText = line[1].lower().strip()
-                    logger.warning(f"{valueText = }")
                     if valueText == "true":
                         value = True
                     else:

@@ -29,8 +29,6 @@ def softDelete(uuid):
     serverDatas = dict(cursor.fetchone())
     conn.close()
 
-    logger.warning(f"{serverDatas=}")
-
     # Move server folder
     src = serverDatas["path"]
     dest = deletedServersDir / serverDatas["name"]
