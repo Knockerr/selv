@@ -3,18 +3,22 @@
 
   import { goto } from "$app/navigation";
   import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";
+  import Confirm from "$lib/components/bits-ui/baseComponents/Confirm.svelte";
+  import { uiStore } from "$lib/components/bits-ui/uiComponentsStore.svelte";
   import Console from "$lib/components/panel/console.svelte";
   import DataDisplayer from "$lib/components/panel/dataDisplayer.svelte";
   import PanelTabList from "$lib/components/panel/panelTabList.svelte";
-  import { startServer as startServerFn, stopServer as stopServerFn } from "$lib/components/recurentActions.svelte";
+  import {
+  postServer,
+    startServer as startServerFn,
+    stopServer as stopServerFn,
+  } from "$lib/components/recurentActions.svelte";
   import EulaWindow from "$lib/components/windowsSystem/WindowsBank/eulaWIndow/eulaWindow.svelte";
   import { windowsManager } from "$lib/components/windowsSystem/windowsManager.svelte";
   import { sidebarStore } from "$lib/sideBarsStore.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import { stats } from "$lib/stores/stats.svelte";
   import { onDestroy, onMount, untrack } from "svelte";
-
-  
 
   let serverIp = $state("Récuperation...");
   let serverName = $state("Récuperation...");
@@ -37,17 +41,16 @@
 
   function startServer() {
     consoleContent = "";
-    startServerFn(uuid)
+    startServerFn(uuid);
     serverStatus = "on";
     hookConsole();
     hookMetrics();
   }
 
-  
   async function stopServer() {
     serverStatus = "closing";
 
-    stopServerFn(uuid)
+    stopServerFn(uuid);
 
     consoleWs?.close();
     metricsWs?.close();
@@ -93,12 +96,13 @@
 
     consoleWs.onmessage = (event) => {
       consoleContent += event.data + "\n";
+      // TODO (urgent) : Switch EULA check to backend side (auto check at each start of eula.txt content, prevents players opening windows by typing the str below)
       if (
         event.data.includes(
           "You need to agree to the EULA in order to run the server. Go to eula.txt for more info.",
         )
       )
-        windowsManager.open("MinecraftEula-" + uuid);
+        uiStore.openDialog("eulaConfirm");
     };
 
     consoleWs.onerror = (err) => {
@@ -235,7 +239,12 @@
   </div>
 </div>
 
-<EulaWindow serverUuid={uuid} />
+<Confirm 
+  title="EULA"
+  description="En cliquant sur 'accepter', vous confirmez accepter l'EULA de Minecraft (https://aka.ms/MinecraftEULA)"
+  onConfirm={() => postServer(uuid, "acceptEula")}
+  name="eulaConfirm"
+/>
 
 <style>
   @import url("https://fonts.googleapis.com/css2?family=Funnel+Sans:ital,wght@0,300..800;1,300..800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Zain:ital,wght@0,200;0,300;0,400;0,700;0,800;0,900;1,300;1,400&family=Zalando+Sans:ital,wght@0,200..900;1,200..900&display=swap");
