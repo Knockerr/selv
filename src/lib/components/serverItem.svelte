@@ -4,9 +4,6 @@
   import { pathDb } from "$lib/icons/pathDb";
   import { onDestroy, onMount, untrack } from "svelte";
   import Icon from "./Icon.svelte";
-  import FolderContextMenu from "./contextMenuSystem/ContextMenusBank/FolderContextMenu/FolderContextMenu.svelte";
-  import { windowsManager } from "./windowsSystem/windowsManager.svelte";
-  import { contextManager } from "./contextMenuSystem/contextMenuManager.svelte";
   import IconButton from "./bits-ui/baseComponents/iconButton.svelte";
   import Dropdown from "./bits-ui/baseComponents/Dropdown.svelte";
   import {
@@ -112,17 +109,6 @@
       })
       .catch((err) => console.error("fetch error:", err));
   });
-
-  let folderButtonPosX = $state();
-  let folderButtonPosY = $state();
-
-  function onFolderButtonClick() {
-    const datas = event.target.getBoundingClientRect();
-    folderButtonPosX = datas.left;
-    folderButtonPosY = datas.top;
-    contextManager.open("folderContextMenu-" + uuid);
-    event.stopPropagation();
-  }
 
   const moreDropdownItems = $derived([
     {
@@ -238,11 +224,6 @@
   </td>
 </tr>
 
-<FolderContextMenu
-  serverUuid={uuid}
-  posx={folderButtonPosX}
-  posy={folderButtonPosY}
-/>
 
 <style>
   * {

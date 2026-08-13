@@ -13,8 +13,6 @@
     startServer as startServerFn,
     stopServer as stopServerFn,
   } from "$lib/components/recurentActions.svelte";
-  import EulaWindow from "$lib/components/windowsSystem/WindowsBank/eulaWIndow/eulaWindow.svelte";
-  import { windowsManager } from "$lib/components/windowsSystem/windowsManager.svelte";
   import { sidebarStore } from "$lib/sideBarsStore.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import { stats } from "$lib/stores/stats.svelte";

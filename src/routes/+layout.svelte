@@ -1,19 +1,12 @@
 <script>
   import favicon from "$lib/assets/favicon.svg";
-  import { contextManager } from "$lib/components/contextMenuSystem/contextMenuManager.svelte";
 
   import "../app.css";
 
   let { children } = $props();
-
-  const isAContextOpen = $derived(contextManager.isAMenuOpen);
 </script>
 
-<svelte:window
-  onclick={() => {
-    if (isAContextOpen) contextManager.close();
-  }}
-/>
+<svelte:window />
 
 <svelte:head>
   <link rel="icon" href={favicon} />

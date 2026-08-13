@@ -6,8 +6,6 @@
   import DataDisplayer from "$lib/components/panel/dataDisplayer.svelte";
   import PanelTabList from "$lib/components/panel/panelTabList.svelte";
   import { startServer, stopServer } from "$lib/components/recurentActions.svelte";
-  import EulaWindow from "$lib/components/windowsSystem/WindowsBank/eulaWIndow/eulaWindow.svelte";
-  import { windowsManager } from "$lib/components/windowsSystem/windowsManager.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
 
   let serverIp = $state(10);
@@ -120,8 +118,6 @@
     </div>
   </div>
 </div>
-
-<EulaWindow serverUuid={uuid} />
 
 <style>
   @import url("https://fonts.googleapis.com/css2?family=Funnel+Sans:ital,wght@0,300..800;1,300..800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Zain:ital,wght@0,200;0,300;0,400;0,700;0,800;0,900;1,300;1,400&family=Zalando+Sans:ital,wght@0,200..900;1,200..900&display=swap");

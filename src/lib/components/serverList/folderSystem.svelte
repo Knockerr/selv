@@ -24,7 +24,6 @@
   import Icon from "../Icon.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import FolderManagement from "../formSystem/forms/folderManagement.svelte";
-  import FolderWindowsContainer from "../windowsSystem/WindowsBank/FolderWindow/FolderWindowsContainer.svelte";
   import InputDialog from "../bits-ui/baseComponents/InputDialog.svelte";
   import { uiStore } from "../bits-ui/uiComponentsStore.svelte";
 

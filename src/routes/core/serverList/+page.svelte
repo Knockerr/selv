@@ -1,21 +1,11 @@
 <script>
   // @ts-nocheck
-  import FolderContextMenu from "$lib/components/contextMenuSystem/ContextMenusBank/FolderContextMenu/FolderContextMenu.svelte";
   import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";
   import FolderManagement from "$lib/components/formSystem/forms/folderManagement.svelte";
   import Icon from "$lib/components/Icon.svelte";
   import ServerItem from "$lib/components/serverItem.svelte";
   import FolderSystem from "$lib/components/serverList/folderSystem.svelte";
   import SliderSwitch from "$lib/components/SliderSwitch.svelte";
-  import Window from "$lib/components/windowsSystem/Window.svelte";
-  import WindowButton from "$lib/components/windowsSystem/WindowButton.svelte";
-  import WindowLabel from "$lib/components/windowsSystem/WindowLabel.svelte";
-  import FolderWindow from "$lib/components/windowsSystem/WindowsBank/FolderWindow/FolderWindow.svelte";
-  import FolderWindowsContainer from "$lib/components/windowsSystem/WindowsBank/FolderWindow/FolderWindowsContainer.svelte";
-  import ServerCreationWindow from "$lib/components/windowsSystem/WindowsBank/serverCreationWindow/ServerCreationWindow.svelte";
-  import WindowSection from "$lib/components/windowsSystem/WindowSection.svelte";
-  import { windowsManager } from "$lib/components/windowsSystem/windowsManager.svelte";
-  import WindowTextInput from "$lib/components/windowsSystem/WindowTextInput.svelte";
   import { pathDb } from "$lib/icons/pathDb";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import Input from "$lib/components/bits-ui/baseComponents/Input.svelte";
@@ -98,7 +88,6 @@
 <ServerRenameDialog />
 <ServerDuplicateDialog />
 <ServerDeletionConfirm />
-<ServerCreationWindow refreshFoldersFunction={folderSystemRef.displayFolders} />
 
 <style>
   table {

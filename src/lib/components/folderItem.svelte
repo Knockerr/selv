@@ -5,8 +5,6 @@
   import { onMount } from "svelte";
   import FolderManagement from "./formSystem/forms/folderManagement.svelte";
   import Icon from "./Icon.svelte";
-  import FolderWindow from "./windowsSystem/WindowsBank/FolderWindow/FolderWindow.svelte";
-  import { windowsManager } from "./windowsSystem/windowsManager.svelte";
   import EditFolderDialog from "./bits-ui/presets/editFolderDialog.svelte";
   import IconButton from "./bits-ui/baseComponents/iconButton.svelte";
   import { uiStore } from "./bits-ui/uiComponentsStore.svelte";

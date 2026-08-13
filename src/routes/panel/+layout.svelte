@@ -5,8 +5,6 @@
   import Console from "$lib/components/panel/console.svelte";
   import DataDisplayer from "$lib/components/panel/dataDisplayer.svelte";
   import PanelTabList from "$lib/components/panel/panelTabList.svelte";
-  import EulaWindow from "$lib/components/windowsSystem/WindowsBank/eulaWIndow/eulaWindow.svelte";
-  import { windowsManager } from "$lib/components/windowsSystem/windowsManager.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
 
   const { children } = $props();
@@ -21,8 +19,6 @@
     {@render children()}
   </div>
 </div>
-
-<EulaWindow serverUuid={uuid} />
 
 <style>
   .container {

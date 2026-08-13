@@ -1,9 +1,6 @@
 // @ts-nocheck
 
 import {
-    windowsManager
-} from "$lib/components/windowsSystem/windowsManager.svelte";
-import {
     load
 } from "@tauri-apps/plugin-store";
 import {
