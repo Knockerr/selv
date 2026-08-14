@@ -30,7 +30,7 @@
     display: flex;
     flex-direction: column;
     align-self: flex-start;
-    gap: 10px;
+    gap: 5px;
     width: 40%;
   }
 
@@ -51,6 +51,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    gap: 10px;
   }
 
   .separator {

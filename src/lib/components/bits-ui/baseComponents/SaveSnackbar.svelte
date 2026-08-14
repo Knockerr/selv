@@ -8,7 +8,7 @@
     oncancel,
     onsave,
     className = "",
-    visible = $bindable(true),
+    visible = $bindable(false),
   } = $props();
 </script>
 

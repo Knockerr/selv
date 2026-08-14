@@ -15,6 +15,8 @@
     color = "",
     ...others
   } = $props();
+
+  // TODO : Make password inputs able to switch display (dots to text yk)
 </script>
 
 <div class="flex flex-col items-start gap-1 box-border" style:width {...others}>
