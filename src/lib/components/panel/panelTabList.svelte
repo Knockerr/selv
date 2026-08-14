@@ -16,13 +16,6 @@
 
   let serverPath = $state("/");
 
-  let propertiesExist = $state();
-
-  const doPropertiesExist = async () => {
-    const data = await getServer(uuid, "propertiesInfos");
-    propertiesExist = data.exist;
-  };
-
   onMount(() => {
     console.log("mounting");
     fetch(`http://127.0.0.1:8000/api/servers/${uuid}/serverListDatas`)
@@ -57,6 +50,8 @@
         await Command.create("explorer", [serverPath]).execute();
         break;
       case "Parametres":
+        const data = await getServer(uuid, "propertiesInfos");
+        const propertiesExist = data.exist;
         if (!propertiesExist) {
           uiStore.openDialog("propertiesWarning");
           return;
