@@ -16,8 +16,9 @@
   onMount(() => {
     sidebarStore.setCurrentTab("main", "Dashboard");
     
-    // Reloading all datas automatically all 5s
-    setInterval(stats.reloadDashboard, 5000);
+    // Reloading all datas automatically all 60s
+    // TODO : Switch runningServers and serversUptimes endpoint from REST to WS
+    setInterval(stats.reloadDashboard, 60000);
   });
 </script>
 
