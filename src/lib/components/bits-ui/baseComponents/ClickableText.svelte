@@ -1,0 +1,23 @@
+<script>
+  const { children, style, onclick = () => {} } = $props();
+</script>
+
+<button class="component" {onclick} {style}>
+  {@render children?.()}
+</button>
+
+<style>
+  .component {
+    width: fit-content;
+    height: fit-content;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    text-decoration: underline;
+    color: var(--emphasized);
+  }
+
+  .component:hover {
+    cursor: pointer;
+  }
+</style>

@@ -4,7 +4,7 @@
   import Icon from "../../Icon.svelte";
 
   const {
-    iconPath = pathDb.cross,
+    iconPath = "",
     iconSize = "18px",
     emphasize = false,
     style = "",
@@ -53,7 +53,7 @@
     border: 1px solid var(--border-input);
     border-radius: 7px;
     color: white;
-    font-family: "Open Sans", sans-serif;
+    font-family: var(--robotoFont);
     font-size: 14px;
     padding: 8px 16px;
     display: flex;
