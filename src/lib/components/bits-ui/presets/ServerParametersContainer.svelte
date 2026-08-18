@@ -7,6 +7,8 @@
   import { onMount, untrack } from "svelte";
   import { error } from "@sveltejs/kit";
   import { load } from "@tauri-apps/plugin-store";
+  import PanelSettingsBlock from "./panelSettingsBlock.svelte";
+  import PanelSettingsItem from "./panelSettingsItem.svelte";
 
   // Settings corresponds to an array of settings from settingsBank
   let { uuid, settings, label, values = $bindable() } = $props();
@@ -41,74 +43,22 @@
 
   onMount(async () => {
     const res = await loadProperties();
-    Object.assign(values, res)
+    Object.assign(values, res);
     valuesInitialized = true;
   });
 </script>
 
-<Container {label}>
-  {#each settings as setting}
-    <div class="itemContainer">
-      <div class="leftSide">
-        <span class="title">{setting.name}</span>
-        <span class="description">{setting.description}</span>
-      </div>
-      {#if valuesInitialized}
-        {#if setting.type == "select"}
-          <Select
-            bind:value={values[setting.property].currentValue}
-            items={setting.options}
-            width="120px"
-            style="max-height: 45px;"
-            iconPath={setting.iconPath}
-          />
-        {:else if setting.type === "bool"}
-          <Switch bind:checked={values[setting.property].currentValue} />
-        {:else if setting.type === "input"}
-          <Input
-            placeholder={values[setting.property]["initValue"]}
-            iconPath={setting.iconPath}
-            bind:value={values[setting.property].currentValue}
-            width="200px"
-          />
-        {:else if setting.type === "number"}
-          <Number
-            placeholder={values[setting.property]["initValue"]}
-            iconPath={setting.iconPath}
-            bind:value={values[setting.property].currentValue}
-            width="50px"
-          />
-        {/if}
-      {/if}
-    </div>
-  {/each}
-</Container>
-
-<style>
-  .itemContainer {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #dddddd48;
-    padding: 15px 15px;
-  }
-
-  .leftSide {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    justify-content: center;
-  }
-
-  .title {
-    font-size: 1rem;
-  }
-
-  .description {
-    max-width: 320px;
-    color: var(--color-foreground-alt);
-    font-size: 0.8rem;
-  }
-</style>
+<PanelSettingsBlock {label}>
+  {#if valuesInitialized}
+    {#each settings as setting}
+      <PanelSettingsItem
+        title={setting.name}
+        description={setting.description}
+        inputPlaceholder={values[setting.property]["initValue"]}
+        inputItems={setting.options ?? ""}
+        iconPath={setting.iconPath}
+        bind:value={values[setting.property].currentValue}
+        inputType={setting.type}
+      />{/each}
+  {/if}
+</PanelSettingsBlock>
