@@ -11,11 +11,11 @@
   const params = new URLSearchParams(window.location.search);
   let uuid = params.get("uuid") ?? "demoUuid";
 
-  let serverCreationStep = $state("")
+  let serverCreationStep = $state("");
 
   onMount(() => {
     sidebarStore.setCurrentTab("panel", "Parametres");
-    serverCreationStep = getServer(uuid, "creationStep")
+    serverCreationStep = getServer(uuid, "creationStep");
   });
 
   let values = $state({});
@@ -81,43 +81,42 @@
 
 <div class="component">
   <h1 class="title">Paramètres</h1>
-  <CustomTabs
-    tabNames={["Jeu", "Monde", "Serveur"]}
-    tabListClass="flex flex-row justify-center mb-8"
-  >
-    {#snippet tabsContentSnippet()}
-      <Tabs.Content value="Jeu">
-        <ServerParametersContainer
-          settings={settingsBank.filter(
-            (setting) => setting.category === "game",
-          )}
-          label="Test label"
-          {uuid}
-          {values}
-        />
-      </Tabs.Content>
-      <Tabs.Content value="Monde">
-        <ServerParametersContainer
-          settings={settingsBank.filter(
-            (setting) => setting.category === "world",
-          )}
-          label="Test label"
-          {uuid}
-          {values}
-        />
-      </Tabs.Content>
-      <Tabs.Content value="Serveur">
-        <ServerParametersContainer
-          settings={settingsBank.filter(
-            (setting) => setting.category === "server",
-          )}
-          label="Test label"
-          {uuid}
-          {values}
-        />
-      </Tabs.Content>
-    {/snippet}
-  </CustomTabs>
+  <div class="tabsContainer">
+    <CustomTabs tabNames={["Jeu", "Monde", "Serveur"]}>
+      {#snippet tabsContentSnippet()}
+        <Tabs.Content value="Jeu">
+          <ServerParametersContainer
+            settings={settingsBank.filter(
+              (setting) => setting.category === "game",
+            )}
+            label="Test label"
+            {uuid}
+            {values}
+          />
+        </Tabs.Content>
+        <Tabs.Content value="Monde">
+          <ServerParametersContainer
+            settings={settingsBank.filter(
+              (setting) => setting.category === "world",
+            )}
+            label="Test label"
+            {uuid}
+            {values}
+          />
+        </Tabs.Content>
+        <Tabs.Content value="Serveur">
+          <ServerParametersContainer
+            settings={settingsBank.filter(
+              (setting) => setting.category === "server",
+            )}
+            label="Test label"
+            {uuid}
+            {values}
+          />
+        </Tabs.Content>
+      {/snippet}
+    </CustomTabs>
+  </div>
 </div>
 
 <SaveSnackbar
@@ -149,5 +148,10 @@
     font-family: var(--robotFont);
     font-size: 3rem;
     font-weight: 500;
+  }
+
+  .tabsContainer{
+    width: 90%;
+    height: fit-content;
   }
 </style>

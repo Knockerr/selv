@@ -92,6 +92,7 @@ class ServerManager:
         """
         from utilities.miscellaneous import Stats
         self.server.lastUseDate = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        self.server.updatePropertiesInfos()
         self.server.save()
         if self.server.isOnline:
             logger.warning("Impossible to start the server - it is already online")
@@ -103,7 +104,7 @@ class ServerManager:
         _ = asyncio.create_task(self.trackUnexpectedStop())
         _ = asyncio.create_task(self.stateBus.broadcast("running"))
 
-        await asyncio.sleep(0.05)
+        await asyncio.sleep(0.02)
 
         parent = psutil.Process(self.process.pid)
         java_pid = None
@@ -142,6 +143,8 @@ class ServerManager:
             self.server.isOnline = False
             _ = asyncio.create_task(self.stateBus.broadcast("stopped"))
             self.server.updateUptime()
+            self.server.updatePropertiesInfos()
+            self.server.save()
             await self.sendCommand(command="stop")
             await self.process.wait()
             self.process = None
@@ -469,6 +472,7 @@ class Server:
         self.uptime: int = server["uptime"]
 
     def getPropertiesAsDict(self) -> {str: str}:
+        self.updatePropertiesInfos()
         propertiesPath = pathlib.Path(self.getPropertiesPath())
         if not propertiesPath.exists():
             # TODO : Handle case where the server isn't fully created in the frontend
@@ -580,6 +584,9 @@ class Server:
         else:
             step = "created"
         return step
+
+    def updatePropertiesInfos(self):
+        self.propertiesPath = findSpecifiedFileByExtension('.properties', self.path)
 
 
 # --DEPRECATED

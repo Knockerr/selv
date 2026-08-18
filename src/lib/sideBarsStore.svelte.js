@@ -3,6 +3,7 @@ function createSidebarsStore() {
         main: "Servers",
         panel: "Console",
         settings: "Compte",
+        serverSettings: "Jeu",
     })
 
     return {
