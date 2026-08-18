@@ -30,13 +30,14 @@
       .catch((err) => console.error("fetch error:", err));
   });
 
-  const tabs = $state(["Console", "Fichiers", "Parametres"]);
+  const tabs = $state(["Console", "Fichiers", "Parametres", "Connectivité"]);
   const unselectableTabs = ["Fichiers"];
 
   const tabsIcons = {
     Console: pathDb.treeStructure,
     Fichiers: pathDb.folder,
     Parametres: pathDb.wrench,
+    Connectivité: pathDb.network,
   };
 
   async function handleTabClick(tabName) {
@@ -57,6 +58,9 @@
           return;
         }
         goto(`/panel/parametres?uuid=${uuid}`);
+        break;
+      case "Connectivité":
+        goto(`/panel/connectivity?uuid=${uuid}`);
         break;
     }
   }
