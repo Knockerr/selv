@@ -1,3 +1,7 @@
+import {
+    supabase
+} from "$lib/supabaseClient.svelte";
+
 export const startServer = (uuid) => {
     fetch("http://localhost:8000/api/servers/" + uuid + "/start", {
             method: "POST",
@@ -105,6 +109,97 @@ export const postDeletedServer = async (uuid, action, body) => {
         console.log("data -> ", data);
 
         return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const getAccessToken = async () => {
+    await supabase.auth.refreshSession()
+    const session = await supabase.auth.getSession()
+    console.warn(session)
+    // Letting time for new token to activate
+    await new Promise(r => setTimeout(r, 200));
+
+    return session.data.session.access_token;
+}
+
+export const postServerWithCredentials = async (uuid, action, body) => {
+    const accessToken = await getAccessToken();
+    if (!accessToken) return;
+    const options = {
+        method: "POST",
+    };
+
+    options.headers = {
+        "Content-Type": "application/json",
+        "accessToken": accessToken
+    };
+
+    if (body) {
+        options.body = JSON.stringify(body);
+    }
+
+    try {
+        const res = await fetch(
+            `http://localhost:8000/api/servers/${uuid}/${action}`,
+            options
+        );
+
+        const data = await res.json();
+
+        console.log("data -> ", data);
+
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const getServerWitCredentials = async (uuid, endpoint) => {
+    const accessToken = await getAccessToken();
+    if (!accessToken) return;
+    try {
+        const res = await fetch(
+            `http://localhost:8000/api/servers/${uuid}/${endpoint}`, {
+                method: "GET",
+                headers: {
+                    accessToken: accessToken
+                }
+            }
+        );
+
+        const data = await res.json();
+
+        console.log("data -> ", data);
+
+        return data;
+
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+
+export const getExternalBackend = async (endpoint) => {
+    const accessToken = await getAccessToken();
+    if (!accessToken) return;
+    try {
+        const res = await fetch(
+            `http://localhost:4555/api/tunnels/${endpoint}`, {
+                method: "GET",
+                headers: {
+                    authorization: `Bearer ${accessToken}`
+                }
+            }
+        );
+
+        const data = await res.json();
+
+        console.log("data -> ", data);
+
+        return data;
+
     } catch (error) {
         console.error(error);
     }
