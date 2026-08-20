@@ -1,6 +1,8 @@
 <script>
   import Icon from "$lib/components/Icon.svelte";
+  import { defineEnvVars } from "@sveltejs/kit/env";
   import { Label } from "bits-ui";
+  import { onMount } from "svelte";
 
   let {
     placeholder,
@@ -13,8 +15,11 @@
     password = false,
     labelProps,
     color = "",
+    defaultValue,
     ...others
   } = $props();
+
+  onMount(() => (value = defaultValue));
 
   // TODO : Make password inputs able to switch display (dots to text yk)
 </script>

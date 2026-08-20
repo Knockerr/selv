@@ -117,6 +117,7 @@
 
   <Input
     placeholder="8"
+    defaultValue="8"
     label="Ram allouée au serveur"
     width="calc(100% - 2rem)"
     iconPath={pathDb.hardDrives}
