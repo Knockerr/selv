@@ -48,6 +48,9 @@
     serverStatus = "on";
     hookConsole();
     hookMetrics();
+    // Suppose that we missed the first few lines while the ws started
+    await new Promise((r) => setTimeout(r, 200));
+    recoverConsoleLogs();
   }
 
   async function stopServer() {
@@ -134,6 +137,7 @@
   }
 
   async function recoverConsoleLogs() {
+    consoleContent = "";
     let serverLogs = [];
     await fetch("http://localhost:8000/api/servers/" + uuid + "/logs", {
       method: "GET",

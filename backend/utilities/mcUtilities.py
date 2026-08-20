@@ -104,8 +104,6 @@ class ServerManager:
         _ = asyncio.create_task(self.trackUnexpectedStop())
         _ = asyncio.create_task(self.stateBus.broadcast("running"))
 
-        await asyncio.sleep(0.02)
-
         parent = psutil.Process(self.process.pid)
         java_pid = None
 
