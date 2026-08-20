@@ -1,5 +1,5 @@
 <script>
-  const { label, width = "500px", children } = $props();
+  const { label, width = "550px", children } = $props();
 </script>
 
 <div class="flex flex-col gap-0">
@@ -12,9 +12,9 @@
 <style>
   .container {
     height: fit-content;
-    background-color: #c1d6fd1a;
-    border: 1px solid #dddddd48;
-    border-radius: 15px;
+    background-color: var(--background-alt);
+    border: 1px solid var(--color-muted-foreground);
+    border-radius: 12px;
     overflow: hidden;
   }
 </style>

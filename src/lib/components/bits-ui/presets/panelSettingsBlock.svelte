@@ -1,9 +1,9 @@
 <script>
   import Container from "../baseComponents/Container.svelte";
 
-  const { children, label } = $props();
+  const { children, label, width } = $props();
 </script>
 
-<Container {label}>
+<Container {label} {width}>
   {@render children?.()}
 </Container>
