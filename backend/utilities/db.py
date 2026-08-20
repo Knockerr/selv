@@ -23,7 +23,8 @@ def initDb():
         path TEXT NOT NULL,
         maxRam INTEGER NOT NULL,
         lastUseDate TEXT,
-        creationDate TEXT
+        creationDate TEXT,
+        domain TEXT
     );
     """)
     cursor.execute("""
@@ -63,5 +64,4 @@ def removeColumn(name):
     cursor = conn.cursor()
     cursor.execute(f"ALTER TABLE servers DROP COLUMN {name}")
     conn.close()
-
 

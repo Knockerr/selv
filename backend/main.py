@@ -1,7 +1,7 @@
 import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from routers import servers, websockets
+from routers import servers, websockets, tunneling
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 import utilities.db as dbManager
@@ -34,6 +34,7 @@ app = FastAPI(
 )
 
 app.include_router(servers.router, prefix="/api", tags=["servers"])
+app.include_router(tunneling.router, prefix="/api", tags=["tunneling"])
 app.include_router(websockets.router, prefix="/ws", tags=["websockets"])
 
 

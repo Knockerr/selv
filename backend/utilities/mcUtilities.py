@@ -374,8 +374,10 @@ class Server:
                  version: str = None,
                  serverType: str = None,
                  path: str = None,
-                 uuid: UUID = None):
+                 uuid: UUID = None,
+                 domain: str = None):
 
+        self.domain: str or None = domain
         self.uuid: UUID = uuid
         self.name: str = name
         self.creationDate = creationDate
@@ -417,10 +419,10 @@ class Server:
         conn = db.getConnexion()
         cursor = conn.cursor()
         cursor.execute(f"""
-            INSERT INTO servers (uuid, name, lastUseDate, maxRam, version, serverType, path, uptime) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO servers (uuid, name, lastUseDate, maxRam, version, serverType, path, uptime, domain) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (str(self.uuid), self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path,
-              self.uptime))
+              self.uptime, self.domain or None))
         conn.commit()
         conn.close()
 
@@ -430,11 +432,11 @@ class Server:
         uuidStr = str(self.uuid)
         cursor.execute(f"""
             UPDATE servers 
-            SET name = ?, lastUseDate = ?, maxRam = ?,  version = ?, serverType = ?, path = ?, uptime = ?
+            SET name = ?, lastUseDate = ?, maxRam = ?,  version = ?, serverType = ?, path = ?, uptime = ?, domain = ?
             WHERE uuid = ?
         """, (
             self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, str(self.path), self.uptime,
-            uuidStr))
+            uuidStr, self.domain))
         conn.commit()
         conn.close()
 
@@ -470,6 +472,7 @@ class Server:
         self.serverType: str = server["serverType"]
         self.path: str = server["path"]
         self.uptime: int = server["uptime"]
+        self.domain: str or None = server["domain"]
 
     def getPropertiesAsDict(self) -> {str: str}:
         self.updatePropertiesInfos()

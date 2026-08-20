@@ -14,6 +14,7 @@ from loguru import logger
 import sys
 import platformdirs as plat
 import utilities.db as db
+import utilities.tunneling as tunneling
 from uuid import UUID
 
 appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
@@ -124,6 +125,13 @@ async def getCreationStep(uuid: UUID):
     return {"creationStep": creationStep}
 
 
+@router.get("/servers/{uuid}/creationStep")
+async def getCreationStep(uuid: UUID):
+    curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]
+    creationStep = curServer.getCreationStep()
+    return {"creationStep": creationStep}
+
+
 @router.get("/servers/{uuid}/propertiesInfos")
 async def getPropertiesInfos(uuid: UUID):
     curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]
@@ -176,7 +184,6 @@ async def getServerCurrentLogs(uuid: UUID):
 # ==========================================
 # ================== POST ==================
 # ==========================================
-
 
 @router.post("/servers/stopAll")
 async def stopAllR():
