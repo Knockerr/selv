@@ -11,7 +11,11 @@ function createUiComponentStore() {
             console.info("Opening dialog " + dialogName);
         },
         closeDialog(dialogName) {
-            store.openDialogs.splice(store.openDialogs.indexOf(dialogName));
+            const index = store.openDialogs.indexOf(dialogName);
+
+            if (index !== -1) {
+                store.openDialogs.splice(index, 1);
+            }
         },
         isDialogOpen(dialogName) {
             return store.openDialogs.includes(dialogName);
@@ -27,6 +31,16 @@ function createUiComponentStore() {
         },
         get currentUuid() {
             return store.currentUuid;
+        },
+        load() {
+            store.openDialogs.push("loader");
+        },
+        stopLoad() {
+            const index = store.openDialogs.indexOf("loader");
+
+            if (index !== -1) {
+                store.openDialogs.splice(index, 1);
+            }
         },
     }
 }
