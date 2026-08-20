@@ -18,6 +18,7 @@
     confirmLabel = "Confirmer",
     onConfirm = () => {},
     children,
+    confirmDisabled,
     ...others
   } = $props();
 
@@ -42,7 +43,7 @@
   });
 </script>
 
-<Dialog.Root bind:open {...others}>
+<Dialog.Root bind:open {...others} class="relative z-50">
   {#if triggerButton}
     <Dialog.Trigger class="bg-transparent h-fit w-fit p-0 border-none">
       {@render triggerButton?.()}
@@ -50,10 +51,11 @@
   {/if}
   <Dialog.Portal>
     <Dialog.Overlay
-      class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/80"
+      class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 bg-black/80"
     />
     <Dialog.Content
       class="rounded-[15px] bg-background-dark shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 outline-hidden fixed left-[50%] top-[50%] z-50 w-full max-w-[calc(100% - 2rem)] translate-x-[-50%] translate-y-[-50%] border p-5 flex flex-col max-w-110"
+      style="z-index: 999999 !important;"
       {...contentProps}
     >
       <Dialog.Title
@@ -83,6 +85,7 @@
             onConfirm();
             open = false;
           }}
+          disabled={confirmDisabled}
           iconPath="">{confirmLabel}</Button
         >
       </div>
