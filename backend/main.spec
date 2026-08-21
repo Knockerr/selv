@@ -1,5 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
 
+binary_name = os.environ.get('BINARY_NAME', 'mcpanel-backend')
 
 a = Analysis(
     ['main.py'],
@@ -23,7 +25,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='mcpanel-backend-x86_64-pc-windows-msvc',
+    name=binary_name,
     debug=True,
     bootloader_ignore_signals=False,
     strip=False,
