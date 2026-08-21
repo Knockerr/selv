@@ -22,8 +22,10 @@
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-shell": "^2.3.5",
     "@tauri-apps/plugin-store": "^2.4.3",
+    "@tauri-apps/plugin-updater": "^2.10.1",
     "bits-ui": "^2.18.1",
     "layerchart": "^2.1.0",
+    "marked": "^18.0.10",
     "postcss": "^8.5.16",
     "qrcode": "^1.5.4",
     "tailwindcss": "^4.3.1"

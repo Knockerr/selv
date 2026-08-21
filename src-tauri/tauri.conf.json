@@ -31,8 +31,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "externalBin": [
-      "binaries/mcpanel-backend"
-    ]
+    "externalBin": ["binaries/mcpanel-backend"],
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "CONTENT FROM PUBLICKEY.PEM",
+      "endpoints": ["https://www.youtube.com"]
+    }
   }
 }

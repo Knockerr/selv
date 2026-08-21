@@ -4,7 +4,8 @@
   import Loader from "$lib/components/bits-ui/baseComponents/Loader.svelte";
 
   onMount(() => {
-    goto("/authentication");
+    goto("/update");
+    //goto("/authentication");
   });
 </script>
 
