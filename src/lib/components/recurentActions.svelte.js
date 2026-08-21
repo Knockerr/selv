@@ -3,21 +3,12 @@ import {
 } from "$lib/supabaseClient.svelte";
 
 export const startServer = (uuid) => {
-    fetch("http://localhost:8000/api/servers/" + uuid + "/start", {
-            method: "POST",
-        })
-        .then((res) => res.json())
-        .then((data) => console.log("data -> ", data))
-        .catch((error) => console.error(error));
+    postServer(uuid, "start")
 }
 
-export const stopServer = (uuid) => {
-    fetch("http://localhost:8000/api/servers/" + uuid + "/stop", {
-            method: "POST",
-        })
-        .then((res) => res.json())
-        .then((data) => console.log("data -> ", data))
-        .catch((error) => console.error(error));
+export const stopServer = async (uuid) => {
+    postServer(uuid, "stop")
+
 }
 
 export const postServer = async (uuid, action, body) => {

@@ -2,6 +2,10 @@
   import { goto } from "$app/navigation";
   import IconButton from "$lib/components/bits-ui/baseComponents/iconButton.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import {
+    startServer,
+    stopServer,
+  } from "$lib/components/recurentActions.svelte";
   import { pathDb } from "$lib/icons/pathDb";
   import { onMount } from "svelte";
 
@@ -41,19 +45,15 @@
       color="#79c"
       onclick={(e) => {
         e.stopPropagation();
-        fetch("http://localhost:8000/api/servers/" + uuid + "/start", {
-          method: "POST",
-        });
+        startServer(uuid);
       }}
     />
     <IconButton
       iconPath={pathDb.stopCircle}
       color="#d55"
-      onclick={() => {
+      onclick={(e) => {
         e.stopPropagation();
-        fetch("http://localhost:8000/api/servers/" + uuid + "/stop", {
-          method: "POST",
-        });
+        stopServer(uuid);
       }}
     />
     <IconButton
@@ -90,9 +90,8 @@
     overflow: hidden;
   }
 
-  .component:hover{
+  .component:hover {
     background-color: rgba(255, 255, 255, 0.14);
-
   }
 
   .left,
