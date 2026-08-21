@@ -71,6 +71,11 @@ function createStatsStore() {
             save();
         },
 
+        removeRecentServer(uuid) {
+            if (store.recentServers.has(uuid)) store.recentServers.delete(uuid);
+            save();
+        },
+
         get dashboardReloadTrigger() {
             return store.dashboardReloadTrigger;
         },
