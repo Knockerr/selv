@@ -13,12 +13,13 @@
     fontSize = "1rem",
     labelStyle,
     onclick,
+    className,
     noHover=false,
   } = $props();
 </script>
 
 <button
-  class="component"
+  class={`component ${className}`}
   style:height
   style:width
   class:selected
