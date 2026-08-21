@@ -1,14 +1,17 @@
 <script>
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
+  import Loader from "$lib/components/bits-ui/baseComponents/Loader.svelte";
 
   onMount(() => {
     goto("/authentication");
   });
 </script>
 
-<div class="container"></div>
-	<h1>Chargement...</h1>
+<div class="container">
+  <Loader width="150px" height="150px" />
+</div>
+
 <style>
   .container {
     display: flex;

@@ -4,10 +4,12 @@
   import LoginCard from "$lib/components/auth/LoginCard.svelte";
   import SignupCard from "$lib/components/auth/SignupCard.svelte";
   import TotpValidationCard from "$lib/components/auth/TotpValidationCard.svelte";
+  import Loader from "$lib/components/bits-ui/baseComponents/Loader.svelte";
+  import { uiStore } from "$lib/components/bits-ui/uiComponentsStore.svelte";
   import { supabase } from "$lib/supabaseClient.svelte";
   import { onMount, untrack } from "svelte";
 
-  let currentAction = $state("signup");
+  let currentAction = $state("loading");
   let email = $state("");
 
   async function checkForTotp() {
@@ -23,6 +25,7 @@
   }
 
   async function redirect() {
+    currentAction = "loading";
     // Redirect to MFA page if needed
     const needTotp = await checkForTotp();
     if (needTotp) {
@@ -34,6 +37,7 @@
   }
 
   onMount(async () => {
+    currentAction = "loading";
     const { error } = await supabase.auth.getUser();
     const needTotp = await checkForTotp();
     if (!error) {
@@ -49,7 +53,9 @@
 </script>
 
 <div class="page">
-  {#if currentAction == "login"}
+  {#if currentAction == "loading"}
+    <Loader width="150px" height="150px" />
+  {:else if currentAction == "login"}
     <LoginCard bind:currentAction bind:email onlogin={redirect} />
   {:else if currentAction == "signup"}
     <SignupCard bind:currentAction bind:email />
