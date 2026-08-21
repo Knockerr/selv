@@ -14,6 +14,7 @@
   let factorName = $state("");
   let isError = $state(false);
   let qrCodeSrc = $state("");
+  let open = $state(false);
 
   async function enroll() {
     await supabase.auth.refreshSession();
@@ -72,7 +73,7 @@
   }
 
   onDestroy(async () => {
-    if (step !== "complete") {
+    if (step !== "complete" && open) {
       await supabase.auth.mfa.unenroll({
         factorId: factorId,
       });
@@ -94,6 +95,7 @@
     : ""}
   name="TOTPEnrollmentDialog"
   contentClass="flex flex-col items-center"
+  bind:open
 >
   {#if step == "info"}
     <Button onclick={() => (step = "factorName")}>Commencer</Button>
