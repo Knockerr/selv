@@ -10,7 +10,7 @@
 
   let password = $state("");
 
-  let { currentAction = $bindable(), email = $bindable() } = $props();
+  let { currentAction = $bindable(), email = $bindable(), onlogin } = $props();
 
   async function login() {
     console.log("Trying to log user in");
@@ -24,7 +24,7 @@
       return;
     }
     console.log("supabase login datas:", data);
-    goto("/core/dashboard");
+    onlogin()
   }
 </script>
 

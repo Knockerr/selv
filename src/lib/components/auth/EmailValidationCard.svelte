@@ -9,10 +9,22 @@
   import { supabase } from "$lib/supabaseClient.svelte";
   import { pathDb } from "$lib/icons/pathDb";
 
-  let { currentAction = $bindable(), email = $bindable() } = $props();
+  let { currentAction = $bindable(), email = $bindable(), onvalidation } = $props();
 
   let otpInput = $state();
   let loading = $state(false);
+
+  async function checkForTotp() {
+    // Return true if need totp, false otherwise
+    const { data, error } =
+      await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    const { currentLevel, nextLevel, currentAuthenticationMethods } = data;
+    if (currentLevel == "aal1" && nextLevel == "aal2") {
+      currentAction = "totpValidation";
+      return true;
+    }
+    return false;
+  }
 
   async function checkOtp() {
     if (!email) return;
@@ -27,7 +39,7 @@
       loading = false;
       return;
     }
-    goto("/core/dashboard");
+    onvalidation()
   }
 </script>
 

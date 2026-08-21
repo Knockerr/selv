@@ -2,6 +2,8 @@
   import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";
   import Input from "$lib/components/bits-ui/baseComponents/Input.svelte";
   import Switch from "$lib/components/bits-ui/baseComponents/switch.svelte";
+  import TOTPEnrollmentDialog from "$lib/components/bits-ui/presets/TOTPEnrollmentDialog.svelte";
+  import { uiStore } from "$lib/components/bits-ui/uiComponentsStore.svelte";
   import SettingsBlock from "$lib/components/core/settings/SettingsBlock.svelte";
   import SettingsItem from "$lib/components/core/settings/SettingsItem.svelte";
   import SettingsPageBase from "$lib/components/core/settings/SettingsPageBase.svelte";
@@ -19,6 +21,10 @@
     >Reinitialiser les données (action destructrice)</Button
   >
   */
+
+  function enrollTOTP() {
+    uiStore.openDialog("TOTPEnrollmentDialog");
+  }
 </script>
 
 <div class="page">
@@ -28,13 +34,15 @@
   />
   <SettingsBlock title="">
     <SettingsItem
-      title="Adresse mail"
-      description="Choisissez votre adresse email de contact et de connexion. Elle ne sera pas partagée."
+      title="Authentification à deux facteurs"
+      description="Connnectez une ou plusieurs applications d'authentification pour garantir la sécurité de votre compte."
     >
-      <Switch />
+      <Button onclick={enrollTOTP}>Ajouter</Button>
     </SettingsItem>
   </SettingsBlock>
 </div>
+
+<TOTPEnrollmentDialog />
 
 <style>
   .page {

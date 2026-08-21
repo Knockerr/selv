@@ -25,6 +25,7 @@
     "bits-ui": "^2.18.1",
     "layerchart": "^2.1.0",
     "postcss": "^8.5.16",
+    "qrcode": "^1.5.4",
     "tailwindcss": "^4.3.1"
   },
   "devDependencies": {

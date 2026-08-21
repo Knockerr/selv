@@ -3,27 +3,64 @@
   import EmailValidationCard from "$lib/components/auth/EmailValidationCard.svelte";
   import LoginCard from "$lib/components/auth/LoginCard.svelte";
   import SignupCard from "$lib/components/auth/SignupCard.svelte";
+  import TotpValidationCard from "$lib/components/auth/TotpValidationCard.svelte";
   import { supabase } from "$lib/supabaseClient.svelte";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
 
   let currentAction = $state("signup");
   let email = $state("");
 
+  async function checkForTotp() {
+    // Return true if need totp, false otherwise
+    const { data, error } =
+      await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    const { currentLevel, nextLevel, currentAuthenticationMethods } = data;
+    if (currentLevel == "aal1" && nextLevel == "aal2") {
+      currentAction = "totpValidation";
+      return true;
+    }
+    return false;
+  }
+
+  async function redirect() {
+    // Redirect to MFA page if needed
+    const needTotp = await checkForTotp();
+    if (needTotp) {
+      currentAction = "totpValidation";
+      return;
+    } else {
+      goto("/core/dashboard");
+    }
+  }
+
   onMount(async () => {
     const { error } = await supabase.auth.getUser();
+    const needTotp = await checkForTotp();
     if (!error) {
-        goto("/core/dashboard")
+      if (needTotp) {
+        currentAction = "totpValidation";
+        return;
+      }
+      goto("/core/dashboard");
+    } else {
+      currentAction = "login";
     }
   });
 </script>
 
 <div class="page">
   {#if currentAction == "login"}
-    <LoginCard bind:currentAction bind:email />
+    <LoginCard bind:currentAction bind:email onlogin={redirect} />
   {:else if currentAction == "signup"}
     <SignupCard bind:currentAction bind:email />
   {:else if currentAction == "emailValidation"}
-    <EmailValidationCard bind:email bind:currentAction />
+    <EmailValidationCard
+      bind:email
+      bind:currentAction
+      onvalidation={redirect}
+    />
+  {:else if currentAction == "totpValidation"}
+    <TotpValidationCard bind:currentAction />
   {/if}
 </div>
 
