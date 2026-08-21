@@ -107,11 +107,17 @@ class ServerManager:
         parent = psutil.Process(self.process.pid)
         java_pid = None
 
-        for child in parent.children(recursive=True):
-            if 'java' in child.name().lower():
-                java_pid = child.pid
-                logger.info(f"Found Java process with PID: {java_pid}")
+        # Check for 2 seconds each .02 seconds to let time to the server to start and get a pid
+        for i in range(100):
+            for child in parent.children(recursive=True):
+                if 'java' in child.name().lower():
+                    java_pid = child.pid
+                    logger.info(f"Found Java process with PID: {java_pid}")
+                    break
+
+            if java_pid:
                 break
+            await asyncio.sleep(0.02)
 
         if java_pid is None:
             logger.error("No Java process found, using cmd PID as fallback")
@@ -577,11 +583,11 @@ class Server:
 
     def getCreationStep(self):
         step: Literal["serverFile", "waitingEula", "created"]
-        if len(os.listdir(self.path)) < 4:
+        if not self._isEulaAccepted():
+            step = "waitingEula"
+        elif len(os.listdir(self.path)) < 4:
             # If there are 3 files only (or less) server is considered as not even started
             step = "serverFile"
-        elif not self._isEulaAccepted():
-            step = "waitingEula"
         else:
             step = "created"
         return step

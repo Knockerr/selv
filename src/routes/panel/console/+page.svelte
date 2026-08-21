@@ -24,6 +24,7 @@
   let uptime = $state("");
   let onlinePlayers = $state("");
   let serverStatus = $state("");
+  let emptyMessage = $state("");
 
   let recovery = false;
 
@@ -32,34 +33,63 @@
   const params = new URLSearchParams(window.location.search);
   let uuid = params.get("uuid") ?? "demoUuid";
 
-  onMount(() => {
-    sidebarStore.setCurrentTab("panel", "Console");
-  });
-
-  async function startServer() {
+  async function checkForEula() {
+    // Return true if need to accept EULA
     const data = await getServer(uuid, "creationStep");
-    console.warn(data);
     if (data.creationStep == "waitingEula") {
       uiStore.openDialog("eulaConfirm");
-      return;
+      return true;
     }
+  }
+
+  async function checkForServerfileState() {
+    // Return true if need to accept EULA
+    const data = await getServer(uuid, "creationStep");
+    if (data.creationStep == "serverFile") {
+      // TODO : switch server current state to a ws conn
+      emptyMessage = "Création des fichiers...";
+      return true;
+    }
+  }
+
+  async function startServer() {
+    const needEula = await checkForEula();
+    if (needEula) return;
     consoleContent = "";
-    startServerFn(uuid);
+    postServer(uuid, "start")
     serverStatus = "on";
+    checkForServerfileState();
     hookConsole();
     hookMetrics();
-    // Suppose that we missed the first few lines while the ws started
-    await new Promise((r) => setTimeout(r, 200));
-    recoverConsoleLogs();
   }
 
   async function stopServer() {
     serverStatus = "closing";
 
-    stopServerFn(uuid);
+    await postServer(uuid, "stop")
+    consoleWs.close();
+    metricsWs.close();
 
     serverStatus = "off";
   }
+
+  async function getStatus() {
+    const data = await getServer(uuid, "status");
+    console.log("Server status detected as", data.status);
+    return data.status;
+  }
+
+  async function upddateStatus() {
+    serverStatus = await getStatus();
+  }
+
+  $effect(() => {
+    if (serverStatus == "on") {
+      emptyMessage = "Démarrage en cours...";
+    } else if (serverStatus == "off") {
+      emptyMessage = "Serveur éteint";
+    }
+  });
 
   function getServerIp() {
     serverIp = fetch("http://localhost:8000/api/servers/" + uuid + "/ip", {
@@ -100,6 +130,9 @@
 
     consoleWs.onmessage = (event) => {
       consoleContent += event.data + "\n";
+      if (event.data.includes("agree to the EULA in order to run the server")) {
+        checkForEula();
+      }
     };
 
     consoleWs.onerror = (err) => {
@@ -153,30 +186,17 @@
   }
 
   onMount(async () => {
+    sidebarStore.setCurrentTab("panel", "Console");
     stats.setLastVisitedServer(uuid);
     stats.addRecentServer(uuid);
 
     getServerName();
 
     // TODO : Fetch IP
-
-    // Getting server state on Mount
-    const _ = await fetch(
-      "http://localhost:8000/api/servers/" + uuid + "/status",
-      {
-        method: "GET",
-      },
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        serverStatus = data.status;
-        if (serverStatus === "on") recovery = true;
-      })
-      .catch((err) => console.error(err));
+    serverStatus = await getStatus();
 
     if (serverStatus === "on") {
-      console.info("Server status detected as on.");
-      if (recovery) recoverConsoleLogs();
+      recoverConsoleLogs();
       hookConsole();
       hookMetrics();
     }
@@ -199,6 +219,7 @@
       {consoleContent}
       {uuid}
       bind:content={consoleContent}
+      {emptyMessage}
     />
     <div class="executionPanel">
       <div class="buttonsRow">
@@ -236,6 +257,7 @@
   description="En cliquant sur 'accepter', vous confirmez accepter l'EULA de Minecraft (https://aka.ms/MinecraftEULA)."
   onConfirm={async () => {
     await postServer(uuid, "acceptEula");
+    await stopServer();
     startServer();
   }}
   name="eulaConfirm"

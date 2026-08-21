@@ -1,5 +1,10 @@
 <script>
-  const { consoleWs, consoleContent = $bindable(""), uuid } = $props();
+  const {
+    consoleWs,
+    consoleContent = $bindable(""),
+    uuid,
+    emptyMessage = "",
+  } = $props();
 
   let currentCommand = $state("");
   let textareaEl = $state();
@@ -23,7 +28,7 @@
 
   async function sendCommand() {
     if (consoleWs) consoleWs.send(currentCommand);
-    else console.warn("Console Ws is not binded")
+    else console.warn("Console Ws is not binded");
   }
 
   function handleKeydown(e) {
@@ -35,14 +40,22 @@
 
 <div class="component">
   <div class="console">
-    <textarea
-      bind:this={textareaEl}
-      onscroll={handleScroll}
-      id="consoleContent"
-      class="consoleContent"
-      spellcheck="false"
-      readonly>{consoleContent}</textarea
-    >
+    {#if consoleContent}
+      <textarea
+        bind:this={textareaEl}
+        onscroll={handleScroll}
+        id="consoleContent"
+        class="consoleContent"
+        spellcheck="false"
+        readonly>{consoleContent}</textarea
+      >
+    {:else}
+      <div class="emptyContainer">
+        <span class="emptyText">
+          {emptyMessage}
+        </span>
+      </div>
+    {/if}
   </div>
   <div class="sendCommandLine">
     <input
@@ -160,5 +173,18 @@
   .sendCommandButton:active {
     transition: background-color 0s;
     background-color: var(--accent-hover);
+  }
+
+  .emptyContainer{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .emptyText {
+    font-size: 1rem;
+    color: var(--foreground-alt);
   }
 </style>
