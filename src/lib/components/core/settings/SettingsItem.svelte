@@ -1,5 +1,5 @@
 <script>
-  const { title, description, children } = $props();
+  const { title, description, children, noborder = false } = $props();
 </script>
 
 <div class="component">
@@ -12,7 +12,9 @@
   </div>
 </div>
 
-<div class="separator"></div>
+{#if !noborder}
+  <div class="separator"></div>
+{/if}
 
 <style>
   .component {

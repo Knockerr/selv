@@ -25,6 +25,7 @@
     <SettingsItem
       title="Réinitialisation des données"
       description="Cette action effacera tous les serveurs de l'interface et supprimera vos dossiers. Vos serveurs ne seront pas supprimés mais il faudra les réimporter si vous souhaitez les utiliser."
+      noborder
     >
       <Button iconPath={pathDb.arrowClockwise} onclick={fullDatasReset}
         >Réinitialiser</Button

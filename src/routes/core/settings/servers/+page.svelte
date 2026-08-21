@@ -31,6 +31,7 @@
     <SettingsItem
       title="Serveurs supprimés"
       description="Restorez ou supprimez définitivement les serveurs que vous avez supprimé. Les serveurs supprimés sont effacés de manière irréversible au bout de 15 jours"
+      noborder
     >
       <DeletedFoldersManager />
     </SettingsItem>

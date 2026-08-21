@@ -88,6 +88,7 @@
     <SettingsItem
       title="Déconnexion"
       description="Cliquer sur ce bouton pour vous déconnecter de votre compte."
+      noborder
     >
       <Button onclick={signOut}>Déconnexion</Button>
     </SettingsItem>

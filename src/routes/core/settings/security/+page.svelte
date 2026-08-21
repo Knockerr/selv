@@ -55,6 +55,7 @@
     <SettingsItem
       title="Application d'A2F"
       description="Gérez en temps réel quelles applications d'authentification sont liées à votre compte"
+      noborder
     >
       {#if connectedFactors == true}
         {#each connectedFactors as { name, id }}
