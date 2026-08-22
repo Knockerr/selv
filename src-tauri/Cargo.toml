@@ -1,6 +1,6 @@
 [package]
 name = "mcpaneltauriappsv"
-version = "0.1.0"
+version = "0.1.1"
 description = "Logiciel de panel pour serveur minecraft hébergés sur son pc."
 authors = ["Knocker"]
 edition = "2024"
@@ -18,7 +18,6 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-windows = { version = "0.62.2", features = ["Win32_System_Services", "Win32_Foundation", "Win32_Security"] }
 tauri = { version = "2.11.0", features = [] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
@@ -26,6 +25,9 @@ serde_json = "1"
 tauri-plugin-shell = "2"
 tauri-plugin-store = "2"
 tauri-plugin-dialog = "2"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = "0.62.2", features = ["Win32_System_Services", "Win32_Foundation", "Win32_Security"] }
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-updater = "2"

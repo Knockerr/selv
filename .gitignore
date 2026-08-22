@@ -24,3 +24,4 @@ src-tauri/binaries/mcpanel-backend-x86_64-pc-windows-msvc.exe
 *.pyc
 backend/routers/__pycache__/
 src/localTests
+~/
