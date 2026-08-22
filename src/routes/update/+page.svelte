@@ -2,23 +2,102 @@
   import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";
   import Container from "$lib/components/bits-ui/baseComponents/Container.svelte";
   import IconButton from "$lib/components/bits-ui/baseComponents/iconButton.svelte";
+  import ProgressBar from "$lib/components/bits-ui/baseComponents/ProgressBar.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import { post } from "$lib/components/recurentActions.svelte";
   import { pathDb } from "$lib/icons/pathDb";
+  import { event } from "@tauri-apps/api";
+  import { getVersion } from "@tauri-apps/api/app";
+  import { check } from "@tauri-apps/plugin-updater";
   import { marked } from "marked";
   import { onMount } from "svelte";
 
   let currentVersion = $state("v0.1.0");
-  let newVersion = $state("v0.1.2");
+  let newVersion = $state("");
   let updateTag = $state("patch");
-  let downloadSize = $state("5Mo");
+  let downloaded = $state(0);
+  let downloadSize = $state(0);
+  let downloadState = $state();
   let releaseDate = $state("08/08/26");
-  let updateMdInfos = $state("`Salut! Je suis du code`");
+  let updateMdInfos = $state("");
 
-  onMount(async () => {
+  let update;
+  async function checkUpdate() {
+    update = await check();
+    if (!update) {
+      newVersion = null;
+      return;
+    }
+    console.log(`Found update ${update.version} from ${update.date}`);
+    currentVersion = await getVersion();
+    newVersion = update.version;
+    releaseDate = update.date;
+    await updateMd();
+    // Update tag
+    const match = updateMdInfos.match(/^\[([^\]]+)\]/);
+    if (match) {
+      console.log("Tag trouvé :", match[1]);
+      updateTag = match[1];
+    }
+  }
+
+  async function updateMd() {
     const res = await fetch(
-      "https://raw.githubusercontent.com/sveltejs/kit/master/README.md",
+      "https://github.com/Knockerr/mcPanelComplete/releases/latest/download/latest.json",
+      {
+        method: "GET",
+      },
     );
-    updateMdInfos = await res.text();
+
+    const data = await res.json();
+    if (data.notes) updateMdInfos = data.notes;
+  }
+
+  async function closeBackend() {
+    let res = await post("shutdown");
+    if (!res.ok) {
+      console.error("Impossible to stop internal backend : ", res);
+    }
+  }
+
+  async function installUpdate() {
+    await checkUpdate();
+    if (!update) return;
+    let downloaded = $state(0);
+    let contentLength = $state(0);
+
+    // Closing all servers and internal backend
+    downloadState = "Fermeture des serveurs";
+    await closeBackend();
+
+    await update.downloadAndInstall((event) => {
+      switch (event.event) {
+        case "Started":
+          contentLength = event.data.contentLength;
+          downloadState = "Démarrage du téléchargement";
+          console.log(`started downloading ${event.data.contentLength} bytes`);
+          break;
+        case "Progress":
+          downloaded += event.data.chunkLength;
+          downloadState = "Téléchargement en cours...";
+          console.log(`downloaded ${downloaded} from ${contentLength}`);
+          break;
+        case "Finished":
+          downloadState = "Téléchargement terminé, installation..";
+          console.log("download finished");
+          break;
+      }
+    });
+
+    downloadState = "Installation terminée! Redémarrage..";
+    // Give user time to see message
+    await new Promise((r) => setTimeout(r, 1500));
+    await relaunch();
+  }
+
+  onMount(() => {
+    checkUpdate();
+    updateMd();
   });
 </script>
 
@@ -26,7 +105,14 @@
   <div class="container" width="80%">
     <div class="titleContainer">
       <div class="titles">
-        <h1 class="title">Mise à jour</h1>
+        <h1 class="title">
+          Mise à jour
+          {#if newVersion}
+            <div class="tag">
+              {updateTag}
+            </div>
+          {/if}
+        </h1>
         <h2 class="versions">
           {currentVersion}
           {#if newVersion}
@@ -34,44 +120,67 @@
             {newVersion}
           {/if}
         </h2>
-        {#if newVersion}
-          <div class="tag">
-            {updateTag}
-          </div>
-        {/if}
       </div>
       {#if !newVersion}
-        <Button emphasize iconPath={pathDb.arrowClockwise} className="mr-5 mt-2"
-          >Chercher des mises à jour</Button
+        <Button
+          iconPath={pathDb.arrowClockwise}
+          className="mr-5 mt-2"
+          onclick={checkUpdate}>Chercher des mises à jour</Button
         >
       {:else}
-        <Button emphasize iconPath={pathDb.download} className="mr-5 mt-2"
-          >Installer</Button
+        <Button
+          emphasize
+          iconPath={pathDb.download}
+          className="mr-5 mt-2"
+          onclick={installUpdate}
+          disabled={downloadState}>Installer</Button
         >
       {/if}
     </div>
 
     <div class="middleSection">
-      {#if newVersion}
-        <div class="infosContainer">
-          <span class="informativeText">
-            Une nouvelle version est disponible! Mettez à jour le logiciel pour
-            accéder aux dernières fonctionnalitées et patchs de sécurité.
-          </span>
-          <span class="informativeText"
-            >Vos serveurs actifs seront éteint pendant la mise à jour. Vous
-            devrez les relancer manuellement après cette dernière.</span
-          >
-        </div>
-        <div class="updateInfos">
-          <span class="updateInfo"
-            >Taille du téléchargement: {downloadSize}</span
-          >
-          <span class="updateInfo">Date: {releaseDate}</span>
-        </div>
-      {:else}
-        <span class="informativeText">Vous êtes à jour!</span>
-      {/if}
+      <div class="left">
+        {#if newVersion && !downloadState}
+          <div class="infosContainer">
+            <span class="informativeText">
+              Une nouvelle version est disponible! Mettez à jour le logiciel
+              pour accéder aux dernières fonctionnalitées et patchs de sécurité.
+            </span>
+            <span class="informativeText"
+              >Vos serveurs actifs seront éteint pendant la mise à jour. Vous
+              devrez les relancer manuellement après cette dernière.</span
+            >
+          </div>
+          <div class="updateInfos">
+            <span class="updateInfo">Date: {releaseDate}</span>
+          </div>
+        {:else if downloadState}
+          <div class="dowloadStateContainer">
+            <span>{downloadState}</span>
+            <div class="downloadProgressContainer">
+              <ProgressBar
+                width="250px"
+                progress={downloaded}
+                max={downloadSize}
+              />
+              <span class="downloadProgressText"
+                >{downloaded} / {downloadSize}</span
+              >
+            </div>
+          </div>
+        {:else if !newVersion}
+          <span class="informativeText">Vous êtes à jour!</span>
+        {/if}
+      </div>
+      <div class="right">
+        <Button iconPath={pathDb.arrowRight} disabled={downloadState} emphasize={!newVersion}>
+          {#if newVersion}
+            Continuer sans mettre à jour
+          {:else}
+            Continuer
+          {/if}</Button
+        >
+      </div>
     </div>
 
     {#if newVersion}
@@ -127,13 +236,16 @@
   .title {
     font-size: 2.5rem;
     display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
   }
 
   .versions {
     font-size: 1.1rem;
     font-weight: 500;
     margin-left: 10px;
-    margin-bottom: 15px;
+    margin-bottom: -15px;
   }
 
   .tag {
@@ -149,18 +261,36 @@
   }
 
   .middleSection {
+    height: 35%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .left {
     height: 25%;
     box-sizing: border-box;
-    padding: 30px 0;
+    padding: 45px 0;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
+  }
+
+  .right {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-sizing: border-box;
+    margin-right: 30px;
   }
 
   .infosContainer {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 10px;
+    width: 120%;
   }
 
   .informativeText {
@@ -172,6 +302,23 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
+  }
+
+  .dowloadStateContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .downloadProgressContainer {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .downloadProgressText {
+    color: var(--color-foreground-alt);
   }
 
   .updateMdTitle {

@@ -11,6 +11,34 @@ export const stopServer = async (uuid) => {
 
 }
 
+export const post = async (endpoint, body) => {
+    const options = {
+        method: "POST",
+    };
+
+    if (body) {
+        options.headers = {
+            "Content-Type": "application/json",
+        };
+        options.body = JSON.stringify(body);
+    }
+
+    try {
+        const res = await fetch(
+            `http://localhost:8000/${action}`,
+            options
+        );
+
+        const data = await res.json();
+
+        console.log("data -> ", data);
+
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 export const postServer = async (uuid, action, body) => {
     const options = {
         method: "POST",

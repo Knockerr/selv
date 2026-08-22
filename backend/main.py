@@ -7,8 +7,12 @@ from starlette.middleware.cors import CORSMiddleware
 import utilities.db as dbManager
 import uvicorn
 import utilities.miscellaneous
-from utilities import softDelete
+from utilities import softDelete, mcUtilities
 from utilities.miscellaneous import Stats
+import os
+import signal
+
+from utilities.serverUtilities import cache
 
 
 @asynccontextmanager
@@ -46,6 +50,24 @@ def root():
         "version": "1.0.0"
     }
 
+
+@app.post("/shutdown")
+async def shutdown():
+    # Close all running servers
+    runningServersObjects: list[mcUtilities.ServerManager] = []
+    for serverUuid in Stats.runningServers:
+        result = cache.getCurrentServerAndSm(serverUuid)
+        serverManager: mcUtilities.ServerManager = result["serverManager"]
+        if serverManager.server.isOnline:
+            runningServersObjects.append(serverManager)
+
+    stopRunningServersList = [server.stopServer() for server in runningServersObjects]
+    # TODO : Better error handling
+    results = await asyncio.gather(*stopRunningServersList)
+
+    # Closing the process in itself
+    os.kill(os.getpid(), signal.SIGTERM)
+    return {"status": "Stopping.."}
 
 if __name__ == "__main__":
     dbManager.initDb()
