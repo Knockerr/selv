@@ -1,6 +1,6 @@
 [package]
 name = "mcpaneltauriappsv"
-version = "0.1.2"
+version = "0.1.1"
 description = "Logiciel de panel pour serveur minecraft hébergés sur son pc."
 authors = ["Knocker"]
 edition = "2024"
