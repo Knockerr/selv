@@ -66,10 +66,12 @@ jobs:
 
       - name: Read changelog
         id: changelog
+        shell: bash
         run: |
           echo "content<<EOF" >> $GITHUB_OUTPUT
           cat RELEASE_NOTES.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+          "Changenotes are -> ${{ steps.changelog.outputs.content }}"
 
       - uses: tauri-apps/tauri-action@v1
         env:
