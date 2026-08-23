@@ -95,6 +95,8 @@
     await relaunch();
   }
 
+  // TODO BEFOREPROD: Test update system with repo in public
+
   onMount(() => {
     checkUpdate();
     updateMd();

@@ -2,10 +2,28 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import Loader from "$lib/components/bits-ui/baseComponents/Loader.svelte";
+  import { check } from "@tauri-apps/plugin-updater";
 
-  onMount(() => {
-    goto("/update");
-    //goto("/authentication");
+  async function isUpdate() {
+    try {
+      update = await check();
+      if (update) return true;
+      else return false;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  onMount(async () => {
+    isUpdate = await isUpdate();
+    // Check for updates
+    if (isUpdate) {
+      console.log("Update detected, redirecting to update...")
+      goto("/update");
+    } else {
+      console.log("No update detected, redirecting to auth...")
+      goto("/authentication");
+    }
   });
 </script>
 
