@@ -1,6 +1,7 @@
 <script>
-  import TopNavBarButton from "./topNavBarButton.svelte";
   import { pathDb } from "$lib/icons/pathDb";
+  import Button from "./bits-ui/baseComponents/Button.svelte";
+  import ProfilePicture from "./bits-ui/baseComponents/ProfilePicture.svelte";
 </script>
 
 <div class="container">
@@ -13,31 +14,17 @@
     </div>
     <div class="rightSide">
       <div class="rightSideButtons">
-        <TopNavBarButton
-          title="Signaler un bug"
-          classes="topButton"
-          path="{pathDb.bug},"
-          color="#ddd"
-        />
-        <TopNavBarButton
-          title="Partager le logiciel"
-          classes="topButton"
-          path="{pathDb.share},"
-          color="#ddd"
-        />
-        <TopNavBarButton
-          title="xx/xx serveurs actifs"
-          classes="topButton"
-          path="{pathDb.power},"
-          color="#ddd"
-        />
+        <Button iconPath="{pathDb.bug}," color="#ddd" height="40px">
+          Signaler un bug
+        </Button>
+        <Button iconPath="{pathDb.share}," color="#ddd" height="40px">
+          Partager le logiciel
+        </Button>
+        <Button iconPath="{pathDb.git}," color="#ddd" height="40px">
+          Code source
+        </Button>
       </div>
-      <TopNavBarButton
-        title=""
-        id="accountButton"
-        path="{pathDb.user},"
-        color="#ddd"
-      />
+      <ProfilePicture size="40px" button />
     </div>
   </div>
 </div>
@@ -102,6 +89,10 @@
     color: white;
     font-family: "Open Sans", sans-serif;
     font-size: 14px;
+  }
+
+  .rightSide{
+    margin-right: 20px;
   }
 
   .rightSideButtons {
