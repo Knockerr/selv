@@ -1,7 +1,10 @@
 <script>
   import { pathDb } from "$lib/icons/pathDb";
+  import { openUrl } from "@tauri-apps/plugin-opener";
   import Button from "./bits-ui/baseComponents/Button.svelte";
   import ProfilePicture from "./bits-ui/baseComponents/ProfilePicture.svelte";
+
+  // TODO BEFOREPROD: Add links
 </script>
 
 <div class="container">
@@ -91,7 +94,7 @@
     font-size: 14px;
   }
 
-  .rightSide{
+  .rightSide {
     margin-right: 20px;
   }
 

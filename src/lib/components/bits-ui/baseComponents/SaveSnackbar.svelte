@@ -18,7 +18,7 @@
     transition:fly={{ duration: 150, y: 10 }}
   >
     <span class="text-base">{label}</span>
-    <div class="flex flex-row gap-1">
+    <div class="flex flex-row gap-3">
       <Button onclick={oncancel}>Annuler</Button>
       <Button emphasize={true} onclick={onsave}>Sauvegarder</Button>
     </div>
@@ -30,10 +30,10 @@
     background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid #dddddd13;
     border-radius: 10px;
-    padding: 10px;
+    padding: 10px 20px;
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
   }
 </style>

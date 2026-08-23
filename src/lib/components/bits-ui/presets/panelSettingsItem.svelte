@@ -19,7 +19,7 @@
     emphasize,
     itemDisabled,
     onclick = () => {},
-    value = $bindable(),
+    value = $bindable(""),
   } = $props();
 </script>
 

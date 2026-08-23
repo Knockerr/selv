@@ -11,15 +11,17 @@
     className,
     style,
     width = "100%",
-    value = $bindable(),
+    value = $bindable(""),
     password = false,
     labelProps,
     color = "",
-    defaultValue,
+    defaultValue = "",
     ...others
   } = $props();
 
-  onMount(() => (value = defaultValue));
+  onMount(() => {
+    if (defaultValue) value = defaultValue;
+  });
 
   // TODO : Make password inputs able to switch display (dots to text yk)
 </script>
