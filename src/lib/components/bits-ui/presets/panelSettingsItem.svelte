@@ -17,6 +17,7 @@
     iconPath,
     children,
     emphasize,
+    dangerous = false,
     itemDisabled,
     onclick = () => {},
     value = $bindable(""),
@@ -25,10 +26,10 @@
 
 <div class="itemContainer" class:itemDisabled>
   <div class="leftSide">
-    <span class="title">{title}</span>
-    <span class="description">{description}</span>
+    <span class="title" class:dangerous>{title}</span>
+    <span class="description" class:dangerous>{description}</span>
   </div>
-  <div class="flex flex-col gap-1">
+  <div class="flex flex-col gap-1 justify-center">
     {#if inputType == "select"}
       <Select
         bind:value
@@ -71,7 +72,6 @@
   .itemContainer {
     display: flex;
     flex-direction: row;
-    align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #dddddd48;
     padding: 17px 17px;
@@ -82,10 +82,13 @@
   .itemContainer::after {
     z-index: 100;
     position: absolute;
+    top: -250px;
     left: -500px;
     width: 2000px;
     height: 2000px;
     background-color: transparent;
+    height: 1000%;
+    width: 1000%;
   }
 
   .itemContainer.itemDisabled::after {
@@ -99,7 +102,7 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    justify-content: center;
+
   }
 
   .title {
@@ -111,5 +114,12 @@
     color: var(--color-foreground-alt);
     font-size: 0.85rem;
     letter-spacing: 0.15px;
+  }
+
+  .title.dangerous {
+    color: var(--dangerous) !important;
+  }
+  .description.dangerous {
+    color: var(--dangerous-alt) !important;
   }
 </style>

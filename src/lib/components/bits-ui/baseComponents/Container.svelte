@@ -17,4 +17,8 @@
     border-radius: 12px;
     overflow: hidden;
   }
+
+  .container:last-child{
+    border-bottom: none;
+  }
 </style>

@@ -24,6 +24,7 @@ def initDb():
         maxRam INTEGER NOT NULL,
         lastUseDate TEXT,
         creationDate TEXT,
+        uptime INTEGER,
         domain TEXT
     );
     """)

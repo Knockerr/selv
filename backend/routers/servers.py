@@ -118,6 +118,16 @@ async def getServerDatas(uuid: UUID):
     }
 
 
+@router.get("/servers/{uuid}/datas")
+def getServerDatasR(uuid: UUID):
+    conn = db.getConnexion()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM servers WHERE uuid=?", (str(uuid),))
+    result = cursor.fetchone()
+    conn.close()
+    return {"datas": result}
+
+
 @router.get("/servers/{uuid}/creationStep")
 async def getCreationStep(uuid: UUID):
     curServer: mcUtilities.Server = cache.getCurrentServerAndSm(uuid)["server"]

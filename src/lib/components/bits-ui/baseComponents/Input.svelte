@@ -11,7 +11,7 @@
     className,
     style,
     width = "100%",
-    value = $bindable(""),
+    value = $bindable(),
     password = false,
     labelProps,
     color = "",

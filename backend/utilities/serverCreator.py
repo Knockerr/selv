@@ -273,6 +273,8 @@ def handlePaperCreation(name: str, uuid: UUID, type_: str, version: str, ram: in
     # Récuperer la date
     creationDate: str = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
+    logger.info(f"{creationDate = }")
+
     # Créer le fichier start.bat de lancement du serveur
     createStartBatFile(name, version, ram, f'PaperServer-{version}.jar')
 

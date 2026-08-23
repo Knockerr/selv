@@ -15,7 +15,7 @@
   let reloadTrigger = $state(0);
 
   onMount(() => {
-    sidebarStore.setCurrentTab("panel", "Parametres");
+    sidebarStore.setCurrentTab("panel", "Jouabilité");
     serverCreationStep = getServer(uuid, "creationStep");
   });
 

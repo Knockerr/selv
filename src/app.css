@@ -34,6 +34,7 @@
   --emphasized: #6e41e2;
 
   --dangerous: rgb(255, 45, 45);
+  --dangerous-alt: rgb(221, 78, 78);
   --success: rgb(129, 162, 255);
 
   --foreground: hsl(222, 20%, 95%);

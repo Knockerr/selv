@@ -423,10 +423,10 @@ class Server:
         conn = db.getConnexion()
         cursor = conn.cursor()
         cursor.execute(f"""
-            INSERT INTO servers (uuid, name, lastUseDate, maxRam, version, serverType, path, uptime, domain) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (str(self.uuid), self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, self.path,
-              self.uptime, self.domain or None))
+            INSERT INTO servers (uuid, name, creationDate, lastUseDate, maxRam, version, serverType, path, uptime, domain) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (str(self.uuid), self.name, self.creationDate, self.lastUseDate, self.maxRam, self.version,
+              self.serverType, self.path, self.uptime, self.domain or None))
         conn.commit()
         conn.close()
 
@@ -440,7 +440,7 @@ class Server:
             WHERE uuid = ?
         """, (
             self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, str(self.path), self.uptime,
-            uuidStr, self.domain))
+            self.domain, uuidStr))
         conn.commit()
         conn.close()
 
@@ -453,6 +453,7 @@ class Server:
             return
         diff: int = round((datetime.now(timezone.utc) - self.startTime).total_seconds())
         self.uptime += diff
+        logger.debug(f"Updating server uptime. Diff: {diff}. Total: {self.uptime}")
         self.save()
 
     def loadDatas(self) -> None:

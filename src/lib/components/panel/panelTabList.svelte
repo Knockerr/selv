@@ -30,14 +30,23 @@
       .catch((err) => console.error("fetch error:", err));
   });
 
-  const tabs = $state(["Console", "Fichiers", "Parametres", "Connectivité"]);
+  const tabs = $state([
+    "Console",
+    "Fichiers",
+    "Jouabilité",
+    "Connectivité",
+    "Gestion",
+    "Dangereux",
+  ]);
   const unselectableTabs = ["Fichiers"];
 
   const tabsIcons = {
     Console: pathDb.treeStructure,
     Fichiers: pathDb.folder,
-    Parametres: pathDb.wrench,
+    Jouabilité: pathDb.sliders,
     Connectivité: pathDb.network,
+    Gestion: pathDb.wrench,
+    Dangereux: pathDb.warn,
   };
 
   async function handleTabClick(tabName) {
@@ -50,17 +59,23 @@
         console.warn(serverPath);
         await Command.create("explorer", [serverPath]).execute();
         break;
-      case "Parametres":
+      case "Jouabilité":
         const data = await getServer(uuid, "propertiesInfos");
         const propertiesExist = data.exist;
         if (!propertiesExist) {
           uiStore.openDialog("propertiesWarning");
           return;
         }
-        goto(`/panel/parametres?uuid=${uuid}`);
+        goto(`/panel/gameplay?uuid=${uuid}`);
         break;
       case "Connectivité":
         goto(`/panel/connectivity?uuid=${uuid}`);
+        break;
+      case "Gestion":
+        goto(`/panel/management?uuid=${uuid}`);
+        break;
+      case "Dangereux":
+        goto(`/panel/dangerous?uuid=${uuid}`);
         break;
     }
   }
