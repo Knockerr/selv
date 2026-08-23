@@ -1,15 +1,36 @@
 <script>
   import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";
   import { pathDb } from "$lib/icons/pathDb";
+  import { onMount } from "svelte";
   import GridElem from "./gridElem.svelte";
+  import { supabase } from "$lib/supabaseClient.svelte";
+  import { goto } from "$app/navigation";
+  import ProfilePicture from "$lib/components/bits-ui/baseComponents/ProfilePicture.svelte";
+
+  let userPicture = $state("");
+  let username = $state("");
+  let userMail = $state("");
+
+  onMount(async () => {
+    const { data, error } = await supabase.auth.getUser();
+    if (error) return;
+    username = data.user.user_metadata.username || "";
+    userPicture = data.user.user_metadata.profilePicture;
+    userMail = data.user.email;
+  });
 </script>
 
 <GridElem>
   <div class="card">
-    <div class="pp"></div>
-    <div class="name">John Smith</div>
-    <div class="mail">johnsmith@gmail.com</div>
-    <Button iconPath={pathDb.arrowRight} emphasize className="mt-2">Mon compte</Button>
+    <ProfilePicture size="70px" />
+    <div class="name">{username}</div>
+    <div class="mail">{userMail}</div>
+    <Button
+      iconPath={pathDb.arrowRight}
+      emphasize
+      className="mt-2"
+      onclick={() => goto("/core/settings/account")}>Mon compte</Button
+    >
   </div>
 </GridElem>
 
@@ -22,14 +43,6 @@
     height: 100%;
     width: 100%;
     gap: 10px;
-  }
-
-  .pp {
-    background-image: url("https://cdn.pixabay.com/photo/2015/11/16/14/43/cat-1045782_640.jpg");
-    background-size: cover;
-    border-radius: 50%;
-    height: 70px;
-    width: 70px;
   }
 
   .mail {

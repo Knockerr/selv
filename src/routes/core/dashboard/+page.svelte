@@ -91,13 +91,11 @@
     grid-gap: 20px;
   }
 
-  /* Haut gauche : identité utilisateur, gros bloc carré */
   .userId {
     grid-column: 1 / 3;
     grid-row: 1 / 3;
   }
 
-  /* Haut, à côté de userId : deux stats rapides côte à côte */
   .serversNumber {
     grid-column: 3 / 5;
     grid-row: 1 / 2;
@@ -108,13 +106,11 @@
     grid-row: 1 / 2;
   }
 
-  /* Sous les deux stats rapides : barre perf plus large */
   .serverStats {
     grid-column: 3 / 7;
     grid-row: 2 / 3;
   }
 
-  /* Colonne droite : deux blocs verticaux */
   .quickActions {
     grid-column: 7 / 9;
     grid-row: 1 / 4;
@@ -125,13 +121,11 @@
     grid-row: 3 / 6;
   }
 
-  /* Bande sous userId/performances : serveurs récents */
   .recentServers {
     grid-column: 9 / 11;
     grid-row: 1 / 4;
   }
 
-  /* Pied de page pleine largeur : articles */
   .articles {
     grid-column: 7 / 11;
     grid-row: 4 / 6;

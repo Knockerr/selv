@@ -5,6 +5,7 @@
   import Dialog from "$lib/components/bits-ui/baseComponents/dialog.svelte";
   import Input from "$lib/components/bits-ui/baseComponents/Input.svelte";
   import InputDialog from "$lib/components/bits-ui/baseComponents/InputDialog.svelte";
+  import ProfilePicture from "$lib/components/bits-ui/baseComponents/ProfilePicture.svelte";
   import SaveSnackbar from "$lib/components/bits-ui/baseComponents/SaveSnackbar.svelte";
   import Switch from "$lib/components/bits-ui/baseComponents/switch.svelte";
   import { uiStore } from "$lib/components/bits-ui/uiComponentsStore.svelte";
@@ -21,15 +22,20 @@
   let email = $state("");
   let newPassword = $state("");
   let oldPassword = $state("");
+  let username = $state("");
 
   let emailInput = $state("");
+  let usernameInput = $state("");
+  let profilePictureInput = $state("");
 
   async function updateUserProperty(property) {
     const { data, error } = await supabase.auth.updateUser(property);
+    console.warn(data);
     if (error) {
       console.error("Error whilst trying to edit user property: ", error);
       return;
     }
+    updateInformations();
   }
 
   async function getUserProperties() {
@@ -51,10 +57,15 @@
     goto("/authentication");
   }
 
-  onMount(async () => {
+  async function updateInformations() {
     const data = await getUserProperties();
     const userData = data.user;
     email = userData.email;
+    username = userData.user_metadata.username || "";
+  }
+
+  onMount(async () => {
+    updateInformations();
   });
 </script>
 
@@ -72,6 +83,28 @@
       <Button
         onclick={() => {
           uiStore.openDialog("emailEditDialog");
+        }}>Modifier</Button
+      >
+    </SettingsItem>
+    <SettingsItem
+      title="Nom d'utilisateur"
+      description="Modifiez votre nom d'utilisateur"
+    >
+      <span>Nom actuel: {username || "Non défini"}</span>
+      <Button
+        onclick={() => {
+          uiStore.openDialog("usernameEditDialog");
+        }}>Modifier</Button
+      >
+    </SettingsItem>
+    <SettingsItem
+      title="Photo de profil"
+      description="Modifiez votre photo de profil"
+    >
+      <div class="flex flex-row gap-3"></div>
+      <Button
+        onclick={() => {
+          uiStore.openDialog("profilePicEditDialog");
         }}>Modifier</Button
       >
     </SettingsItem>
@@ -105,6 +138,30 @@
   }}
   bind:value={emailInput}
   name="emailEditDialog"
+/>
+
+<InputDialog
+  title="Nom d'utilisateur"
+  description="Modifiez le nom d'utilisateur lié à votre compte."
+  label="Nouveau nom"
+  placeholder="Nom d'utilisateur"
+  onConfirm={() => {
+    updateUserProperty({ data: { username: usernameInput } });
+  }}
+  bind:value={usernameInput}
+  name="usernameEditDialog"
+/>
+
+<InputDialog
+  title="Photo de profil"
+  description="Modifiez la photo lié à votre compte."
+  label="Lien de la photo de profil"
+  placeholder="https://site.com/photo.jpg"
+  onConfirm={() => {
+    updateUserProperty({ data: { profilePicture: profilePictureInput } });
+  }}
+  bind:value={profilePictureInput}
+  name="profilePicEditDialog"
 />
 
 <Confirm

@@ -7,6 +7,7 @@
   import { Command, open } from "@tauri-apps/plugin-shell";
   import QuickActionsElement from "../dashboardUtilities/QuickActionsElement.svelte";
   import GridElem from "./gridElem.svelte";
+  import { openUrl } from "@tauri-apps/plugin-opener";
 
   const actions = $derived([
     {
@@ -57,7 +58,9 @@
       label: "Mises à jour",
       icon: pathDb.update,
       color: "#b50",
-      onclick: () => {}, // TODO: Update after the update system is done
+      onclick: () => {
+        goto("/update")
+      }, // TODO: Update after the update system is done
     },
     {
       label: "Fichiers",
@@ -78,7 +81,7 @@
       icon: pathDb.gears,
       color: "",
       onclick: () => {
-        goto("/core/settings");
+        goto("/core/settings/account");
         sidebarStore.setCurrentTab("main", "Paramètres");
       },
     },
@@ -86,7 +89,9 @@
       label: "Discord",
       icon: pathDb.question,
       color: "#5865F2",
-      onclick: () => {}, // TODO : Goto discord link
+      onclick: () => {
+        openUrl("https://discord.gg/FVh9daFrH7")
+      }, // TODO : Goto discord link
     },
   ]);
 </script>
