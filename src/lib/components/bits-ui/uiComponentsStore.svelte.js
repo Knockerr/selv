@@ -3,6 +3,7 @@ function createUiComponentStore() {
         openDialogs: [],
         currentEditedFolder: "",
         currentUuid: "",
+        loaderTitle: "",
     });
 
     return {
@@ -32,7 +33,8 @@ function createUiComponentStore() {
         get currentUuid() {
             return store.currentUuid;
         },
-        load() {
+        load(title) {
+            if (title) store.loaderTitle = title;
             store.openDialogs.push("loader");
         },
         stopLoad() {
@@ -41,7 +43,11 @@ function createUiComponentStore() {
             if (index !== -1) {
                 store.openDialogs.splice(index, 1);
             }
+            store.loaderTitle = "";
         },
+        get loaderTitle() {
+            return store.loaderTitle;
+        }
     }
 }
 

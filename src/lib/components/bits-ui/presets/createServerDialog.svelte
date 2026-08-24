@@ -8,6 +8,7 @@
   import Input from "../baseComponents/Input.svelte";
   import Select from "../baseComponents/select.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
+  import { uiStore } from "../uiComponentsStore.svelte";
 
   const { refreshFoldersFunction } = $props();
 
@@ -58,6 +59,7 @@
   ];
 
   async function onServerCreationClick() {
+    uiStore.load("Téléchargement des fichiers");
     const response = await fetch(`http://localhost:8000/api/servers/create`, {
       method: "POST",
       headers: {
@@ -74,6 +76,8 @@
     const data = await response.json();
 
     await folderSystem.addServer(data.uuid);
+
+    uiStore.stopLoad();
 
     refreshFoldersFunction();
   }

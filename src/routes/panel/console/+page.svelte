@@ -67,8 +67,8 @@
     serverStatus = "closing";
 
     await postServer(uuid, "stop")
-    consoleWs.close();
-    metricsWs.close();
+    consoleWs?.close();
+    metricsWs?.close();
 
     serverStatus = "off";
   }
