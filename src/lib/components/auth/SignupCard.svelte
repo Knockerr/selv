@@ -37,10 +37,12 @@
     const { data, error } = await supabase.auth.signUp({
       email: email,
       password: password,
-      data: {
-        username: username,
-        profilePicture:
-          "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
+      options: {
+        data: {
+          username: username,
+          profilePicture:
+            "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png",
+        },
       },
     });
     if (error) {

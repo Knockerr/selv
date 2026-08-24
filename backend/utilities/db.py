@@ -25,7 +25,8 @@ def initDb():
         lastUseDate TEXT,
         creationDate TEXT,
         uptime INTEGER,
-        domain TEXT
+        domain TEXT,
+        deletionTime TEXT
     );
     """)
     cursor.execute("""

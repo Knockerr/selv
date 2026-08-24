@@ -117,10 +117,15 @@ def checkForTotalDeletion():
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM deletedServers")
     deletedServers = [dict(row) for row in cursor.fetchall()]
+    logger.info(f"{deletedServers = }")
     conn.close()
+    if len(deletedServers) == 0:
+        return
     for deletedServer in deletedServers:
         # Check if older than 15d
         cutoff = datetime.now(timezone.utc) - timedelta(days=15)
+        if "deletionTime" not in deletedServer.keys():
+            continue
         deletionTime = datetime.fromisoformat(deletedServer["deletionTime"])
         if cutoff > deletionTime:
             fullDelete(deletedServer["uuid"])

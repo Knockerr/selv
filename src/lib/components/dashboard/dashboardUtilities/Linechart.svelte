@@ -11,6 +11,7 @@
   import { format } from "@layerstack/utils";
   import { scaleLinear } from "d3-scale";
   import { range } from "d3-array";
+  import { formatSeconds } from "$lib/components/recurentActions.svelte";
 
   const { datas, labelName } = $props();
 
@@ -68,7 +69,7 @@
         x={-50}
         stroke={color.ramRaw}
       />
-      <Axis placement="bottom" format="none" rule />
+      <Axis placement="bottom" format="none" tickMarks={false} rule />
       <Spline class="stroke-2" stroke={color.cpu} />
       <Spline
         y={(d) => context.y1Scale?.(d.ram)}
@@ -89,7 +90,7 @@
       class="text-2 bg-background/90 text-primary mt-[2px] p-2 border border-primary rounded-sm whitespace-nowrap"
     >
       {#snippet children({ data })}
-        <Tooltip.Header value={data.time} />
+        <Tooltip.Header value={formatSeconds((360-data.time)*5)} />
         <Tooltip.List>
           <Tooltip.Item label="CPU" value={data.cpu} color={color.cpuRaw} />
           <Tooltip.Item label="RAM" value={data.ram} color={color.ramRaw} />

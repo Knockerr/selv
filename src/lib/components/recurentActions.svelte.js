@@ -230,5 +230,15 @@ export const formatSeconds = (seconds) => {
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
 
-    return `${h}h${m}m${s}s`;
+    if (h) {
+
+        return `${h}h${m}m${s}s`;
+    } else if (m) {
+        return `${m}m${s}s`;
+
+    } else {
+        return `${s}s`;
+
+    }
+
 }
