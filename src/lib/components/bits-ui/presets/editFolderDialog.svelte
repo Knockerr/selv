@@ -14,6 +14,8 @@
   import ServersManager from "./presetSpecificComponents/ServersManager.svelte";
   import Confirm from "../baseComponents/Confirm.svelte";
 
+  const { reloadFoldersFunction } = $props();
+
   const componentName = `editFolderDialog`;
   const folderName = $derived(uiStore.currentEditedFolder);
 
@@ -39,12 +41,13 @@
 
   async function onRenameClick() {
     await folderSystem.getFolder(folderName).rename(newName);
-    open = false;
+    uiStore.closeDialog("editFolderDialog");
   }
 
   async function onDeleteClick() {
     await folderSystem.delete(folderName);
-    open = false;
+    uiStore.closeDialog("deleteFolderConfirm");
+    uiStore.closeDialog("editFolderDialog");
   }
 </script>
 
@@ -80,14 +83,17 @@
   <ServersManager {folderName} />
 
   <div class="flex flex-rox justify-start">
-    <Confirm
-      onConfirm={onDeleteClick}
-      title="Supression de dossier"
-      description="Êtes vous sûr de vouloir supprimer ce dossier? Vous perdrez votre configuration actuelle."
+    <Button
+      label="Supprimer le dossier"
+      onclick={() => uiStore.openDialog("deleteFolderConfirm")}
+      >Supprimer</Button
     >
-      {#snippet triggerButton()}
-        <Button label="Supprimer le dossier">Supprimer</Button>
-      {/snippet}
-    </Confirm>
   </div>
 </Dialog>
+
+<Confirm
+  onConfirm={onDeleteClick}
+  name="deleteFolderConfirm"
+  title="Supression de dossier"
+  description="Êtes vous sûr de vouloir supprimer ce dossier? Vous perdrez votre configuration actuelle."
+/>

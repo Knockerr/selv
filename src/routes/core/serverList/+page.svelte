@@ -84,7 +84,7 @@
   </div>
 </div>
 
-<EditFolderDialog />
+<EditFolderDialog reloadFoldersFunction={folderSystemRef.displayFolders} />
 <ServerRenameDialog />
 <ServerDuplicateDialog />
 <ServerDeletionConfirm />

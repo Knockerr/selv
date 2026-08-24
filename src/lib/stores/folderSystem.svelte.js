@@ -236,9 +236,7 @@ function createFolderSystem() {
                 async rename(newName) {
                     folderSystem.selectFolder("all");
 
-                    createFolder(newName, foldersDatas[folder].isFolderFav, foldersDatas[folder].servers);
-
-                    windowsManager.close("FolderWindow-" + folder);
+                    await createFolder(newName, foldersDatas[folder].isFolderFav, foldersDatas[folder].servers);
 
                     await folderSystem.delete(folder);
 
