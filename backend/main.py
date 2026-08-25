@@ -94,6 +94,13 @@ async def exceptionHandler(request: Request, exception: Exception):
     return JSONResponse(status_code=500, content={"detail": "Une erreur interne est survenue"})
 
 
+@app.middleware("http")
+async def onRequest(request: Request, call_next):
+    logger.debug(f"Request received : {request.url}")
+    response = await call_next(request)
+    return response
+
+
 if __name__ == "__main__":
     dbManager.initDb()
     softDelete.checkForTotalDeletion()
