@@ -1,18 +1,27 @@
 import asyncio
+import datetime
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from routers import servers, websockets, tunneling
+from loguru import logger
+from starlette.requests import Request
+from starlette.responses import FileResponse, JSONResponse
+
+from routers import servers, websockets, tunneling, testing
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 import utilities.db as dbManager
 import uvicorn
 import utilities.miscellaneous
-from utilities import softDelete, mcUtilities
+from utilities import softDelete, mcUtilities, eventBuses
 from utilities.miscellaneous import Stats
 import os
 import signal
+import platformdirs as plat
 
 from utilities.serverUtilities import cache
+
+appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
+logsPath = appDir.user_data_path / "logs/backend"
 
 
 @asynccontextmanager
@@ -37,6 +46,7 @@ app = FastAPI(
     ]
 )
 
+app.include_router(testing.router, prefix="/test", tags=["testing"])
 app.include_router(servers.router, prefix="/api", tags=["servers"])
 app.include_router(tunneling.router, prefix="/api", tags=["tunneling"])
 app.include_router(websockets.router, prefix="/ws", tags=["websockets"])
@@ -68,6 +78,21 @@ async def shutdown():
     # Closing the process in itself
     os.kill(os.getpid(), signal.SIGTERM)
     return {"status": "Stopping.."}
+
+
+@app.get("/logs/download")
+async def downloadBackendLogs():
+    date = datetime.datetime.now()
+    dateFormatted = f"{date.year:02}-{date.month:02}-{date.day:02}"
+    return FileResponse(logsPath / f"logs-{dateFormatted}.log", filename="backend.log")
+
+
+@app.exception_handler(Exception)
+async def exceptionHandler(request: Request, exception: Exception):
+    logger.opt(exception=exception).error(f"Unhandled error on {request.method} {request.url}")
+    await eventBuses.errorBus.broadcast(str(exception))
+    return JSONResponse(status_code=500, content={"detail": "Une erreur interne est survenue"})
+
 
 if __name__ == "__main__":
     dbManager.initDb()

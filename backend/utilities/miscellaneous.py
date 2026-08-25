@@ -6,6 +6,10 @@ from loguru import logger
 from typing import Literal
 from utilities import db
 from utilities.serverUtilities import cache
+import platformdirs as plat
+
+appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
+logsPath = appDir.user_data_path / "logs/backend"
 
 
 def initLogger():
@@ -17,6 +21,15 @@ def initLogger():
                "<cyan>{file.name}</cyan> | "
                "{message}",
         colorize=True)
+    logger.add(
+        logsPath / "logs-{time:YYYY-MM-DD}.log",
+        rotation="10 MB",
+        retention="7 days",
+        level="DEBUG",
+        encoding="utf-8",
+        backtrace=True,
+        diagnose=True
+    )
 
 
 class Stats:
@@ -38,14 +51,14 @@ class Stats:
                 totalCpu += float(perfs["cpu"])
                 totalRam += float(perfs["ram"])
             return {
-                    "cpu": totalCpu / len(cls.runningServers),
-                    "ram": totalRam / len(cls.runningServers),
-                }
+                "cpu": totalCpu / len(cls.runningServers),
+                "ram": totalRam / len(cls.runningServers),
+            }
         else:
             return {
-                    "cpu": 0,
-                    "ram": 0,
-                }
+                "cpu": 0,
+                "ram": 0,
+            }
 
     @classmethod
     async def startPerfsLoop(cls):

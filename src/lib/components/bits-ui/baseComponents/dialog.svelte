@@ -48,7 +48,7 @@
       class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/80"
     />
     <Dialog.Content
-      class="rounded-card-lg bg-background-dark shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 outline-hidden fixed left-[50%] top-[50%] z-50 w-full max-w-[calc(100% - 2rem)] translate-x-[-50%] translate-y-[-50%] border p-5 sm:max-w-122.5 md:w-full flex flex-col max-h-170 overflow-y-scroll overflow-x-hidden"
+      class="rounded-card-lg bg-background-dark shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 outline-hidden fixed left-[50%] top-[50%] z-9999 w-full max-w-[calc(100% - 2rem)] translate-x-[-50%] translate-y-[-50%] border p-5 sm:max-w-122.5 md:w-full flex flex-col max-h-170 overflow-y-scroll overflow-x-hidden"
     >
       {#if !empty}
         <Dialog.Title

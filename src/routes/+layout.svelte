@@ -1,8 +1,11 @@
 <script>
   import favicon from "$lib/assets/favicon.svg";
   import LoadingDialog from "$lib/components/bits-ui/LoadingDialog.svelte";
+  import { onDestroy, onMount } from "svelte";
 
   import "../app.css";
+  import { uiStore } from "$lib/components/bits-ui/uiComponentsStore.svelte";
+  import ErrorReportDialog from "$lib/components/bits-ui/presets/ErrorReportDialog.svelte";
 
   let { children } = $props();
 </script>
@@ -16,6 +19,7 @@
 {@render children()}
 
 <LoadingDialog />
+<ErrorReportDialog />
 
 <style>
   @import url("https://fonts.googleapis.com/css2?family=Funnel+Sans:ital,wght@0,300..800;1,300..800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Zain:ital,wght@0,200;0,300;0,400;0,700;0,800;0,900;1,300;1,400&family=Zalando+Sans:ital,wght@0,200..900;1,200..900&display=swap");

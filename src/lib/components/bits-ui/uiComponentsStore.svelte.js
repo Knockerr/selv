@@ -4,6 +4,7 @@ function createUiComponentStore() {
         currentEditedFolder: "",
         currentUuid: "",
         loaderTitle: "",
+        currentError: "",
     });
 
     return {
@@ -47,6 +48,13 @@ function createUiComponentStore() {
         },
         get loaderTitle() {
             return store.loaderTitle;
+        },
+        reportError(error) {
+            if (error) store.currentError = error;
+            store.openDialogs.push("errorReportDialog");
+        },
+        get currentError() {
+            return store.currentError;
         }
     }
 }

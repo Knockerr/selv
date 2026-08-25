@@ -141,3 +141,25 @@ async def serverState(webSocket: WebSocket, uuid: UUID):
         logger.debug(f"Disconnected state ws for {uuid}")
     except Exception as e:
         logger.error(f"Error in state ws for {uuid} : {e}")
+
+
+@router.websocket("/errorHandling/subscribe")  # TODO : Centralize error/logs operations in one module
+async def sendErrors(webSocket: WebSocket):
+    await webSocket.accept()
+
+    async def sendToClient(msg):
+        if not msg:
+            return
+        await webSocket.send_text(msg)
+
+    eventBus = eventBuses.errorBus
+    eventBus.subscribe(sendToClient)
+
+    try:
+        while True:
+            await webSocket.receive_text()
+    except WebSocketDisconnect:
+        eventBus.unsubscribe(sendToClient)
+        logger.debug(f"Disconnected error ws")
+    except Exception as e:
+        logger.error(f"Error in error ws for : {e}")
