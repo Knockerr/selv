@@ -1,6 +1,8 @@
+import os
 import sqlite3
 import platformdirs as plat
 from loguru import logger
+from pathlib import Path
 
 # Get the user app directory
 appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
@@ -12,7 +14,14 @@ def initDb():
     This function is executed at each start of the backend.
     """
     logger.debug("Initialising database...")
-    conn = sqlite3.connect(appDir.user_data_path / "datas.db")
+    dbPath = appDir.user_data_path / "datas.db"
+
+    # Create file if not exists
+    dbPath.parent.mkdir(parents=True, exist_ok=True)
+    dbPath.touch(exist_ok=True)
+
+    # Setup sqlite db
+    conn = sqlite3.connect(dbPath)
     cursor = conn.cursor()
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS servers (
