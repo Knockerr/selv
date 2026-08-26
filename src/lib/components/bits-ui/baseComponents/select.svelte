@@ -20,7 +20,7 @@
   } = $props();
 </script>
 
-<div class="flex flex-col items-start gap-1 box-border" {...others}>
+<div class="flex flex-col items-start gap-1 box-border relative" {...others}>
   {#if label}
     <p class="text-sm font-medium my-0">{label}</p>
   {/if}
@@ -36,7 +36,7 @@
     </Select.Trigger>
     <Select.Portal>
       <Select.Content
-        class="border-muted bg-background-dark shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 outline-hidden z-50 h-fit w-(--bits-select-anchor-width) min-w-(--bits-select-anchor-width) select-none rounded-xl border px-1 py-3 data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1 max-h-100 flex gap-0"
+        class="border-muted bg-background-dark shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 outline-hidden h-fit w-(--bits-select-anchor-width) min-w-(--bits-select-anchor-width) select-none rounded-xl border px-1 py-3 data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1 max-h-100 flex gap-0 z-99999"
         {...contentProps}
       >
         <Select.Viewport>

@@ -4,7 +4,6 @@
   import X from "phosphor-svelte/lib/X";
   import Button from "./Button.svelte";
   import { uiStore } from "../uiComponentsStore.svelte";
-  import { untrack } from "svelte";
 
   let {
     open = $bindable(false),
@@ -34,12 +33,9 @@
 
   // Close the window in the store on standard closure
   $effect(() => {
-    open;
-    untrack(() => {
-      if (!open) {
-        uiStore.closeDialog(name);
-      }
-    });
+    if (!open) {
+      uiStore.closeDialog(name);
+    }
   });
 </script>
 
