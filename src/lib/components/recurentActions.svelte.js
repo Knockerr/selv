@@ -11,7 +11,8 @@ export const stopServer = async (uuid) => {
 
 }
 
-export const post = async (endpoint, body) => {
+
+export const post = async (endpoint, body, headers) => {
     const options = {
         method: "POST",
     };
@@ -19,6 +20,7 @@ export const post = async (endpoint, body) => {
     if (body) {
         options.headers = {
             "Content-Type": "application/json",
+            ...headers || {}
         };
         options.body = JSON.stringify(body);
     }
@@ -31,7 +33,7 @@ export const post = async (endpoint, body) => {
 
         const data = await res.json();
 
-        console.log("data -> ", data);
+        console.log(`[ POST ] to ${endpoint} =>`, data);
 
         return data;
     } catch (error) {
@@ -39,98 +41,40 @@ export const post = async (endpoint, body) => {
     }
 }
 
-export const postServer = async (uuid, action, body) => {
-    const options = {
-        method: "POST",
-    };
-
-    if (body) {
-        options.headers = {
-            "Content-Type": "application/json",
-        };
-        options.body = JSON.stringify(body);
-    }
-
+export const get = async (endpoint, headers) => {
     try {
         const res = await fetch(
-            `http://localhost:8000/api/servers/${uuid}/${action}`,
-            options
+            endpoint, {
+                method: "GET",
+                headers: headers || {}
+            }
         );
 
         const data = await res.json();
 
-        console.log("data -> ", data);
-
+        console.log(`[ GET ] to ${endpoint} =>`, data);
         return data;
+
     } catch (error) {
         console.error(error);
     }
+};
+
+export const postServer = async (uuid, action, body) => {
+    return await post(`http://localhost:8000/api/servers/${uuid}/${action}`, body)
+
 };
 
 export const getServer = async (uuid, endpoint) => {
-    try {
-        const res = await fetch(
-            `http://localhost:8000/api/servers/${uuid}/${endpoint}`, {
-                method: "GET"
-            }
-        );
-
-        const data = await res.json();
-
-        console.log("data -> ", data);
-
-        return data;
-
-    } catch (error) {
-        console.error(error);
-    }
+    return await getServer(`http://localhost:8000/api/servers/${uuid}/${action}`)
 };
 
 export const getDeletedServer = async (uuid, endpoint) => {
-    try {
-        const res = await fetch(
-            `http://localhost:8000/api/deletedServers/${uuid}/${endpoint}`, {
-                method: "GET"
-            }
-        );
-
-        const data = await res.json();
-
-        console.log("data -> ", data);
-
-        return data;
-
-    } catch (error) {
-        console.error(error);
-    }
+    return await get(`http://localhost:8000/api/deletedServers/${uuid}/${endpoint}`)
 };
 
-export const postDeletedServer = async (uuid, action, body) => {
-    const options = {
-        method: "POST",
-    };
-
-    if (body) {
-        options.headers = {
-            "Content-Type": "application/json",
-        };
-        options.body = JSON.stringify(body);
-    }
-
-    try {
-        const res = await fetch(
-            `http://localhost:8000/api/deletedServers/${uuid}/${action}`,
-            options
-        );
-
-        const data = await res.json();
-
-        console.log("data -> ", data);
-
-        return data;
-    } catch (error) {
-        console.error(error);
-    }
+export const postDeletedServer = async (uuid, endpoint) => {
+    return await post(`http://localhost:8000/api/deletedServers/${uuid}/${endpoint}`)
 };
 
 export const getAccessToken = async () => {
@@ -146,82 +90,27 @@ export const getAccessToken = async () => {
 export const postServerWithCredentials = async (uuid, action, body) => {
     const accessToken = await getAccessToken();
     if (!accessToken) return;
-    const options = {
-        method: "POST",
-    };
 
-    options.headers = {
-        "Content-Type": "application/json",
+    return await post(`http://localhost:8000/api/servers/${uuid}/${action}`, body, {
         "accessToken": accessToken
-    };
-
-    if (body) {
-        options.body = JSON.stringify(body);
-    }
-
-    try {
-        const res = await fetch(
-            `http://localhost:8000/api/servers/${uuid}/${action}`,
-            options
-        );
-
-        const data = await res.json();
-
-        console.log("data -> ", data);
-
-        return data;
-    } catch (error) {
-        console.error(error);
-    }
+    })
 };
 
-export const getServerWitCredentials = async (uuid, endpoint) => {
+export const getServerWithCredentials = async (uuid, action, body) => {
     const accessToken = await getAccessToken();
     if (!accessToken) return;
-    try {
-        const res = await fetch(
-            `http://localhost:8000/api/servers/${uuid}/${endpoint}`, {
-                method: "GET",
-                headers: {
-                    accessToken: accessToken
-                }
-            }
-        );
 
-        const data = await res.json();
-
-        console.log("data -> ", data);
-
-        return data;
-
-    } catch (error) {
-        console.error(error);
-    }
+    return await get(`http://localhost:8000/api/servers/${uuid}/${action}`, body, {
+        "accessToken": accessToken
+    })
 };
-
 
 export const getExternalBackend = async (endpoint) => {
     const accessToken = await getAccessToken();
     if (!accessToken) return;
-    try {
-        const res = await fetch(
-            `http://localhost:4555/api/tunnels/${endpoint}`, {
-                method: "GET",
-                headers: {
-                    authorization: `Bearer ${accessToken}`
-                }
-            }
-        );
-
-        const data = await res.json();
-
-        console.log("data -> ", data);
-
-        return data;
-
-    } catch (error) {
-        console.error(error);
-    }
+    return await get(`http://localhost:4555/api/tunnels/${endpoint}`, {
+        authorization: `Bearer ${accessToken}`
+    })
 };
 
 
@@ -231,14 +120,10 @@ export const formatSeconds = (seconds) => {
     const s = seconds % 60;
 
     if (h) {
-
         return `${h}h${m}m${s}s`;
     } else if (m) {
         return `${m}m${s}s`;
-
     } else {
         return `${s}s`;
-
     }
-
 }
