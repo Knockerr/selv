@@ -95,6 +95,8 @@ class ServerManager:
         from utilities.miscellaneous import Stats
         self.server.lastUseDate = datetime.now(timezone.utc).isoformat(timespec="seconds")
         self.server.updatePropertiesInfos()
+        if self.server.propertiesPath:
+            self.updateLocalPortInFiles()
         self.server.save()
         if self.server.isOnline:
             logger.warning("Impossible to start the server - it is already online")
@@ -260,9 +262,12 @@ class ServerManager:
 
     def setProperty(self, property, value):
         value = str(value).lower()
-        propertiesPath = (pathlib.Path(self.server.propertiesPath) or
-                          findSpecifiedFileByExtension(".properties", self.server.path))
-        if not propertiesPath.exists():
+        if self.server.propertiesPath:
+            propertiesPath = pathlib.Path(self.server.propertiesPath)
+        else:
+            propertiesPath = findSpecifiedFileByExtension(".properties", self.server.path)
+
+        if not propertiesPath or not propertiesPath.exists():
             logger.error(f"Server.properties file path for {self.server.name} does not exist.")
             return
 
@@ -300,9 +305,21 @@ class ServerManager:
             "ram": memForm,
         }
 
-    def updateLocalPortInFiles(self, port=None):
+    def updateLocalPortInFiles(self, port: int = None):
         if not port:
-            port = self.server.localPort
+            logger.warning(f"{self.server.localPort=}")
+            port = self.server.localPort or None
+        # If localPort is not initialized
+        if not port:
+            conn = db.getConnexion()
+            cursor = conn.cursor()
+            cursor.execute("""
+                  SELECT * FROM servers WHERE uuid = ?;   
+                """, (str(self.server.uuid),))
+            logger.warning(f"{dict(cursor.fetchone())=}")
+            port = dict(cursor.fetchone())["local_port"]
+            conn.close()
+        logger.warning(f"{port=}")
         self.setProperty("query.port", port)
         self.setProperty("server-port", port)
 

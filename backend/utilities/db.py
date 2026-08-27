@@ -7,6 +7,8 @@ from pathlib import Path
 # Get the user app directory
 appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
 
+# TODO : Create db functions "execute", "fetch", etc... to centralize db access
+
 
 def initDb():
     """

@@ -12,14 +12,28 @@
 
   const { uuid, onregister } = $props();
 
+  let domain = $state("");
+  let domainAvailable = $state(null);
+
+  let error = $state("");
+
+  function checkIpFormat() {
+    const regex = /^(?![0-9-]+$)[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i;
+    return regex.test();
+  }
+
   async function updateDomainAvailability() {
     if (!domain) return;
+
+    const isValid = checkIpFormat(domain);
+    if (!isValid) {
+      error = "Format d'ip non valide.";
+      return;
+    }
+
     const res = await getExternalBackend(`domains/${domain}/availability`);
     domainAvailable = res.available;
   }
-
-  let domain = $state("");
-  let domainAvailable = $state(null);
 
   function registerServer() {
     postServerWithCredentials(uuid, "tunnel/register", {
@@ -36,10 +50,17 @@
   name="registerServerDialog"
   confirmDisabled={!domainAvailable}
 >
+  <span>
+    L'ip peut contenir des lettres minuscules (a-z), des chiffres (0-9) et des
+    tirets(-)
+  </span>
   {#if domainAvailable === false}
     <span class="unavalaible">Cette IP est déjà utilisée.</span>
   {:else if domainAvailable === true}
     <span class="avalaible">Disponible!</span>
+  {/if}
+  {#if error}
+    <span class="unavalaible">{error}</span>
   {/if}
   <IpInput
     placeholder="nom-du-serveur"
@@ -55,12 +76,15 @@
 </Confirm>
 
 <style>
+  span {
+    color: var(--color-foreground-alt);
+    font-size: 0.9rem;
+  }
+
   .avalaible {
     color: var(--success);
-    font-size: 0.9rem;
   }
   .unavalaible {
     color: var(--dangerous);
-    font-size: 0.9rem;
   }
 </style>

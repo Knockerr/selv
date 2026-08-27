@@ -17,7 +17,7 @@ jinjaEnv = Environment(loader=FileSystemLoader("."))
 
 appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
 
-remoteServerIp = "http://127.0.0.1:4555"
+remoteServerIp = "http://92.222.68.29:4555"
 
 
 async def postExternalServer(endpoint, body, accessToken) -> dict:
@@ -111,12 +111,19 @@ async def changeDomain(server: mcUtilities.Server, newDomain, accessToken):
         raise HTTPException(500, f"Error whilst registering server in db : {e}")
 
 
-def createFrpcFile(server: mcUtilities.Server, accessToken):
+def setupTunnelConnexion(serverManager: mcUtilities.ServerManager, accessToken):
     """
-    accessToken only contains a str with the token, no "Bearer " prefix
+    This function creates the frpc file and updates server.properties file to use its local_port value from db
+
+    Args: accessToken only contains a str with the token, no "Bearer " prefix
     """
+    server = serverManager.server
     configFolderPath = pathlib.Path(server.path) / ".mcPanel" / "frpc"
     configPath = configFolderPath / "frpc.toml"
+
+    # Force server to use local_port value in db
+    serverManager.updateLocalPortInFiles()
+
     # Create file if not exists
     if not configPath.exists():
         configFolderPath.mkdir(parents=True, exist_ok=True)
@@ -174,7 +181,8 @@ def startTunnel(serverManager: mcUtilities.ServerManager, accessToken):
     """
     from utilities.miscellaneous import getSystem
     logger.info(f"Starting tunnel for server {serverManager.server.name} ({serverManager.server.uuid})")
-    createFrpcFile(serverManager.server, accessToken)
+
+    setupTunnelConnexion(serverManager, accessToken)
 
     frpcFolderPath = pathlib.Path(serverManager.server.path) / ".mcPanel" / "frpc"
 
