@@ -25,20 +25,33 @@ export const post = async (endpoint, body, headers) => {
         options.body = JSON.stringify(body);
     }
 
-    try {
-        const res = await fetch(
-            `http://localhost:8000/${action}`,
-            options
-        );
+    const res = await fetch(
+        endpoint,
+        options
+    );
 
-        const data = await res.json();
+    if (!res.ok) {
+        let error;
 
-        console.log(`[ POST ] to ${endpoint} =>`, data);
+        try {
+            error = await res.json();
+        } catch {
+            error = await res.text();
+        }
+        console.error(`[ POST ] ${endpoint} =>`, {
+            status: res.status,
+            statusText: res.statusText,
+            error
+        });
 
-        return data;
-    } catch (error) {
-        console.error(error);
+        return;
     }
+
+    const data = await res.json();
+
+    console.log(`[ POST ] to ${endpoint} =>`, data);
+
+    return data;
 }
 
 export const get = async (endpoint, headers) => {
@@ -49,6 +62,24 @@ export const get = async (endpoint, headers) => {
                 headers: headers || {}
             }
         );
+
+        if (!res.ok) {
+            let error;
+
+            try {
+                error = await res.json();
+            } catch {
+                error = await res.text();
+            }
+            console.error(`[ POST ] ${endpoint} =>`, {
+                status: res.status,
+                statusText: res.statusText,
+                error
+            });
+
+            return;
+        }
+
 
         const data = await res.json();
 
@@ -66,7 +97,7 @@ export const postServer = async (uuid, action, body) => {
 };
 
 export const getServer = async (uuid, endpoint) => {
-    return await getServer(`http://localhost:8000/api/servers/${uuid}/${action}`)
+    return await get(`http://localhost:8000/api/servers/${uuid}/${endpoint}`)
 };
 
 export const getDeletedServer = async (uuid, endpoint) => {
@@ -92,7 +123,7 @@ export const postServerWithCredentials = async (uuid, action, body) => {
     if (!accessToken) return;
 
     return await post(`http://localhost:8000/api/servers/${uuid}/${action}`, body, {
-        "accessToken": accessToken
+        accessToken: accessToken
     })
 };
 
