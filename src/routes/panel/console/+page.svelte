@@ -361,4 +361,17 @@
     padding: 0;
     gap: 20px;
   }
+
+  @media (max-width: 1225px) {
+    .executionPanel {
+      display: none !important;
+    }
+  }
+
+  @media (max-height: 700px) {
+    .title {
+      font-size: 0;
+      margin-bottom: 30px;
+    }
+  }
 </style>

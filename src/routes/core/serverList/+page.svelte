@@ -1,5 +1,4 @@
 <script>
-  
   import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";
   import FolderManagement from "$lib/components/formSystem/forms/folderManagement.svelte";
   import Icon from "$lib/components/Icon.svelte";
@@ -48,13 +47,13 @@
         <table>
           <thead>
             <tr>
-              <th>Nom</th>
-              <th>Statut</th>
-              <th>Type</th>
-              <th>Version</th>
-              <th>Dossier</th>
-              <th>Utilisation</th>
-              <th></th>
+              <th class="nameHeader">Nom</th>
+              <th class="statusHeader">Statut</th>
+              <th class="typeHeader">Type</th>
+              <th class="versionHeader">Version</th>
+              <th class="folderHeader">Dossier</th>
+              <th class="lastUseHeader">Utilisation</th>
+              <th class="moreOptionsHeader"></th>
             </tr>
           </thead>
           <tbody id="serverList">
@@ -312,5 +311,26 @@
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+  }
+
+  @media (max-width: 1300px) {
+    .folderHeader {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1225px) {
+    .lastUseHeader {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1040px) {
+    .typeHeader {
+      display: none;
+    }
+    .versionHeader {
+      display: none;
+    }
   }
 </style>

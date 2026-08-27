@@ -88,8 +88,11 @@
     align-items: center;
     height: 80%;
     width: 70%;
+    max-width: 900px;
+    max-height: 650px;
     box-shadow: 0 0 2px var(--dark-10);
     border-radius: 10px;
+    flex: 1;
   }
 
   .console {
@@ -186,5 +189,11 @@
   .emptyText {
     font-size: 1rem;
     color: var(--foreground-alt);
+  }
+
+  @media (max-height: 700px) {
+    .component{
+      height: 90%;
+    }
   }
 </style>

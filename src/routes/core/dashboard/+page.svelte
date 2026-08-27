@@ -15,10 +15,12 @@
 
   onMount(() => {
     sidebarStore.setCurrentTab("main", "Dashboard");
-    
+
     // Reloading all datas automatically all 60s
     // TODO : Switch runningServers and serversUptimes endpoint from REST to WS
-    setInterval(stats.reloadDashboard, 60000);
+    const interval = setInterval(stats.reloadDashboard, 60000);
+
+    return () => clearInterval(interval); // Bonnes pratiques Svelte (nettoyage)
   });
 </script>
 
@@ -55,79 +57,145 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
   .dashContainer {
     width: 100%;
+    height: 100%;
     flex: 1;
     box-sizing: border-box;
-    padding: 50px;
-    padding-top: 40px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
+    overflow-y: scroll;
   }
 
   .titleSection {
     width: 100%;
     height: fit-content;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    flex-shrink: 0;
   }
 
   .title {
     margin: 0;
     margin-left: 10px;
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
   .gridContainer {
     flex: 1;
+    min-height: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, 150px);
-    grid-template-rows: repeat(auto-fill, 150px);
-    grid-gap: 20px;
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 
-  .userId {
-    grid-column: 1 / 3;
-    grid-row: 1 / 3;
-  }
-
-  .serversNumber {
-    grid-column: 3 / 5;
-    grid-row: 1 / 2;
-  }
-
-  .availability {
-    grid-column: 5 / 7;
-    grid-row: 1 / 2;
-  }
-
-  .serverStats {
-    grid-column: 3 / 7;
-    grid-row: 2 / 3;
-  }
-
-  .quickActions {
-    grid-column: 7 / 9;
-    grid-row: 1 / 4;
-  }
-
-  .performances {
-    grid-column: 1 / 7;
-    grid-row: 3 / 6;
-  }
-
-  .recentServers {
-    grid-column: 9 / 11;
-    grid-row: 1 / 4;
-  }
-
+  .userId,
+  .serversNumber,
+  .availability,
+  .serverStats,
+  .quickActions,
+  .recentServers,
+  .performances,
   .articles {
-    grid-column: 7 / 11;
-    grid-row: 4 / 6;
+    grid-column: auto;
+    grid-row: auto;
+    min-height: 120px;
+  }
+
+  @media (min-width: 768px) {
+    .dashContainer {
+      padding: 30px;
+    }
+
+    .gridContainer {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .userId {
+      display: none !important;
+    }
+    .performances {
+      display: none !important;
+    }
+    .articles {
+      display: none !important;
+    }
+    .serverStats {
+      display: none !important;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .userId,
+    .serversNumber,
+    .availability,
+    .serverStats,
+    .quickActions,
+    .recentServers,
+    .performances,
+    .articles {
+      display: flex !important;
+    }
+    .dashContainer {
+      padding: 40px;
+      padding-top: 30px;
+    }
+
+    .title {
+      font-size: 2.5rem;
+    }
+
+    .gridContainer {
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+    }
+
+    .userId {
+      grid-column: 1 / 3;
+      grid-row: 1 / 3;
+    }
+
+    .serversNumber {
+      grid-column: 3 / 5;
+      grid-row: 1 / 2;
+    }
+
+    .availability {
+      grid-column: 5 / 7;
+      grid-row: 1 / 2;
+    }
+
+    .serverStats {
+      grid-column: 3 / 7;
+      grid-row: 2 / 3;
+    }
+
+    .quickActions {
+      grid-column: 7 / 9;
+      grid-row: 1 / 4;
+    }
+
+    .recentServers {
+      grid-column: 9 / 11;
+      grid-row: 1 / 4;
+    }
+
+    .performances {
+      grid-column: 1 / 7;
+      grid-row: 3 / 6;
+    }
+
+    .articles {
+      grid-column: 7 / 11;
+      grid-row: 4 / 6;
+    }
   }
 </style>

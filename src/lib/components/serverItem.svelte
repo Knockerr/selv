@@ -1,5 +1,4 @@
 <script>
-  
   import { goto } from "$app/navigation";
   import { pathDb } from "$lib/icons/pathDb";
   import { onDestroy, onMount, untrack } from "svelte";
@@ -207,7 +206,7 @@
   >
   <td id="serverType">{serverType}</td>
   <td id="serverVersion">{serverVersion}</td>
-  <td>
+  <td id="folders">
     <Dropdown items={foldersDropdownItems}>
       {#snippet triggerSnippet()}
         <IconButton iconSize="20" iconPath={pathDb.bookmarks} />
@@ -223,7 +222,6 @@
     </Dropdown>
   </td>
 </tr>
-
 
 <style>
   * {
@@ -258,16 +256,6 @@
     cursor: pointer;
   }
 
-  .buttonPreset1:hover {
-    transition: background-color 0.3s ease;
-    background-color: rgb(50, 59, 80);
-  }
-
-  .buttonPreset1:active {
-    transition: background-color 0s ease;
-    background-color: rgb(32, 38, 54);
-  }
-
   #quickButtons {
     display: flex;
     flex-direction: row;
@@ -294,24 +282,13 @@
     text-align: left;
   }
 
-  #moreOptionsButton {
-    background-color: var(--mainBackgroundColor);
-    border: none;
-    height: 25px;
-    width: 25px;
-    padding: 5px;
-    border-radius: 50%;
-    color: white;
-    transform: scale(1.6);
-    position: relative;
-    margin-right: 80px;
+  @media (max-width: 1300px) {
+    #folders {
+      display: none;
+    }
   }
 
   @media (max-width: 1225px) {
-    #lastUse {
-      display: none;
-    }
-
     #lastUse {
       display: none;
     }
@@ -321,17 +298,6 @@
     #serverType {
       display: none;
     }
-
-    #serverType {
-      display: none;
-    }
-  }
-
-  @media (max-width: 985px) {
-    #serverVersion {
-      display: none;
-    }
-
     #serverVersion {
       display: none;
     }

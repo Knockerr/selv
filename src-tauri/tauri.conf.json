@@ -13,8 +13,11 @@
     "windows": [
       {
         "title": "mcpaneltauriappsv",
-        "width": 800,
-        "height": 600
+        "maximized": true,
+        "width": 1200,
+        "height": 750,
+        "minHeight": 650,
+        "minWidth": 1200
       }
     ],
     "security": {

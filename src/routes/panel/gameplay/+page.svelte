@@ -139,6 +139,7 @@
     flex-direction: column;
     align-items: center;
     background-color: transparent;
+    overflow-y: scroll !important;
   }
 
   .component:hover {
