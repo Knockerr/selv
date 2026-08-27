@@ -102,9 +102,9 @@ async def getServerDatas(uuid: UUID):
     curServerDatas = dict(cursor.fetchone())
     conn.close()
     name = curServerDatas['name']
-    type_ = curServerDatas['serverType']
+    type_ = curServerDatas['server_type']
     state = '...'  # TODO
-    lastUse = curServerDatas['lastUseDate']
+    lastUse = curServerDatas['last_use_date']
     version = curServerDatas['version']
     path = curServerDatas['path']
 
@@ -232,7 +232,7 @@ class Configuration(BaseModel):
 async def createServerR(config: Configuration):
     logger.info("Server Creation Detected!")
     uuid = uuidLib.uuid4()
-    utilities.serverCreator.createServer(config.name, uuid, config.type, config.version, config.ram)
+    await utilities.serverCreator.createServer(config.name, uuid, config.type, config.version, config.ram)
     return {"status": "created", "uuid": str(uuid)}
 
 

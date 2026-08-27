@@ -9,6 +9,7 @@
   import {
     getServer,
     postServer,
+    postServerWithCredentials,
     startServer as startServerFn,
     stopServer as stopServerFn,
   } from "$lib/components/recurentActions.svelte";
@@ -52,23 +53,48 @@
     }
   }
 
+  async function startTunnel() {
+    const res = await getServer(uuid, "tunnel/domain");
+    const serverDomain = res.domain;
+    if (serverDomain) await postServerWithCredentials(uuid, "tunnel/start");
+  }
+
+  async function stopTunnel() {
+    const res = await getServer(uuid, "tunnel/domain");
+    const serverDomain = res.domain;
+    if (!serverDomain) return;
+    // Prevent error if the fetch fails (if user registers server while server is running)
+    try {
+      await postServerWithCredentials(uuid, "tunnel/stop");
+    } catch {
+      console.warn(
+        "Impossible to stop tunnel for " +
+          uuid +
+          ". This could be caused by a user registering the server on remote while it was running and isn't a problem in that case.",
+      );
+    }
+  }
+
   async function startServer() {
     const needEula = await checkForEula();
     if (needEula) return;
     consoleContent = "";
-    postServer(uuid, "start")
+    postServer(uuid, "start");
     serverStatus = "on";
     checkForServerfileState();
     hookConsole();
     hookMetrics();
+    startTunnel();
   }
 
   async function stopServer() {
     serverStatus = "closing";
 
-    await postServer(uuid, "stop")
+    await postServer(uuid, "stop");
     consoleWs?.close();
     metricsWs?.close();
+
+    stopTunnel();
 
     serverStatus = "off";
   }

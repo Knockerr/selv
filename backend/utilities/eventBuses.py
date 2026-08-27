@@ -22,7 +22,6 @@ class EventBus:
 
     async def broadcast(self, data: str or dict):
         self.currentVal = data
-        logger.info("Broadcasting error to user")
         for subscriber in self.subscribers:
             await subscriber(data)
 

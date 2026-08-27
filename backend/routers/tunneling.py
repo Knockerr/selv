@@ -51,3 +51,24 @@ async def getDomain(uuid: UUID):
     result = cache.getCurrentServerAndSm(uuid)
     server: mcUtilities.Server = result["server"]
     return {"domain": server.domain}
+
+
+@router.post("/servers/{serverUuid}/tunnel/start")
+async def startTunnelR(serverUuid: UUID, accessToken=Header(...)):
+    isRegistered = await tunneling.checkRegistration(serverUuid, accessToken)
+    if not isRegistered:
+        raise HTTPException(404, "Cannot start tunnel if server is not registered")
+    result = cache.getCurrentServerAndSm(serverUuid)
+    serverManager: mcUtilities.ServerManager = result["serverManager"]
+    tunneling.startTunnel(serverManager, accessToken)
+    return {"status": "started"}
+
+
+@router.post("/servers/{serverUuid}/tunnel/stop")
+async def stopTunnelR(serverUuid: UUID):
+    result = cache.getCurrentServerAndSm(serverUuid)
+    serverManager: mcUtilities.ServerManager = result["serverManager"]
+    if not serverManager.tunnelProcess:
+        raise HTTPException(404, f"No tunnel seems to run for server {serverUuid}")
+    tunneling.stopTunnel(serverManager)
+    return {"status": "stopped"}

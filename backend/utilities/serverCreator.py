@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import pathlib
+import platform
 import shutil
 import subprocess
 import sys
@@ -13,6 +14,8 @@ import requests
 from loguru import logger
 
 import utilities.mcUtilities as mcUtilities
+from utilities import db, tunneling
+from utilities.miscellaneous import getSystem
 
 logger.remove()
 logger.add(
@@ -113,7 +116,49 @@ def editAutoForgeBatFile(serverName, mcVersion):
                       f"win_args.txt %*\n")
 
 
-def handleSpigotDownload(version: str):
+def getFrpcBinaryPath():
+    binDir = pathlib.Path(__file__).parent.parent / "binaries" / "frpc"
+
+    system = getSystem()
+
+    if system == "Windows":
+        return binDir / "frpc.exe"
+    elif system == "Linux":
+        return binDir / "frpc"
+    else:
+        raise RuntimeError(f"OS non supporté: {system}")
+
+
+def createFrpcFolder(server: mcUtilities.Server):
+    backendRoot = pathlib.Path(__file__).resolve().parent.parent
+    folderPath = pathlib.Path(server.path) / ".mcPanel"
+    frpcFolderPath = folderPath / "frpc"
+    mdFilePath = folderPath / "README.md"
+
+    # Create folders
+    if not folderPath.exists():
+        frpcFolderPath.mkdir(parents=True, exist_ok=True)
+        mdFilePath.touch(exist_ok=True)
+
+    # Fill md file
+    mdTemplatePath = backendRoot / "frpc-markdown-template.md"
+    mdContent = mdTemplatePath.read_text(encoding="utf-8")
+
+    with open(mdFilePath, "w", encoding="utf-8") as file:
+        file.write(mdContent)
+
+    # Add frpc bin in folder
+    frpcBinPath = getFrpcBinaryPath()
+
+    if getSystem() == "Windows":
+        dest = frpcFolderPath / "frpc.exe"
+    else:
+        dest = frpcFolderPath / "frpc"
+
+    shutil.copy(frpcBinPath, dest)
+
+
+async def handleSpigotDownload(version: str):
     # Charger le fichier manifest de spigot non officiel
     with open('./orgBukkitManifest-unoff.json', 'r') as f:
         spigotManifest = json.load(f)
@@ -134,12 +179,12 @@ def handleSpigotDownload(version: str):
         file.write(jarFile.content)
 
 
-def handleSpigotCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
+async def handleSpigotCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
     # Vérification : Si le fichier n'est pas déja téléchargé, l'installer.
     serverFile = jarsDir / 'spigot' / f"Spigot-{version}.jar"
     if not serverFile.exists():
         logger.info(f"Aucun serveur spigot {version} n'est téléchargé. Lancement du téléchargement..")
-        handleSpigotDownload(version)
+        await handleSpigotDownload(version)
     logger.debug("Copie du fichier vanilla vers le serveur.")
     # Créer le dossier du serveur
     (serversDir / name).mkdir(parents=True, exist_ok=True)
@@ -152,14 +197,19 @@ def handleSpigotCreation(name: str, uuid: UUID, type_: str, version: str, ram: i
     # Créer le fichier start.bat de lancement du serveur
     createStartBatFile(name, version, ram, f'SpigotServer-{version}.jar')
 
+    availablePort = await tunneling.getAvailableLocalPort()
+
     logger.debug("Création du serveur")
     # Créer le serveur
-    server = mcUtilities.Server(name, creationDate, creationDate, ram, version, type_, str(serversDir / name), uuid)
+    server = mcUtilities.Server(name, creationDate, creationDate, ram, version, type_, str(serversDir / name), uuid,
+                                None, availablePort)
     server.init()
     logger.debug(f"Objet Server de {name} créé et sauvegardé.")
 
+    return server
 
-def handleVanillaDownload(version: str) -> None:
+
+async def handleVanillaDownload(version: str) -> None:
     """
     Gère le téléchargement d'une version de paper.
     """
@@ -204,12 +254,12 @@ def handleVanillaDownload(version: str) -> None:
         file.write(jarFile.content)
 
 
-def handleVanillaCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
+async def handleVanillaCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
     # Vérification : Si le fichier n'est pas déja téléchargé, l'installer.
     serverFile = jarsDir / 'vanilla' / f"Vanilla-{version}.jar"
     if not serverFile.exists():
         logger.info(f"Aucun serveur vanilla {version} n'est téléchargé. Lancement du téléchargement..")
-        handleVanillaDownload(version)
+        await handleVanillaDownload(version)
     logger.debug("Copie du fichier vanilla vers le serveur.")
     # Créer le dossier du serveur
     (serversDir / name).mkdir(parents=True, exist_ok=True)
@@ -222,14 +272,19 @@ def handleVanillaCreation(name: str, uuid: UUID, type_: str, version: str, ram: 
     # Créer le fichier start.bat de lancement du serveur
     createStartBatFile(name, version, ram, f'VanillaServer-{version}.jar')
 
+    availablePort = await tunneling.getAvailableLocalPort()
+
     logger.debug("Création du serveur")
     # Créer le serveur
-    server = mcUtilities.Server(name, creationDate, creationDate, ram, version, type_, str(serversDir / name), uuid)
+    server = mcUtilities.Server(name, creationDate, creationDate, ram, version, type_, str(serversDir / name), uuid,
+                                None, availablePort)
     server.init()
     logger.debug(f"Objet Server de {name} créé et sauvegardé.")
 
+    return server
 
-def handlePaperDownload(version: str) -> None:
+
+async def handlePaperDownload(version: str) -> None:
     """
     Gère le téléchargement d'une version de paper.
     """
@@ -254,7 +309,7 @@ def handlePaperDownload(version: str) -> None:
         file.write(jarFile.content)
 
 
-def handlePaperCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
+async def handlePaperCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
     # Shield qui empeche le téléchargement de versions non prises en charge
     if version.split('.')[1] < '12':
         logger.error("Seul les versions supérieur a la 1.12 sont stable et suportées par paper.")
@@ -263,7 +318,7 @@ def handlePaperCreation(name: str, uuid: UUID, type_: str, version: str, ram: in
     serverFile = jarsDir / 'paper' / f"Paper-{version}.jar"
     if not serverFile.exists():
         logger.info(f"Aucun serveur paper {version} n'est téléchargé. Lancement du téléchargement..")
-        handlePaperDownload(version)
+        await handlePaperDownload(version)
     logger.debug("Copie du fichier paper vers le serveur.")
     # Créer le dossier du serveur
     (serversDir / name).mkdir(parents=True, exist_ok=True)
@@ -278,14 +333,19 @@ def handlePaperCreation(name: str, uuid: UUID, type_: str, version: str, ram: in
     # Créer le fichier start.bat de lancement du serveur
     createStartBatFile(name, version, ram, f'PaperServer-{version}.jar')
 
+    availablePort = await tunneling.getAvailableLocalPort()
+
     logger.debug("Création du serveur")
     # Créer le serveur
-    server = mcUtilities.Server(name, creationDate, creationDate, ram, version, type_, str(serversDir / name), uuid)
+    server = mcUtilities.Server(name, creationDate, creationDate, ram, version, type_, str(serversDir / name), uuid,
+                                None, availablePort)
     server.init()
     logger.debug(f"Objet Server de {name} créé et sauvegardé.")
 
+    return server
 
-def getForgeVersion(version):
+
+async def getForgeVersion(version):
     # Déterminer la route api qui sera utilisée :
     forgeManifestRoute = f"https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json"
     # Récuperer le manifest paper de la version
@@ -309,7 +369,7 @@ def getForgeVersion(version):
         return
 
 
-def handleForgeDownload(version: str):
+async def handleForgeDownload(version: str):
     """
        Gère le téléchargement d'une version de forge.
        """
@@ -328,12 +388,12 @@ def handleForgeDownload(version: str):
         file.write(jarFile.content)
 
 
-def handleForgeCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
+async def handleForgeCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
     # Vérification : Si le fichier n'est pas déja téléchargé, l'installer.
     serverFile = jarsDir / 'forge' / f"ForgeInstaller-{version}.jar"
     if not serverFile.exists():
         logger.info(f"Aucun serveur forge {version} n'est téléchargé. Lancement du téléchargement..")
-        handleForgeDownload(version)
+        await handleForgeDownload(version)
     logger.debug("Copie du fichier installeur forge vers le serveur.")
     # Créer le dossier du serveur
     (serversDir / name).mkdir(parents=True, exist_ok=True)
@@ -358,25 +418,32 @@ def handleForgeCreation(name: str, uuid: UUID, type_: str, version: str, ram: in
     # Récuperer la date
     creationDate: str = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
-    # Créer le serveur
+    availablePort = await tunneling.getAvailableLocalPort()
+
     logger.debug("Création du serveur")
-    server = mcUtilities.Server(name, creationDate, creationDate, ram, version, type_, str(serversDir / name), uuid)
+    # Créer le serveur
+    server = mcUtilities.Server(name, creationDate, creationDate, ram, version, type_, str(serversDir / name), uuid,
+                                None, availablePort)
     server.init()
     logger.debug(f"Objet Server de {name} créé et sauvegardé.")
 
+    return server
 
-def createServer(name: str, uuid: UUID, type_: str, version: str, ram: int):
+
+async def createServer(name: str, uuid: UUID, type_: str, version: str, ram: int):
     match type_:
         case "vanilla":
-            handleVanillaCreation(name, uuid, type_, version, ram)
+            server = await handleVanillaCreation(name, uuid, type_, version, ram)
         case "spigot":
-            handleSpigotCreation(name, uuid, type_, version, ram)
+            server = await handleSpigotCreation(name, uuid, type_, version, ram)
         case "paper":
-            handlePaperCreation(name, uuid, type_, version, ram)
+            server = await handlePaperCreation(name, uuid, type_, version, ram)
         case "forge":
-            handleForgeCreation(name, uuid, type_, version, ram)
+            server = await handleForgeCreation(name, uuid, type_, version, ram)
         case _:
             logger.error(f"Le type du serveur n'a pas été reconnu. Type : {type_}")
+            return
+    createFrpcFolder(server)
 
 
 def getServerRam(name, path):

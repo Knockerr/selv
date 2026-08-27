@@ -91,6 +91,7 @@ async def downloadBackendLogs():
 async def exceptionHandler(request: Request, exception: Exception):
     logger.opt(exception=exception).error(f"Unhandled error on {request.method} {request.url}")
     await eventBuses.errorBus.broadcast(str(exception))
+    logger.info("Broadcasting error to user")
     return JSONResponse(status_code=500, content={"detail": "Une erreur interne est survenue"})
 
 
@@ -105,4 +106,4 @@ if __name__ == "__main__":
     dbManager.initDb()
     softDelete.checkForTotalDeletion()
     utilities.miscellaneous.initLogger()
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=False)
+    uvicorn.run(app, host="127.0.0.1", port=8000, reload=False)

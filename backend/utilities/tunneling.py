@@ -1,7 +1,21 @@
+import asyncio
+import datetime
+import pathlib
+import random
+import subprocess
+import uuid
+
 import httpx
 from fastapi import HTTPException
+from jinja2 import Environment, FileSystemLoader
+from loguru import logger
+import platformdirs as plat
 
 from utilities import mcUtilities, db
+
+jinjaEnv = Environment(loader=FileSystemLoader("."))
+
+appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
 
 remoteServerIp = "http://127.0.0.1:4555"
 
@@ -10,6 +24,18 @@ async def postExternalServer(endpoint, body, accessToken) -> dict:
     try:
         async with httpx.AsyncClient() as client:
             res = await client.post(f"{remoteServerIp}/api/tunnels/{endpoint}", json=body, headers={
+                "authorization": f"Bearer {accessToken}",
+            })
+    except Exception:
+        raise
+
+    return res.json()
+
+
+async def getExternalServer(endpoint, accessToken) -> dict:
+    try:
+        async with httpx.AsyncClient() as client:
+            res = await client.get(f"{remoteServerIp}/api/tunnels/{endpoint}", headers={
                 "authorization": f"Bearer {accessToken}",
             })
     except Exception:
@@ -64,6 +90,7 @@ async def unregisterServer(server: mcUtilities.Server, accessToken):
 
 
 async def changeDomain(server: mcUtilities.Server, newDomain, accessToken):
+    logger.info(f"Changing domain {server.domain} to {newDomain} for server {server.uuid}")
     try:
         await postExternalServer("changeDomain", {
             "serverUuid": str(server.uuid),
@@ -82,3 +109,107 @@ async def changeDomain(server: mcUtilities.Server, newDomain, accessToken):
         conn.close()
     except Exception as e:
         raise HTTPException(500, f"Error whilst registering server in db : {e}")
+
+
+def createFrpcFile(server: mcUtilities.Server, accessToken):
+    """
+    accessToken only contains a str with the token, no "Bearer " prefix
+    """
+    configFolderPath = pathlib.Path(server.path) / ".mcPanel" / "frpc"
+    configPath = configFolderPath / "frpc.toml"
+    # Create file if not exists
+    if not configPath.exists():
+        configFolderPath.mkdir(parents=True, exist_ok=True)
+        configPath.touch(exist_ok=True)
+
+    logPath = str(appDir.user_data_path / "logs" / "frpc"
+                  / f"frpc-{server.uuid}-{datetime.datetime.now().isoformat()}.log").replace("\\", "\\\\")
+
+    logger.info(f"Creating frpc file for {server.uuid}...")
+    template = jinjaEnv.get_template("frpc.toml.j2")
+    fileContent = template.render(
+        server_name=server.name,
+        server_uuid=server.uuid,
+        jwt_token=accessToken,
+        local_port=server.localPort,
+        log_path=logPath
+    )
+    with open(configPath, "w") as file:
+        file.write(fileContent)
+    logger.info(f"Created frpc file for {server.uuid}")
+
+
+async def getAvailableLocalPort() -> int:
+    conn = db.getConnexion()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE local_ports_list SET available = ?
+        WHERE port = (
+            SELECT port FROM available_local_ports
+            LIMIT 1
+        )
+        RETURNING port;
+    """, (False,))
+    row = cursor.fetchone()
+    conn.commit()
+    conn.close()
+    if row is None:
+        raise Exception("No more available ports")
+    return row["port"]
+
+
+def freeLocalPort(port):
+    logger.info(f"Freeing port {port}...")
+    conn = db.getConnexion()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE local_ports_list SET available = ? WHERE port=?;", (True, port))
+    conn.commit()
+    conn.close()
+    logger.info(f"Port {port} freed")
+
+
+def startTunnel(serverManager: mcUtilities.ServerManager, accessToken):
+    """
+    accessToken only contains a str with the token, no "Bearer " prefix
+    """
+    from utilities.miscellaneous import getSystem
+    logger.info(f"Starting tunnel for server {serverManager.server.name} ({serverManager.server.uuid})")
+    createFrpcFile(serverManager.server, accessToken)
+
+    frpcFolderPath = pathlib.Path(serverManager.server.path) / ".mcPanel" / "frpc"
+
+    frpcExePath = frpcFolderPath / "frpc.exe"
+    frpcLinPath = frpcFolderPath / "frpc"
+    frpcConfigPath = frpcFolderPath / "frpc.toml"
+
+    if getSystem() == "Windows":
+        tunnelProces = subprocess.Popen(
+            [str(frpcExePath), "-c", str(frpcConfigPath)],
+            cwd=frpcFolderPath
+        )
+    else:
+        tunnelProces = subprocess.Popen(
+            [str(frpcLinPath), "-c", str(frpcConfigPath)],
+            cwd=frpcFolderPath
+        )
+    serverManager.tunnelProcess = tunnelProces
+    logger.info("Tunnel process started")
+
+
+def stopTunnel(serverManager: mcUtilities.ServerManager):
+    logger.info(f"Stopping tunnel for server {serverManager.server.name} ({serverManager.server.uuid})")
+    if not serverManager.tunnelProcess:
+        logger.warning("Impossible to stop tunnel : None exists")
+
+    # Stopping process
+    serverManager.tunnelProcess.terminate()
+
+    logger.info("Tunnel process stopped")
+
+
+async def checkRegistration(serverUuid, accessToken):
+    try:
+        data = await getExternalServer(f"servers/{serverUuid}/registration", accessToken)
+    except Exception as e:
+        raise HTTPException(500, f"Error whilst checking server's registration in external backend : {e}")
+    return data["registered"]

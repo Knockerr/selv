@@ -12,7 +12,7 @@
   import ServerRenameDialog from "$lib/components/bits-ui/presets/ServerRenameDialog.svelte";
   import { uiStore } from "$lib/components/bits-ui/uiComponentsStore.svelte";
   import {
-  formatSeconds,
+    formatSeconds,
     getExternalBackend,
     getServer,
     postServerWithCredentials,
@@ -26,43 +26,34 @@
   const params = new URLSearchParams(window.location.search);
   let uuid = params.get("uuid") ?? "demoUuid";
 
-  let infos = {
-    name: "",
-    type: "",
-    version: "",
-    ram: "",
-    uptime: "",
-    lastUse: "",
-    creationDate: "",
-  };
+  let infos = {};
 
   onMount(async () => {
     const data = await getServer(uuid, "datas");
     const serverDatas = data.datas;
 
-    const lastUseDate = new Date(serverDatas.lastUseDate);
+    const lastUseDate = new Date(serverDatas.last_use_date);
     let lastUseDateFormatted = lastUseDate.toLocaleString("fr-FR", {
       dateStyle: "long",
       timeStyle: "short",
     });
 
-    const creationDate = new Date(serverDatas.creationDate);
+    const creationDate = new Date(serverDatas.creation_date);
     let creationDateFormatted = creationDate.toLocaleString("fr-FR", {
       dateStyle: "long",
       timeStyle: "short",
     });
 
-
-
     infos = {
       name: serverDatas.name,
-      type: serverDatas.serverType,
+      type: serverDatas.server_type,
       version: serverDatas.version,
-      ram: serverDatas.maxRam,
+      ram: serverDatas.max_ram,
       path: serverDatas.path,
       uptime: formatSeconds(serverDatas.uptime),
       lastUse: lastUseDateFormatted,
       creationDate: creationDateFormatted,
+      port: serverDatas.local_port,
     };
   });
 </script>
@@ -94,7 +85,6 @@
         title="Informations"
         description="Informations concernant votre serveur."
         inputType="none"
-        
       >
         <div class="infosContainer">
           <span>Identifiant: {uuid}</span>
@@ -102,6 +92,7 @@
           <span>Moteur: {infos.type}</span>
           <span>Version: {infos.version}</span>
           <span>Ram attribuée: {infos.ram}</span>
+          <span>Port local: {infos.port}</span>
           <span>Chemin local: {infos.path}</span>
           <span>Temps d'utilisation total: {infos.uptime}</span>
           <span>Dernière utilisation: {infos.lastUse}</span>

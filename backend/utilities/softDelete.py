@@ -6,7 +6,7 @@ from datetime import datetime, timezone, timedelta
 import platformdirs as plat
 from loguru import logger
 
-from utilities import db
+from utilities import db, tunneling
 
 appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
 deletedServersDir = appDir.user_data_path / 'deletedServers'
@@ -38,7 +38,7 @@ def softDelete(uuid):
     cursor = conn.cursor()
     cursor.execute(f"""
         UPDATE servers
-        SET deletionTime=?
+        SET deletion_time=?
         WHERE uuid=?;
     """, (deletionTime.isoformat(), str(uuid),))
     conn.commit()
@@ -81,7 +81,7 @@ def fullDelete(uuid):
     conn = db.getConnexion()
     cursor = conn.cursor()
     # Getting its datas
-    cursor.execute(f"SELECT * FROM deletedServers WHERE uuid=?", (str(uuid),))
+    cursor.execute(f"SELECT * FROM deletedServers WHERE uuid=?;", (str(uuid),))
     deletedServer = dict(cursor.fetchone())
 
     logger.info(f"Full deleting {uuid}")
@@ -100,12 +100,20 @@ def fullDelete(uuid):
         logger.error(f"Impossible to delete dir for server {uuid} : {e}")
         return
 
+    # Get its port to add it to available ports db
+    cursor.execute(f"""
+            SELECT * FROM servers WHERE uuid=?;
+        """, (str(uuid),))
+    port = cursor.fetchone()["local_port"]
+
     # Delete from db
     cursor.execute(f"""
         DELETE FROM servers WHERE uuid=?;
     """, (str(uuid),))
     conn.commit()
     conn.close()
+
+    tunneling.freeLocalPort(port)
 
 
 def checkForTotalDeletion():
@@ -124,8 +132,8 @@ def checkForTotalDeletion():
     for deletedServer in deletedServers:
         # Check if older than 15d
         cutoff = datetime.now(timezone.utc) - timedelta(days=15)
-        if "deletionTime" not in deletedServer.keys():
+        if "deletion_time" not in deletedServer.keys():
             continue
-        deletionTime = datetime.fromisoformat(deletedServer["deletionTime"])
+        deletionTime = datetime.fromisoformat(deletedServer["deletion_time"])
         if cutoff > deletionTime:
             fullDelete(deletedServer["uuid"])

@@ -1,6 +1,7 @@
 import asyncio
 import os
 import pathlib
+import subprocess
 import sys
 from asyncio.subprocess import Process
 from typing import Literal
@@ -12,7 +13,7 @@ from uuid import UUID, uuid4
 from datetime import datetime, timezone
 import shutil
 import utilities.eventBuses as eventBuses
-from utilities import softDelete
+from utilities import softDelete, tunneling
 
 
 # ----------------------------------------
@@ -76,6 +77,7 @@ class ServerManager:
         self.psutilsProcess: psutil.Process | None = None
         self.stateBus = eventBuses.getServerBus(self.server.uuid)
         self.stateBus.setValue("stopped")
+        self.tunnelProcess: None or subprocess.Popen = None
 
         try:
             self.cpuCores: int = os.cpu_count()
@@ -298,6 +300,12 @@ class ServerManager:
             "ram": memForm,
         }
 
+    def updateLocalPortInFiles(self, port=None):
+        if not port:
+            port = self.server.localPort
+        self.setProperty("query.port", port)
+        self.setProperty("server-port", port)
+
 
 # ----------------------------------------
 # ----------------------------------------
@@ -379,7 +387,8 @@ class Server:
                  serverType: str = None,
                  path: str = None,
                  uuid: UUID = None,
-                 domain: str = None):
+                 domain: str = None,
+                 localPort: int = None):
 
         self.domain: str or None = domain
         self.uuid: UUID = uuid
@@ -393,6 +402,7 @@ class Server:
         self.isOnline: bool = False
         self.uptime: int = 0
         self.startTime = None
+        self.localPort: int = localPort
 
         self.batPath: str
         self.propertiesPath: str
@@ -423,10 +433,11 @@ class Server:
         conn = db.getConnexion()
         cursor = conn.cursor()
         cursor.execute(f"""
-            INSERT INTO servers (uuid, name, creationDate, lastUseDate, maxRam, version, serverType, path, uptime, domain) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO servers (uuid, name, creation_date, last_use_date, max_ram, version, server_type, path, uptime, 
+            domain, local_port) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (str(self.uuid), self.name, self.creationDate, self.lastUseDate, self.maxRam, self.version,
-              self.serverType, self.path, self.uptime, self.domain or None))
+              self.serverType, self.path, self.uptime, self.domain or None, self.localPort))
         conn.commit()
         conn.close()
 
@@ -436,11 +447,11 @@ class Server:
         uuidStr = str(self.uuid)
         cursor.execute(f"""
             UPDATE servers 
-            SET name = ?, lastUseDate = ?, maxRam = ?,  version = ?, serverType = ?, path = ?, uptime = ?, domain = ?
-            WHERE uuid = ?
+            SET name = ?, last_use_date = ?, max_ram = ?,  version = ?, server_type = ?, path = ?, uptime = ?, 
+            domain = ?, local_port = ? WHERE uuid = ?
         """, (
             self.name, self.lastUseDate, self.maxRam, self.version, self.serverType, str(self.path), self.uptime,
-            self.domain, uuidStr))
+            self.domain, self.localPort, uuidStr))
         conn.commit()
         conn.close()
 
@@ -470,14 +481,15 @@ class Server:
         conn.close()
 
         self.name: str = server["name"]
-        self.creationDate = server["creationDate"]
-        self.lastUseDate = server["lastUseDate"]
-        self.maxRam: int = server["maxRam"]
+        self.creationDate = server["creation_date"]
+        self.lastUseDate = server["last_use_date"]
+        self.maxRam: int = server["max_ram"]
         self.version: str = server["version"]
-        self.serverType: str = server["serverType"]
+        self.serverType: str = server["server_type"]
         self.path: str = server["path"]
         self.uptime: int = server["uptime"]
         self.domain: str or None = server["domain"]
+        self.localPort: str or None = server["local_port"]
 
     def getPropertiesAsDict(self) -> {str: str}:
         self.updatePropertiesInfos()
@@ -507,8 +519,9 @@ class Server:
         """
         eulaLatestLogPath = pathlib.Path(self.path) / "logs/latest.log"
         if not eulaLatestLogPath.exists():
-            logger.error("Aucun fichier de logs n'a pu être récupéré")
-            return
+            logger.warning("Aucun fichier de logs n'a pu être récupéré. Cela peut avoir lieu si l'utilisateur a "
+                           "rouvert la console peu apres la création du serveur et n'est pas inquiétant dans ce cas.")
+            return []
         with open(eulaLatestLogPath) as file:
             logs = file.readlines()
         return logs

@@ -1,4 +1,5 @@
 import asyncio
+import platform
 import sys
 from uuid import UUID
 
@@ -12,7 +13,15 @@ appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
 logsPath = appDir.user_data_path / "logs/backend"
 
 
+def getSystem():
+    system = platform.system()
+    if system not in ["Windows", "Linux"]:
+        raise RuntimeError(f"OS non supporté: {system}")
+    return system
+
+
 def initLogger():
+    logger.info("Initialiazing logger...")
     logger.remove()
     logger.add(
         sys.stdout,
@@ -30,6 +39,7 @@ def initLogger():
         backtrace=True,
         diagnose=True
     )
+    logger.info("Logger initialized...")
 
 
 class Stats:
@@ -105,7 +115,7 @@ class Stats:
         types = {}
         servers = cls._getServersDatas()
         for server in servers:
-            serverType = server["serverType"]
+            serverType = server["server_type"]
             if serverType in types:
                 types[serverType] += 1
             else:

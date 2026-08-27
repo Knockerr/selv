@@ -1,0 +1,22 @@
+# TODO BEFOREPROD : Edit server addr and port
+serverAddr = "127.0.0.1"
+serverPort = 7000
+
+# =========================
+# Frpc config file for {{ server_name }} ({{ server_uuid }})
+# =========================
+
+log.to = "{{ log_path }}"
+log.level = "info"
+log.maxDays = 3
+
+[metadatas]
+jwt_token = "{{ jwt_token }}"
+server_uuid = "{{ server_uuid }}"
+
+[[proxies]]
+name = "{{ server_uuid }}-tcp"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = {{ local_port }}
+remotePort = 4000 # Value will not be used

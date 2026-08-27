@@ -15,19 +15,21 @@ export const stopServer = async (uuid) => {
 export const post = async (endpoint, body, headers) => {
     const options = {
         method: "POST",
+        headers: {
+            ...(body ? {
+                "Content-Type": "application/json"
+            } : {}),
+            ...headers
+        }
     };
 
     if (body) {
-        options.headers = {
-            "Content-Type": "application/json",
-            ...headers || {}
-        };
         options.body = JSON.stringify(body);
     }
 
     const res = await fetch(
         endpoint,
-        options
+        options,
     );
 
     if (!res.ok) {
