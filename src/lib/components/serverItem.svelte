@@ -7,6 +7,7 @@
   import Dropdown from "./bits-ui/baseComponents/Dropdown.svelte";
   import {
     postServer,
+    restartServer,
     startServer,
     stopServer,
   } from "./recurentActions.svelte";
@@ -188,10 +189,14 @@
   >
   <td
     ><div id="quickButtons">
-      <button id="start">
+      <button id="start" disabled={state === "running"} onclick={() => {startServer(uuid)}}>
         <Icon path={pathDb.playCircle} size="15" color="#38ab4a" />
       </button>
-      <button id="restart">
+      <button
+        id="restart"
+        disabled={state === "stopped"}
+        onclick={() => {restartServer(uuid)}}
+      >
         <Icon
           path={pathDb.restartCircle}
           size="15"
@@ -199,7 +204,7 @@
           color="orange"
         />
       </button>
-      <button id="stop">
+      <button id="stop" disabled={state === "stopped"} onclick={() => {stopServer(uuid)}}>
         <Icon path={pathDb.stopCircle} size="15" color="#a82a2a" />
       </button>
     </div></td
@@ -266,6 +271,26 @@
     padding: 0;
     height: fit-content;
     width: fit-content;
+    overflow: hidden !important;
+  }
+
+  #quickButtons button::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0009;
+    content: "";
+    display: none;
+  }
+
+  #quickButtons button:disabled {
+    cursor: default;
+  }
+
+  #quickButtons button:disabled::after {
+    display: inline;
   }
 
   #quickButtons:hover {

@@ -48,7 +48,7 @@
           <thead>
             <tr>
               <th class="nameHeader">Nom</th>
-              <th class="statusHeader">Statut</th>
+              <th class="statusHeader">Actions</th>
               <th class="typeHeader">Type</th>
               <th class="versionHeader">Version</th>
               <th class="folderHeader">Dossier</th>

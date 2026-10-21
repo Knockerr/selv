@@ -213,6 +213,14 @@ async def startServerR(uuid: UUID):
     return {"status": "started", "uuid": uuid}
 
 
+@router.post("/servers/{uuid}/restart")
+async def restartServerR(uuid: UUID):
+    result = cache.getCurrentServerAndSm(uuid)
+    serverManager: mcUtilities.ServerManager = result["serverManager"]
+    _ = asyncio.create_task(serverManager.restartServer())
+    return {"status": "restarted", "uuid": uuid}
+
+
 @router.post("/servers/{uuid}/stop")
 async def stopServerR(uuid: UUID):
     result = cache.getCurrentServerAndSm(uuid)

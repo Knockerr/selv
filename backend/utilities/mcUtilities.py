@@ -186,11 +186,6 @@ class ServerManager:
 
     async def restartServer(self):
         await self.stopServer()
-        while True:
-            if "ThreadedAnvilChunkStorage: All dimensions are saved" not in self.getServerLastConsoleEntry():
-                continue
-            else:
-                break
         await self.startServer()
 
     async def sendCommand(self, command: str):

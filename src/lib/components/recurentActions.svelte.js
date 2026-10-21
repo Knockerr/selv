@@ -6,6 +6,11 @@ export const startServer = (uuid) => {
     postServer(uuid, "start")
 }
 
+export const restartServer = (uuid) => {
+    postServer(uuid, "restart")
+}
+
+
 export const stopServer = async (uuid) => {
     postServer(uuid, "stop")
 
