@@ -13,7 +13,6 @@ from uuid import UUID, uuid4
 from datetime import datetime, timezone
 import shutil
 import utilities.eventBuses as eventBuses
-from utilities import softDelete, tunneling
 
 
 # ----------------------------------------
@@ -175,7 +174,6 @@ class ServerManager:
 
     async def handleServerAutoStop(self):
         from utilities.miscellaneous import Stats
-        logger.info("Server stopped correctly")
         self.server.isOnline = False
         self.server.updateUptime()
         self.onlineEvent.clear()
@@ -184,6 +182,7 @@ class ServerManager:
             self.process = None
             await self.stateBus.broadcast("stopped")
         Stats.runningServers.remove(self.server.uuid)
+        logger.info("Server stopped correctly")
 
     async def restartServer(self):
         await self.stopServer()

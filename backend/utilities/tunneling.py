@@ -33,11 +33,14 @@ async def postExternalServer(endpoint, body, accessToken) -> dict:
 
 
 async def getExternalServer(endpoint, accessToken) -> dict:
+    headers: dict = {}
+    if accessToken:
+        headers = {
+            "authorization": f"Bearer {accessToken}",
+        }
     try:
         async with httpx.AsyncClient() as client:
-            res = await client.get(f"{remoteServerIp}/api/tunnels/{endpoint}", headers={
-                "authorization": f"Bearer {accessToken}",
-            })
+            res = await client.get(f"{remoteServerIp}/api/tunnels/{endpoint}", headers=headers)
     except Exception:
         raise
 
@@ -45,6 +48,17 @@ async def getExternalServer(endpoint, accessToken) -> dict:
 
 
 async def registerServer(server: mcUtilities.Server, domain, accessToken):
+    # Ensuring the domain is available
+    try:
+        domainAvailable = await checkDomainAvailability(domain)
+        if not domainAvailable:
+            # Raising error as frontend should prevent this from happening
+            raise HTTPException(409, f"The domain {domain} is already being used ; Impossible to "
+                                     f"register server with that domain.")
+
+    except Exception as e:
+        raise HTTPException(500, f"Error whilst checking domain's availability in external backend : {e}")
+
     try:
         await postExternalServer("register", {
             "serverUuid": str(server.uuid),
@@ -52,6 +66,7 @@ async def registerServer(server: mcUtilities.Server, domain, accessToken):
         }, accessToken)
     except Exception as e:
         raise HTTPException(500, f"Error whilst registering server in external backend : {e}")
+
     try:
         conn = db.getConnexion()
         cursor = conn.cursor()
@@ -221,3 +236,11 @@ async def checkRegistration(serverUuid, accessToken):
     except Exception as e:
         raise HTTPException(500, f"Error whilst checking server's registration in external backend : {e}")
     return data["registered"]
+
+
+async def checkDomainAvailability(domain):
+    try:
+        data = await getExternalServer(f"domains/{domain}/availability")
+    except Exception as e:
+        raise
+    return data["available"]
