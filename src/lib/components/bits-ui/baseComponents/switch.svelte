@@ -22,7 +22,6 @@
   {...restProps}
   class="focus-visible:ring-foreground focus-visible:ring-offset-background bg-dark-10 data-[state=unchecked]:shadow-mini-inset focus-visible:outline-hidden peer inline-flex h-7.5 w-12.5 shrink-0 cursor-pointer items-center rounded-full px-0.75 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2"
   onclick={() => {
-    toggle();
     onchange(checked);
   }}
 >
