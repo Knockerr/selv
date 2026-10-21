@@ -1,4 +1,5 @@
 <script>
+  import { goto } from "$app/navigation";
   import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";
   import Container from "$lib/components/bits-ui/baseComponents/Container.svelte";
   import IconButton from "$lib/components/bits-ui/baseComponents/iconButton.svelte";
@@ -175,7 +176,7 @@
         {/if}
       </div>
       <div class="right">
-        <Button iconPath={pathDb.arrowRight} disabled={downloadState} emphasize={!newVersion}>
+        <Button iconPath={pathDb.arrowRight} disabled={downloadState} emphasize={!newVersion} onclick={goto("/core/dashboard")}>
           {#if newVersion}
             Continuer sans mettre à jour
           {:else}
