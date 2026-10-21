@@ -8,6 +8,10 @@
 
 <style>
   .component {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
     width: fit-content;
     height: fit-content;
     background-color: transparent;

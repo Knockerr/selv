@@ -1,8 +1,10 @@
 <script>
   import { goto } from "$app/navigation";
   import Button from "$lib/components/bits-ui/baseComponents/Button.svelte";
+  import ClickableText from "$lib/components/bits-ui/baseComponents/ClickableText.svelte";
   import Confirm from "$lib/components/bits-ui/baseComponents/Confirm.svelte";
   import { uiStore } from "$lib/components/bits-ui/uiComponentsStore.svelte";
+  import Icon from "$lib/components/Icon.svelte";
   import Console from "$lib/components/panel/console.svelte";
   import DataDisplayer from "$lib/components/panel/dataDisplayer.svelte";
   import PanelTabList from "$lib/components/panel/panelTabList.svelte";
@@ -13,6 +15,7 @@
     startServer as startServerFn,
     stopServer as stopServerFn,
   } from "$lib/components/recurentActions.svelte";
+  import { pathDb } from "$lib/icons/pathDb";
   import { sidebarStore } from "$lib/sideBarsStore.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import { stats } from "$lib/stores/stats.svelte";
@@ -237,6 +240,9 @@
 </script>
 
 <div class="container">
+  <div class="backTextContainer">
+    <ClickableText onclick={() => {goto("/core/serverList")}}>⬅ Retour</ClickableText>
+  </div>
   <h1 class="title">{serverName}</h1>
 
   <div class="rightSideElemsContainer">
@@ -309,6 +315,18 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+  }
+
+  .backTextContainer {
+    position: relative;
+    top: 30px;
+    width: 95%;
+  }
+
+  .backTextContainer :global(button) {
+    color: var(--foreground-alt);
+    font-size: 1.1rem;
+    align-self: flex-start;
   }
 
   .title {
