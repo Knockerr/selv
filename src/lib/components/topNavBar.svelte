@@ -10,10 +10,12 @@
 <div class="container">
   <div class="topBar">
     <div class="leftSide">
+      <!--
       <select name="profil" id="profil-input" class="profilSelector" disabled>
         <option value="Pierre">Profil de SOON</option>
         <option value="Jean">Profil de Jean</option>
       </select>
+    -->
     </div>
     <div class="rightSide">
       <div class="rightSideButtons">

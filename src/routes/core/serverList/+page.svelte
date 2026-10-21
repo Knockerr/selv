@@ -37,11 +37,13 @@
     <FolderSystem bind:this={folderSystemRef} />
 
     <div class="serverList">
-      <div class="firstServerListLine">
+      <!--
+            <div class="firstServerListLine">
         <button id="filtersButton">
           <Icon path={pathDb.sliders} size="18" color="#ddd" />Filtres
         </button>
       </div>
+      -->
 
       <div class="serverListTable">
         <table>
