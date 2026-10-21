@@ -48,7 +48,7 @@
     <div class="titleSection">
       <h1 class="title">Vérification d'adresse mail</h1>
       <span class="subtitle"
-        >Un code de vérification a été envoyé à votre adresse e-mail "[EMAIL]".
+        >Un code de vérification a été envoyé à votre adresse e-mail "{email}".
         Entrez ce code ici</span
       >
     </div>
