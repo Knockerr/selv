@@ -15,7 +15,7 @@
 
   onMount(async () => {
     const baseDir = await localDataDir();
-    logDir = await join(baseDir, "Selv", "App", "logs", "frontend");
+    logDir = await join(baseDir, "Selv", "logs", "frontend");
     logPath = await join(logDir, "frontend.log");
   });
 
@@ -89,7 +89,7 @@
     margin-bottom: 10px;
   }
 
-  .codeFieldContainer{
+  .codeFieldContainer {
     display: flex;
     flex-direction: column;
     gap: 3px;
