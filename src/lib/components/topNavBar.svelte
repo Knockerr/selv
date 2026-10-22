@@ -3,8 +3,6 @@
   import { openUrl } from "@tauri-apps/plugin-opener";
   import Button from "./bits-ui/baseComponents/Button.svelte";
   import ProfilePicture from "./bits-ui/baseComponents/ProfilePicture.svelte";
-
-  // TODO BEFOREPROD: Add links
 </script>
 
 <div class="container">
@@ -19,13 +17,27 @@
     </div>
     <div class="rightSide">
       <div class="rightSideButtons">
-        <Button iconPath="{pathDb.bug}," color="#ddd" height="40px">
+        <Button
+          iconPath="{pathDb.bug},"
+          color="#ddd"
+          height="40px"
+          onclick={() => {
+            openUrl("https://discord.selvmc.com");
+          }}
+        >
           Signaler un bug
         </Button>
         <Button iconPath="{pathDb.share}," color="#ddd" height="40px">
           Partager le logiciel
         </Button>
-        <Button iconPath="{pathDb.git}," color="#ddd" height="40px">
+        <Button
+          iconPath="{pathDb.git},"
+          color="#ddd"
+          height="40px"
+          onclick={() => {
+            openUrl("https://github.com/Knockerr/selv");
+          }}
+        >
           Code source
         </Button>
       </div>

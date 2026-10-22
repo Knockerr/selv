@@ -2,6 +2,7 @@
   import SideBarButton from "$lib/components/sideBarButton.svelte";
   import { pathDb } from "$lib/icons/pathDb.js";
   import logoProvisoire from "$lib/assets/logo-provisoire.png";
+  import { openUrl } from "@tauri-apps/plugin-opener";
 </script>
 
 <div class="container">
@@ -50,20 +51,26 @@
   <ul id="bottomOptions">
     <SideBarButton
       title="Support"
-      href="TODO"
+      onclick={() => {
+        openUrl("https://discord.selvmc.com");
+      }}
       path={pathDb.question}
       classes="bottomOptions"
       id="help"
-      num="4"
+      num="3"
+      noSelect
     />
 
     <SideBarButton
-      title="Doc"
-      href="TODO"
-      path={pathDb.fileText}
+      title="Site"
+      onclick={() => {
+        openUrl("https://selvmc.com");
+      }}
+      path={pathDb.web}
       classes="bottomOptions"
       id="doc"
-      num="5"
+      num="4"
+      noSelect
     />
   </ul>
 </div>

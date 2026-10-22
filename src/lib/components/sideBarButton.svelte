@@ -2,6 +2,7 @@
   import { sidebarStore } from "$lib/sideBarsStore.svelte";
   import { onMount } from "svelte";
   import { fly } from "svelte/transition";
+  import Icon from "./Icon.svelte";
 
   let {
     path = "M3 12h18M12 3v18",
@@ -10,6 +11,8 @@
     id,
     href,
     num = 0,
+    onclick = () => {},
+    noselect = false,
   } = $props();
   let fillColor = $state("#ddd");
   let bgColor = $state("111825");
@@ -28,16 +31,24 @@
 
 {#if visible}
   <li class={classes} {id} transition:fly={{ x: -10, duration: 500 }}>
-    <a {href} aria-label={title} class:selected={isSelected} onclick={() => {sidebarStore.setCurrentTab("main", title)}}>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width={size}
-        height={size}
-        viewBox="0 0 256 256"
+    {#if href}
+      <a
+        {href}
+        class="button"
+        aria-label={title}
+        class:selected={isSelected}
+        onclick={() => {
+          if (noselect) return;
+          sidebarStore.setCurrentTab("main", title);
+        }}
       >
-        <path d={path} />
-      </svg>
-    </a>
+        <Icon {path} {size} />
+      </a>
+    {:else}
+      <button class="button" {onclick} aria-label={title}>
+        <Icon {path} {size} />
+      </button>
+    {/if}
 
     <p>{title}</p>
   </li>
@@ -46,11 +57,14 @@
 <style>
   @import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wdth,wght@0,96.2,335;1,96.2,335&display=swap");
 
-  a {
+  .button {
     font-size: 25px;
     padding: 10px;
-    width: 30px;
-    height: 30px;
+    width: 30px !important;
+    height: 30px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: #111825;
     border: 0;
     border-radius: 15px;
@@ -62,23 +76,36 @@
     text-decoration: none;
   }
 
-  a svg {
+  button.button {
+    box-sizing: content-box;
+    flex-shrink: 0;
+}
+
+button.button :global(svg) {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+}
+
+  .button :global(svg) {
     fill: whitesmoke;
   }
 
-  a:hover svg {
+  .button:hover :global(svg) {
     fill: #674dbd;
   }
 
-  a:hover {
+  .button:hover {
     background-color: #1f2937;
+    cursor: pointer;
   }
 
-  a.selected svg {
+  .button.selected :global(svg) {
     fill: #674dbd;
   }
 
-  a.selected {
+  .button.selected {
     background-color: #1f2937;
   }
 
@@ -107,22 +134,7 @@
     bottom: 0;
   }
 
-  .topOptions {
-    font-family: "Roboto", sans-serif;
-    list-style: none;
-    list-style-type: none;
-    color: white;
-    text-align: center;
-    font-size: 20px;
-    padding: 20px, 10px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .topOptions a {
-    margin-top: 30px;
-  }
-
+  .topOptions,
   .bottomOptions {
     font-family: "Roboto", sans-serif;
     list-style: none;
@@ -133,15 +145,20 @@
     padding: 20px, 10px;
     display: flex;
     flex-direction: column;
+  }
+
+  .topOptions .button {
+    margin-top: 30px;
+  }
+
+  .bottomOptions {
+    display: flex;
+    flex-direction: column;
     margin-top: 0;
   }
 
-  .bottomOptions a {
+  .bottomOptions .button {
     margin-top: 5px;
   }
 
-  #dashboard {
-    margin-top: 0;
-    padding-top: 0;
-  }
 </style>
