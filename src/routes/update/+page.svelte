@@ -44,7 +44,7 @@
 
   async function updateMd() {
     const res = await fetch(
-      "https://github.com/Knockerr/mcPanelComplete/releases/latest/download/latest.json",
+      "https://github.com/Knockerr/selv/releases/latest/download/latest.json",
       {
         method: "GET",
       },

@@ -8,7 +8,7 @@ from loguru import logger
 
 from utilities import db, tunneling
 
-appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
+appDir = plat.PlatformDirs("App", "Selv")
 deletedServersDir = appDir.user_data_path / 'deletedServers'
 
 

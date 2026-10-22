@@ -46,7 +46,7 @@ const originalWarn = console.warn;
 
 export async function init() {
     const baseDir = await localDataDir();
-    logDir = await join(baseDir, "Knocker", "mcPanel-DEV", "logs", "frontend");
+    logDir = await join(baseDir, "Selv", "App", "logs", "frontend");
     logPath = await join(logDir, "frontend.log")
 
     // Create file if not exists

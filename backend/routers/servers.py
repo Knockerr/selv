@@ -17,7 +17,7 @@ import utilities.db as db
 import utilities.tunneling as tunneling
 from uuid import UUID
 
-appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
+appDir = plat.PlatformDirs("App", "Selv")
 serversPath = appDir.user_data_path / "servers"
 
 # Create routeur

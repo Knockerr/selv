@@ -9,7 +9,7 @@ from utilities import db
 from utilities.serverUtilities import cache
 import platformdirs as plat
 
-appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
+appDir = plat.PlatformDirs("App", "Selv")
 logsPath = appDir.user_data_path / "logs/backend"
 
 

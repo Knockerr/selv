@@ -16,10 +16,10 @@ fn main() {
     path.push("binaries");
 
     #[cfg(target_os = "windows")]
-    path.push("mcpanel-backend-x86_64-pc-windows-msvc.exe");
+    path.push("selv-backend-x86_64-pc-windows-msvc.exe");
 
     #[cfg(target_os = "linux")]
-    path.push("mcpanel-backend-x86_64-unknown-linux-gnu");
+    path.push("selv-backend-x86_64-unknown-linux-gnu");
 
     #[cfg(target_os = "windows")]
     let _ = Command::new(&path)
@@ -30,5 +30,5 @@ fn main() {
     let _ = Command::new(&path)
         .spawn();
 
-    mcpaneltauriappsv_lib::run()
+    selv_lib::run()
 }

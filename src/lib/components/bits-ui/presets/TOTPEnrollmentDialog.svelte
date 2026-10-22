@@ -20,7 +20,7 @@
     await supabase.auth.refreshSession();
     const { data, error } = await supabase.auth.mfa.enroll({
       factorType: "totp",
-      friendlyName: `mcPanel-${factorName}`,
+      friendlyName: `Selv-${factorName}`,
     });
 
     console.warn("DATA : ", data);

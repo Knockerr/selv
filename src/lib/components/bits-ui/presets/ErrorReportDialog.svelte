@@ -15,7 +15,7 @@
 
   onMount(async () => {
     const baseDir = await localDataDir();
-    logDir = await join(baseDir, "Knocker", "mcPanel-DEV", "logs", "frontend");
+    logDir = await join(baseDir, "Selv", "App", "logs", "frontend");
     logPath = await join(logDir, "frontend.log");
   });
 
@@ -43,7 +43,7 @@
     const zipContent = await getReport();
 
     const savePath = await save({
-      defaultPath: `mcpanel_logs_${Date.now()}.zip`,
+      defaultPath: `selv_logs_${Date.now()}.zip`,
       filters: [{ name: "Zip", extensions: ["zip"] }],
     });
 

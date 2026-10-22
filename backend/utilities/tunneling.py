@@ -15,7 +15,7 @@ from utilities import mcUtilities, db
 
 jinjaEnv = Environment(loader=FileSystemLoader("."))
 
-appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
+appDir = plat.PlatformDirs("App", "Selv")
 
 remoteServerIp = "https://api.selvmc.com"
 
@@ -133,7 +133,7 @@ def setupTunnelConnexion(serverManager: mcUtilities.ServerManager, accessToken):
     Args: accessToken only contains a str with the token, no "Bearer " prefix
     """
     server = serverManager.server
-    configFolderPath = pathlib.Path(server.path) / ".mcPanel" / "frpc"
+    configFolderPath = pathlib.Path(server.path) / ".selv" / "frpc"
     configPath = configFolderPath / "frpc.toml"
 
     # Force server to use local_port value in db
@@ -199,7 +199,7 @@ def startTunnel(serverManager: mcUtilities.ServerManager, accessToken):
 
     setupTunnelConnexion(serverManager, accessToken)
 
-    frpcFolderPath = pathlib.Path(serverManager.server.path) / ".mcPanel" / "frpc"
+    frpcFolderPath = pathlib.Path(serverManager.server.path) / ".selv" / "frpc"
 
     frpcExePath = frpcFolderPath / "frpc.exe"
     frpcLinPath = frpcFolderPath / "frpc"

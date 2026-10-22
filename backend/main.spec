@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 import os
 
-binary_name = os.environ.get('BINARY_NAME', 'mcpanel-backend')
+binary_name = os.environ.get('BINARY_NAME', 'selv-backend')
 
 a = Analysis(
     ['main.py'],

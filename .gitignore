@@ -15,11 +15,11 @@ backend/__pycache__
 backend/.venv
 backend/build
 backend/dist
-backend/mcpanel-backend-x86_64-pc-windows-msvc.spec
-backend/mcpanel-backend.spec
+backend/selv-backend-x86_64-pc-windows-msvc.spec
+backend/selv-backend.spec
 backend/servers.db
 backend/temp.py
-src-tauri/binaries/mcpanel-backend-x86_64-pc-windows-msvc.exe
+src-tauri/binaries/selv-backend-x86_64-pc-windows-msvc.exe
 *.log
 *.pyc
 backend/routers/__pycache__/

@@ -20,7 +20,7 @@ import platformdirs as plat
 
 from utilities.serverUtilities import cache
 
-appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
+appDir = plat.PlatformDirs("App", "Selv")
 logsPath = appDir.user_data_path / "logs/backend"
 
 
@@ -31,8 +31,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Minecraft Panel API",
-    description="API pour gérer vos serveurs Minecraft",
+    title="Selv intern API",
+    description="A custom built API by Selv that manages your Minecraft servers with ease.",
     version="1.0.0",
     lifespan=lifespan,
     middleware=[
@@ -55,7 +55,7 @@ app.include_router(websockets.router, prefix="/ws", tags=["websockets"])
 @app.get("/")
 def root():
     return {
-        "message": "Minecraft Panel API",
+        "message": app.description,
         "docs": "/docs",
         "version": "1.0.0"
     }

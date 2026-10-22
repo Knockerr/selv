@@ -27,7 +27,7 @@ logger.add(
     colorize=True
 )
 
-appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
+appDir = plat.PlatformDirs("App", "Selv")
 serversDir = appDir.user_data_path / 'servers'
 jarsDir = appDir.user_data_path / 'jars'
 javaDir = appDir.user_data_path / 'JREs'
@@ -131,7 +131,7 @@ def getFrpcBinaryPath():
 
 def createFrpcFolder(server: mcUtilities.Server):
     backendRoot = pathlib.Path(__file__).resolve().parent.parent
-    folderPath = pathlib.Path(server.path) / ".mcPanel"
+    folderPath = pathlib.Path(server.path) / ".selv"
     frpcFolderPath = folderPath / "frpc"
     mdFilePath = folderPath / "README.md"
 

@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "mcpaneltauriappsv",
+  "productName": "Selv",
   "version": "0.0.0",
-  "identifier": "com.mcpaneltauriappsv.app",
+  "identifier": "com.selv.app",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "mcpaneltauriappsv",
+        "title": "Selv - Application",
         "maximized": true,
         "width": 1200,
         "height": 750,
@@ -34,13 +34,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "externalBin": ["binaries/mcpanel-backend"],
+    "externalBin": ["binaries/selv-backend"],
     "createUpdaterArtifacts": true
   },
   "plugins": {
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQyOUIxRTM4REE0NTFDN0MKUldSOEhFWGFPQjZiUWlqb2x2RTVLdHk3Q3hJZUdMQXlhV3o3M1gwZTllTnZ6NElOckljbCtCOVkK",
-      "endpoints": ["https://github.com/Knockerr/mcPanelComplete/releases/latest/download/latest.json"]
+      "endpoints": ["https://github.com/Knockerr/selv/releases/latest/download/latest.json"]
     }
   }
 }

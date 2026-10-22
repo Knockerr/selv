@@ -5,7 +5,7 @@ from loguru import logger
 from pathlib import Path
 
 # Get the user app directory
-appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
+appDir = plat.PlatformDirs("App", "Selv")
 
 # TODO : Create db functions "execute", "fetch", etc... to centralize db access
 
