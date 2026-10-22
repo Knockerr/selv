@@ -6,8 +6,27 @@
   import "../app.css";
   import { uiStore } from "$lib/components/bits-ui/uiComponentsStore.svelte";
   import ErrorReportDialog from "$lib/components/bits-ui/presets/ErrorReportDialog.svelte";
+  import { invoke } from "@tauri-apps/api/core";
 
   let { children } = $props();
+
+  onMount(() => {
+    const media = window.matchMedia("(prefers-color-scheme: light)");
+
+    const updateIcon = () => {
+      invoke("set_window_icon", {
+        light: !media.matches,
+      }).catch(console.error);
+    };
+
+    updateIcon();
+
+    media.addEventListener("change", updateIcon);
+
+    return () => {
+      media.removeEventListener("change", updateIcon);
+    };
+  });
 </script>
 
 <svelte:window />

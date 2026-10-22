@@ -1,12 +1,13 @@
 <script>
   import SideBarButton from "$lib/components/sideBarButton.svelte";
   import { pathDb } from "$lib/icons/pathDb.js";
-  import logoProvisoire from "$lib/assets/logo-provisoire.png";
+  import logo from "$lib/assets/logo-simple-light.svg";
   import { openUrl } from "@tauri-apps/plugin-opener";
+  
 </script>
 
 <div class="container">
-  <img src={logoProvisoire} alt="LOGO" id="logo" />
+  <img src={logo} alt="LOGO" id="logo" />
 
   <ul id="topOptions">
     <SideBarButton
@@ -79,8 +80,8 @@
   #logo {
     padding: 0;
     height: auto;
-    width: 40px;
-    margin-top: 10px;
+    width: 60px;
+    margin-top: 20px;
   }
 
   .container {

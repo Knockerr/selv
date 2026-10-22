@@ -147,8 +147,12 @@ button.button :global(svg) {
     flex-direction: column;
   }
 
+  .topOptions:first-child .button{
+    margin-top: 15px;
+  }
+
   .topOptions .button {
-    margin-top: 30px;
+    margin-top: 20px;
   }
 
   .bottomOptions {
