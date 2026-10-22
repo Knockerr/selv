@@ -9,8 +9,10 @@
   let componentKey = $state(0);
 
   let datas = $state([]);
-  let cpu = $state("--");
-  let ram = $state("--");
+  let cpu = $state("0");
+  let ram = $state("0");
+  let download = $state("0");
+  let upload = $state("0");
 
   let datasWs;
   function hookServersPerfsDatas() {
@@ -26,6 +28,8 @@
       const data = JSON.parse(event.data);
       cpu = data.cpu;
       ram = data.ram;
+      download = data.download;
+      upload = data.upload;
     };
 
     datasWs.onerror = (err) => {
@@ -84,8 +88,8 @@
       <div class="valuesContainer">
         <StatDisplayer title="RAM utilisée" value={ram} unit="Go" />
         <StatDisplayer title="CPU utilisé" value={cpu} unit="%" />
-        <StatDisplayer title="Débit descendant" value="10" unit="Mo.s" />
-        <StatDisplayer title="Débit ascendant" value="2" unit="Mo.s" />
+        <StatDisplayer title="Débit descendant" value={download} unit="Ko.s" />
+        <StatDisplayer title="Débit ascendant" value={upload} unit="Ko.s" />
       </div>
       <div class="graphContainer">
         <span class="graphTitle">Dernière demie-heure</span>

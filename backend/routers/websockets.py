@@ -97,7 +97,7 @@ async def metricsHook(webSocket: WebSocket, uuid: UUID):
 
     await webSocket.send_json({
         "cpu": 0,
-        "ram": 0
+        "ram": 0,
     })
     await webSocket.close(1000, f"Le serveur {uuid} est fermé")
 
