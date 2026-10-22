@@ -15,7 +15,7 @@ from utilities import mcUtilities, db
 
 jinjaEnv = Environment(loader=FileSystemLoader("."))
 
-appDir = plat.PlatformDirs("App", "Selv")
+appDir = plat.PlatformDirs(appname="Selv", appauthor=False)
 
 remoteServerIp = "https://api.selvmc.com"
 

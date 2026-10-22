@@ -8,7 +8,7 @@ from loguru import logger
 
 from utilities import db, tunneling
 
-appDir = plat.PlatformDirs("App", "Selv")
+appDir = plat.PlatformDirs(appname="Selv", appauthor=False)
 deletedServersDir = appDir.user_data_path / 'deletedServers'
 
 

@@ -11,7 +11,7 @@ from utilities import db
 from utilities.serverUtilities import cache
 import platformdirs as plat
 
-appDir = plat.PlatformDirs("App", "Selv")
+appDir = plat.PlatformDirs(appname="Selv", appauthor=False)
 logsPath = appDir.user_data_path / "logs/backend"
 
 

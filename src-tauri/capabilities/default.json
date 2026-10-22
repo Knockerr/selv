@@ -8,22 +8,21 @@
     "opener:default",
     "shell:default",
     "shell:allow-open",
-    "shell:allow-execute",
     {
       "identifier": "fs:allow-mkdir",
-      "allow": [{ "path": "$LOCALDATA/Knocker/**" }]
+      "allow": [{ "path": "$LOCALDATA/Selv" }, { "path": "$LOCALDATA/Selv/**" }]
     },
     {
       "identifier": "fs:allow-write-text-file",
-      "allow": [{ "path": "$LOCALDATA/Knocker/**" }]
+      "allow": [{ "path": "$LOCALDATA/Selv/**" }]
     },
     {
       "identifier": "fs:allow-read-text-file",
-      "allow": [{ "path": "$LOCALDATA/Knocker/**" }]
+      "allow": [{ "path": "$LOCALDATA/Selv/**" }]
     },
     {
       "identifier": "fs:allow-app-write",
-      "allow": [{ "path": "$LOCALDATA/Knocker/**" }]
+      "allow": [{ "path": "$LOCALDATA/Selv/**" }]
     },
     {
       "identifier": "shell:allow-execute",

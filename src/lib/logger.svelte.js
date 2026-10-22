@@ -26,7 +26,7 @@ function captureLog(level, args) {
     logs.push(entry);
     if (logs.length > maxLogs) logs.shift();
 
-    if (level == "error"){
+    if (level == "error") {
         uiStore.reportError(logLine)
         console.log("Reporting error " + logLine + " to user")
     }
@@ -45,14 +45,21 @@ const originalError = console.error;
 const originalWarn = console.warn;
 
 export async function init() {
-    const baseDir = await localDataDir();
-    logDir = await join(baseDir, "Selv", "App", "logs", "frontend");
-    logPath = await join(logDir, "frontend.log")
+    try {
 
-    // Create file if not exists
-    await mkdir(logDir, {
-        recursive: true
-    });
+        const baseDir = await localDataDir();
+        logDir = await join(baseDir, "Selv", "logs", "frontend");
+        logPath = await join(logDir, "frontend.log")
+
+        // Create file if not exists
+        await mkdir(logDir, {
+            recursive: true
+        });
+
+    } catch (e) {
+        originalError("Log init failed:", e);
+        logPath = undefined;
+    }
 
     // Catch errors
     window.addEventListener('error', (event) => {

@@ -5,7 +5,7 @@ from loguru import logger
 from pathlib import Path
 
 # Get the user app directory
-appDir = plat.PlatformDirs("App", "Selv")
+appDir = plat.PlatformDirs(appname="Selv", appauthor=False)
 
 # TODO : Create db functions "execute", "fetch", etc... to centralize db access
 

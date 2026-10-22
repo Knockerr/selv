@@ -17,7 +17,7 @@ import utilities.db as db
 import utilities.tunneling as tunneling
 from uuid import UUID
 
-appDir = plat.PlatformDirs("App", "Selv")
+appDir = plat.PlatformDirs(appname="Selv", appauthor=False)
 serversPath = appDir.user_data_path / "servers"
 
 # Create routeur

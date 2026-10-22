@@ -27,7 +27,7 @@ logger.add(
     colorize=True
 )
 
-appDir = plat.PlatformDirs("App", "Selv")
+appDir = plat.PlatformDirs(appname="Selv", appauthor=False)
 serversDir = appDir.user_data_path / 'servers'
 jarsDir = appDir.user_data_path / 'jars'
 javaDir = appDir.user_data_path / 'JREs'
