@@ -68,7 +68,8 @@
   .infos {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    justify-content: center;
+    height: 80%;
     gap: 5px;
     max-width: 180px;
   }

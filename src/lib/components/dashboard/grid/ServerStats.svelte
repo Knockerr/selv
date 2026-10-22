@@ -68,13 +68,15 @@
       description="Répartition des types de vos serveurs"
       tooltipLabel="Nombre de serveurs"
     />
-    <ServerStat
-      graphType="pie"
-      data={serversUptimes}
-      title="Utilisation serveur"
-      description="Répartition du temps d'utilisation de vos serveurs"
-      tooltipLabel="Temps d'utilisation"
-    />
+    <div class="uptimes">
+      <ServerStat
+        graphType="pie"
+        data={serversUptimes}
+        title="Utilisation serveur"
+        description="Répartition du temps d'utilisation de vos serveurs"
+        tooltipLabel="Temps d'utilisation"
+      />
+    </div>
   </div>
 </GridElem>
 
@@ -84,5 +86,11 @@
     width: 100%;
     display: flex;
     flex-direction: row;
+  }
+
+  @media (max-width: 1550px) {
+    .uptimes {
+      display: none;
+    }
   }
 </style>
