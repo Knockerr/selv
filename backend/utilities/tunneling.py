@@ -17,7 +17,7 @@ jinjaEnv = Environment(loader=FileSystemLoader("."))
 
 appDir = plat.PlatformDirs("mcPanel-DEV", "Knocker")
 
-remoteServerIp = "http://92.222.68.29:4555"
+remoteServerIp = "https://api.selvmc.com"
 
 
 async def postExternalServer(endpoint, body, accessToken) -> dict:
@@ -32,7 +32,7 @@ async def postExternalServer(endpoint, body, accessToken) -> dict:
     return res.json()
 
 
-async def getExternalServer(endpoint, accessToken) -> dict:
+async def getExternalServer(endpoint, accessToken=None) -> dict:
     headers: dict = {}
     if accessToken:
         headers = {

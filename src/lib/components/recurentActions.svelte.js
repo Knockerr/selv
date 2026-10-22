@@ -146,7 +146,7 @@ export const getServerWithCredentials = async (uuid, action, body) => {
 export const getExternalBackend = async (endpoint) => {
     const accessToken = await getAccessToken();
     if (!accessToken) return;
-    return await get(`http://92.222.68.29:4555/api/tunnels/${endpoint}`, {
+    return await get(`https://api.selvmc.com/api/tunnels/${endpoint}`, {
         authorization: `Bearer ${accessToken}`
     })
 };
