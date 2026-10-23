@@ -18,7 +18,27 @@ fn main() {
     }
 
     #[cfg(target_os = "linux")]
+    fn preload_system_wayland() {
+        if std::env::var_os("APPIMAGE").is_none() {
+            return;
+        }
+        let candidates = [
+            "/usr/lib/libwayland-client.so.0", // Arch-based
+            "/usr/lib/x86_64-linux-gnu/libwayland-client.so.0", // Debian / Ubuntu
+            "/usr/lib64/libwayland-client.so.0", // Fedora / openSUSE
+        ];
+        if let Some(path) = candidates.iter().find(|p| std::path::Path::new(p).exists()) {
+            let new = match std::env::var("LD_PRELOAD") {
+                Ok(old) if !old.is_empty() => format!("{path}:{old}"),
+                _ => path.to_string(),
+            };
+            unsafe { std::env::set_var("LD_PRELOAD", new) };
+        }
+    }
+
+    #[cfg(target_os = "linux")]
     {
+        preload_system_wayland();
         path.push("selv-backend");
         let r = Command::new(&path)
             .env_remove("LD_PRELOAD")
