@@ -1,13 +1,18 @@
 # -*- mode: python ; coding: utf-8 -*-
 import os
+import sys
 
 binary_name = os.environ.get('BINARY_NAME', 'selv-backend')
+frpc_name = 'frpc.exe' if sys.platform == 'win32' else 'frpc'
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[
+        ('templates', 'templates'),
+        (f'binaries/frpc/{frpc_name}', 'bin')
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

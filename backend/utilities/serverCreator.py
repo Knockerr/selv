@@ -15,7 +15,7 @@ from loguru import logger
 
 import utilities.mcUtilities as mcUtilities
 from utilities import db, tunneling
-from utilities.miscellaneous import getSystem
+from utilities.miscellaneous import getSystem, getResourceRuntimePath
 
 logger.remove()
 logger.add(
@@ -117,14 +117,12 @@ def editAutoForgeBatFile(serverName, mcVersion):
 
 
 def getFrpcBinaryPath():
-    binDir = pathlib.Path(__file__).parent.parent / "binaries" / "frpc"
-
     system = getSystem()
 
     if system == "Windows":
-        return binDir / "frpc.exe"
+        return getResourceRuntimePath("bin/frpc.exe")
     elif system == "Linux":
-        return binDir / "frpc"
+        return getResourceRuntimePath("bin/frpc")
     else:
         raise RuntimeError(f"OS non supporté: {system}")
 
@@ -141,7 +139,7 @@ def createFrpcFolder(server: mcUtilities.Server):
         mdFilePath.touch(exist_ok=True)
 
     # Fill md file
-    mdTemplatePath = backendRoot / "frpc-markdown-template.md"
+    mdTemplatePath = getResourceRuntimePath("templates/frpc-markdown-template.md")
     mdContent = mdTemplatePath.read_text(encoding="utf-8")
 
     with open(mdFilePath, "w", encoding="utf-8") as file:

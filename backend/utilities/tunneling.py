@@ -12,8 +12,12 @@ from loguru import logger
 import platformdirs as plat
 
 from utilities import mcUtilities, db
+from utilities.miscellaneous import getResourceRuntimePath
 
-jinjaEnv = Environment(loader=FileSystemLoader("."))
+jinjaEnv = Environment(
+    loader=FileSystemLoader(str(getResourceRuntimePath("templates"))),
+    keep_trailing_newline=True,
+)
 
 appDir = plat.PlatformDirs(appname="Selv", appauthor=False)
 

@@ -7,6 +7,9 @@ from uuid import UUID
 import psutil
 from loguru import logger
 from typing import Literal
+
+from pathlib import Path
+
 from utilities import db
 from utilities.serverUtilities import cache
 import platformdirs as plat
@@ -22,6 +25,19 @@ def getSystem():
     if system not in ["Windows", "Linux"]:
         raise RuntimeError(f"OS non supporté: {system}")
     return system
+
+
+def getResourceRuntimePath(relative: str) -> Path:
+    """
+    Returns the runtime path of a ressource bundled by pyinstaller
+    """
+    if hasattr(sys, "_MEIPASS"):
+        # Prod
+        base = Path(sys._MEIPASS)
+    else:
+        # Dev
+        base = Path(__file__).resolve().parent.parent
+    return base / relative
 
 
 def initLogger():
