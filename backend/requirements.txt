@@ -5,6 +5,6 @@ platformdirs==4.11.3
 psutil==7.1.1
 pydantic==2.13.4
 starlette==1.6.0
-uvicorn==0.52.4
+uvicorn[standard]==0.52.4
 Jinja2==3.1.6
 requests==2.34.2
