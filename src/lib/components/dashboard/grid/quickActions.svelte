@@ -27,7 +27,7 @@
       icon: pathDb.stopCircle,
       color: "#d22",
       onclick: () => {
-        fetch("http://localhost:8000/api/servers/stopAll", {
+        fetch("http://localhost:40401/api/servers/stopAll", {
           method: "POST",
         });
       },
@@ -68,7 +68,7 @@
       color: "",
       onclick: async () => {
         // Fetching %localappdata%/servers
-        const res = await fetch("http://localhost:8000/api/servers/localPath", {
+        const res = await fetch("http://localhost:40401/api/servers/localPath", {
           method: "GET",
         });
         const datas = await res.json();

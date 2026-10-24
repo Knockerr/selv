@@ -29,7 +29,7 @@
 
   let stateWs;
   function trackServerState() {
-    stateWs = new WebSocket(`ws://127.0.0.1:8000/ws/servers/${uuid}/state`);
+    stateWs = new WebSocket(`ws://127.0.0.1:40401/ws/servers/${uuid}/state`);
 
     stateWs.onopen = () => {
       console.info("Succesfully connected to state ws for ", uuid);
@@ -77,7 +77,7 @@
   onMount(() => {
     console.log("mounting");
     trackServerState();
-    fetch(`http://127.0.0.1:8000/api/servers/${uuid}/serverListDatas`)
+    fetch(`http://127.0.0.1:40401/api/servers/${uuid}/serverListDatas`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -94,7 +94,7 @@
 
   $effect(() => {
     console.log("Uuid changed!");
-    fetch(`http://127.0.0.1:8000/api/servers/${uuid}/serverListDatas`)
+    fetch(`http://127.0.0.1:40401/api/servers/${uuid}/serverListDatas`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();

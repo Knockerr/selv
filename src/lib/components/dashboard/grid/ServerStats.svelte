@@ -18,7 +18,7 @@
   }
 
   async function getFetch(endpoint) {
-    const res = await fetch(`http://localhost:8000/api/${endpoint}`);
+    const res = await fetch(`http://localhost:40401/api/${endpoint}`);
     const datas = await res.json();
     return datas;
   }

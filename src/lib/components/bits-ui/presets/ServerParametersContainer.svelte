@@ -19,7 +19,7 @@
     let result = {};
     // TODO : Optimize, not fetching in each tab
     const response = await fetch(
-      "http://localhost:8000/api/servers/" + uuid + "/properties",
+      "http://localhost:40401/api/servers/" + uuid + "/properties",
     );
     const datas = await response.json();
     const properties = datas.properties;

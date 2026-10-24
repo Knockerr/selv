@@ -38,8 +38,12 @@ app = FastAPI(
     middleware=[
         Middleware(
             CORSMiddleware,
-            allow_origins=["*"],
-            allow_credentials=False,
+            allow_origins=[
+                "tauri://localhost",
+                "http://tauri.localhost",
+                "http://localhost:1420",  # Dev
+            ],
+            allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],
         )
@@ -55,7 +59,7 @@ app.include_router(websockets.router, prefix="/ws", tags=["websockets"])
 @app.get("/")
 def root():
     return {
-        "message": app.description,
+        "message": "A custom built API by Selv that manages your Minecraft servers with ease.",
         "docs": "/docs",
         "version": "1.0.0"
     }
@@ -106,4 +110,4 @@ if __name__ == "__main__":
     dbManager.initDb()
     softDelete.checkForTotalDeletion()
     utilities.miscellaneous.initLogger()
-    uvicorn.run(app, host="127.0.0.1", port=8000, reload=False)
+    uvicorn.run(app, host="127.0.0.1", port=40401, reload=False)

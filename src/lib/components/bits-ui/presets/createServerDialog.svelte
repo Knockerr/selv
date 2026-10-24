@@ -20,11 +20,6 @@
   let currentType = $state("");
   let currentRam = $state("");
 
-  $inspect(minecraftVersions).with(() => {
-    console.warn("minecraftVersions > " + minecraftVersions);
-    console.warn("currentType > " + currentType);
-  });
-
   const availableVersionItems = $derived.by(() => {
     if (!minecraftVersions || !currentType) return;
     let temp = [];
@@ -58,7 +53,7 @@
 
   async function onServerCreationClick() {
     uiStore.load("Téléchargement des fichiers");
-    const response = await fetch(`http://localhost:8000/api/servers/create`, {
+    const response = await fetch(`http://localhost:40401/api/servers/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

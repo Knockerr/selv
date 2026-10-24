@@ -65,7 +65,7 @@
     );
     console.warn("dirtyPropertiesClean", dirtyPropertiesClean);
     const res = await fetch(
-      "http://localhost:8000/api/servers/" + uuid + "/editProperties",
+      "http://localhost:40401/api/servers/" + uuid + "/editProperties",
       {
         method: "POST",
         headers: {

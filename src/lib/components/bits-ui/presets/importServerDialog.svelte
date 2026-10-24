@@ -21,9 +21,9 @@
   let minecraftVersions = $derived(getMinecraftVersions());
 
   const availableVersionItems = $derived.by(() => {
-    if (!minecraftVersions) return;
+    if (!minecraftVersions || !currentType) return;
     let temp = [];
-    minecraftVersions[currentVersion].versions.forEach((version) => {
+    minecraftVersions[currentType].versions.forEach((version) => {
       temp.push({
         label: version.id,
         value: version.id,
@@ -65,7 +65,7 @@
     console.warn(currentVersion);
     console.warn(currentType);
     console.warn(currentPath);
-    const response = await fetch(`http://localhost:8000/api/servers/import`, {
+    const response = await fetch(`http://localhost:40401/api/servers/import`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

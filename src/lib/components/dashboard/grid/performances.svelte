@@ -17,7 +17,7 @@
   let datasWs;
   function hookServersPerfsDatas() {
     datasWs = new WebSocket(
-      "ws://localhost:8000/ws/servers/hooks/stats/serversPerfs?delay=1&content=last",
+      "ws://localhost:40401/ws/servers/hooks/stats/serversPerfs?delay=1&content=last",
     );
 
     datasWs.onopen = () => {
@@ -44,7 +44,7 @@
   let graphWs;
   function hookServersPerfsGraph() {
     graphWs = new WebSocket(
-      "ws://localhost:8000/ws/servers/hooks/stats/serversPerfs?delay=2&label=true",
+      "ws://localhost:40401/ws/servers/hooks/stats/serversPerfs?delay=2&label=true",
     );
 
     graphWs.onopen = () => {

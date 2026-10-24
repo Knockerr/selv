@@ -14,7 +14,7 @@
   let name = $state("");
 
   onMount(() => {
-    fetch(`http://127.0.0.1:8000/api/servers/${uuid}/serverListDatas`)
+    fetch(`http://127.0.0.1:40401/api/servers/${uuid}/serverListDatas`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();

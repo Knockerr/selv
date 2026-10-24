@@ -6,7 +6,7 @@ import {
 init();
 
 const errorWs = new WebSocket(
-    "ws://localhost:8000/ws/errorHandling/subscribe",
+    "ws://localhost:40401/ws/errorHandling/subscribe",
 );
 
 errorWs.onopen = () => {

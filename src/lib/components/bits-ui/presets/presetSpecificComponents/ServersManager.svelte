@@ -24,7 +24,7 @@
   let serversName = $state({});
   $effect(() => {
     [...serversInFolder, ...otherServers].forEach((uuid) => {
-      fetch(`http://127.0.0.1:8000/api/servers/${uuid}/serverListDatas`)
+      fetch(`http://127.0.0.1:40401/api/servers/${uuid}/serverListDatas`)
         .then((res) => res.json())
         .then((data) => {
           serversName[uuid] = data?.name ?? "";

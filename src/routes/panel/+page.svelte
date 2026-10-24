@@ -21,7 +21,7 @@
 
 
   function getServerIp() {
-    serverIp = fetch("http://localhost:8000/api/servers/" + uuid + "/ip", {
+    serverIp = fetch("http://localhost:40401/api/servers/" + uuid + "/ip", {
       method: "GET",
     })
       .then((res) => res.json())
@@ -34,7 +34,7 @@
 
   function hookConsole() {
     const consoleWs = new WebSocket(
-      `ws://localhost:8000/ws/servers/${uuid}/hooks/console`,
+      `ws://localhost:40401/ws/servers/${uuid}/hooks/console`,
     );
 
     consoleWs.onopen = () => {
@@ -62,7 +62,7 @@
 
   function hookMetrics() {
     const consoleWs = new WebSocket(
-      `ws://localhost:8000/ws/servers/${uuid}/hooks/metrics`,
+      `ws://localhost:40401/ws/servers/${uuid}/hooks/metrics`,
     );
 
     consoleWs.onopen = () => {

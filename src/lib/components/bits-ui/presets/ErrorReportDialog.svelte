@@ -26,7 +26,7 @@
     zip.file(`frontend/frontend.log`, content);
 
     const backendLogsResponse = await fetch(
-      "http://localhost:8000/logs/download",
+      "http://localhost:40401/logs/download",
     );
     const backendLogsBlob = await backendLogsResponse.blob();
     const backendLogsBuffer = new Uint8Array(

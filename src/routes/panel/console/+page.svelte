@@ -121,7 +121,7 @@
   });
 
   function getServerIp() {
-    serverIp = fetch("http://localhost:8000/api/servers/" + uuid + "/ip", {
+    serverIp = fetch("http://localhost:40401/api/servers/" + uuid + "/ip", {
       method: "GET",
     })
       .then((res) => res.json())
@@ -137,7 +137,7 @@
   }
 
   function getServerName() {
-    fetch("http://localhost:8000/api/servers/" + uuid + "/name", {
+    fetch("http://localhost:40401/api/servers/" + uuid + "/name", {
       method: "GET",
     })
       .then((res) => res.json())
@@ -150,7 +150,7 @@
   let consoleWs = $state();
   function hookConsole() {
     consoleWs = new WebSocket(
-      `ws://localhost:8000/ws/servers/${uuid}/hooks/console`,
+      `ws://localhost:40401/ws/servers/${uuid}/hooks/console`,
     );
 
     consoleWs.onopen = () => {
@@ -176,7 +176,7 @@
   let metricsWs;
   function hookMetrics() {
     metricsWs = new WebSocket(
-      `ws://localhost:8000/ws/servers/${uuid}/hooks/metrics`,
+      `ws://localhost:40401/ws/servers/${uuid}/hooks/metrics`,
     );
 
     metricsWs.onopen = () => {
@@ -201,7 +201,7 @@
   async function recoverConsoleLogs() {
     consoleContent = "";
     let serverLogs = [];
-    await fetch("http://localhost:8000/api/servers/" + uuid + "/logs", {
+    await fetch("http://localhost:40401/api/servers/" + uuid + "/logs", {
       method: "GET",
     })
       .then((res) => res.json())

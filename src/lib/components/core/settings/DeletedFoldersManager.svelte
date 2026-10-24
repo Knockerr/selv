@@ -16,7 +16,7 @@
   let confirmOpen = $state(false);
 
   async function updateDeletedServers() {
-    const res = await fetch("http://localhost:8000/api/deletedServers", {
+    const res = await fetch("http://localhost:40401/api/deletedServers", {
       method: "GET",
     });
     if (!res.ok) {

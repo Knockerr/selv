@@ -14,7 +14,7 @@
     // Fetch n of started servers
     // TODO : Switch to WS en centralize this kind of datas in stats store
     const res = await fetch(
-      "http://localhost:8000/api/servers/runningServers",
+      "http://localhost:40401/api/servers/runningServers",
       {
         method: "GET",
       },

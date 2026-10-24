@@ -116,20 +116,20 @@ export const get = async (endpoint, headers) => {
 };
 
 export const postServer = async (uuid, action, body) => {
-    return await post(`http://localhost:8000/api/servers/${uuid}/${action}`, body)
+    return await post(`http://localhost:40401/api/servers/${uuid}/${action}`, body)
 
 };
 
 export const getServer = async (uuid, endpoint) => {
-    return await get(`http://localhost:8000/api/servers/${uuid}/${endpoint}`)
+    return await get(`http://localhost:40401/api/servers/${uuid}/${endpoint}`)
 };
 
 export const getDeletedServer = async (uuid, endpoint) => {
-    return await get(`http://localhost:8000/api/deletedServers/${uuid}/${endpoint}`)
+    return await get(`http://localhost:40401/api/deletedServers/${uuid}/${endpoint}`)
 };
 
 export const postDeletedServer = async (uuid, endpoint) => {
-    return await post(`http://localhost:8000/api/deletedServers/${uuid}/${endpoint}`)
+    return await post(`http://localhost:40401/api/deletedServers/${uuid}/${endpoint}`)
 };
 
 export const getAccessToken = async () => {
@@ -146,7 +146,7 @@ export const postServerWithCredentials = async (uuid, action, body) => {
     const accessToken = await getAccessToken();
     if (!accessToken) return;
 
-    return await post(`http://localhost:8000/api/servers/${uuid}/${action}`, body, {
+    return await post(`http://localhost:40401/api/servers/${uuid}/${action}`, body, {
         accessToken: accessToken
     })
 };
@@ -155,7 +155,7 @@ export const getServerWithCredentials = async (uuid, action, body) => {
     const accessToken = await getAccessToken();
     if (!accessToken) return;
 
-    return await get(`http://localhost:8000/api/servers/${uuid}/${action}`, body, {
+    return await get(`http://localhost:40401/api/servers/${uuid}/${action}`, body, {
         "accessToken": accessToken
     })
 };
