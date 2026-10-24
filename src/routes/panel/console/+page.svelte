@@ -68,7 +68,7 @@
     if (!serverDomain) return;
     // Prevent error if the fetch fails (if user registers server while server is running)
     try {
-      await postServerWithCredentials(uuid, "tunnel/stop");
+      await postServerWithCredentials(uuid, "tunnel/stop", true);
     } catch {
       console.warn(
         "Impossible to stop tunnel for " +

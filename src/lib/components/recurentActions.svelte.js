@@ -2,18 +2,35 @@ import {
     supabase
 } from "$lib/supabaseClient.svelte";
 
-export const startServer = (uuid) => {
-    postServer(uuid, "start")
+async function startTunnel(uuid) {
+    const res = await getServer(uuid, "tunnel/domain");
+    const serverDomain = res.domain;
+    if (serverDomain) await postServerWithCredentials(uuid, "tunnel/start");
 }
 
-export const restartServer = (uuid) => {
-    postServer(uuid, "restart")
+async function stopTunnel(uuid) {
+    const res = await getServer(uuid, "tunnel/domain");
+    const serverDomain = res.domain;
+    if (!serverDomain) return;
+    await postServerWithCredentials(uuid, "tunnel/stop");
+}
+
+
+export const startServer = (uuid) => {
+    postServer(uuid, "start");
+    startTunnel(uuid);
+}
+
+export const restartServer = async (uuid) => {
+    stopTunnel(uuid);
+    await postServer(uuid, "restart");
+    startTunnel(uuid);
 }
 
 
 export const stopServer = async (uuid) => {
     postServer(uuid, "stop")
-
+    stopTunnel(uuid);
 }
 
 
