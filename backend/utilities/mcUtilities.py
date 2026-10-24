@@ -77,6 +77,7 @@ class ServerManager:
         self.stateBus = eventBuses.getServerBus(self.server.uuid)
         self.stateBus.setValue("stopped")
         self.tunnelProcess: None or subprocess.Popen = None
+        self.justRegistered: bool = False
 
         try:
             self.cpuCores: int = os.cpu_count()
@@ -127,6 +128,8 @@ class ServerManager:
             self.pid = self.process.pid
         else:
             self.pid = java_pid
+
+        self.justRegistered = False
 
         logger.info(f"Server started with PID: {self.pid}")
         self.server.startTime = datetime.now(timezone.utc)

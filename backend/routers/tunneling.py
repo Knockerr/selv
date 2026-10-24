@@ -22,9 +22,11 @@ class ChangeDomainConfig(BaseModel):
 async def registerServer(serverUuid: UUID, registerConfig: RegisterConfig, accessToken=Header(...)):
     result = cache.getCurrentServerAndSm(serverUuid)
     server: mcUtilities.Server = result["server"]
+    serverManager: mcUtilities.ServerManager = result["serverManager"]
     if server.domain:
         raise HTTPException(409, "Server is already registered")
     await tunneling.registerServer(server, registerConfig.domain, accessToken)
+    serverManager.justRegistered = True
     return {"status": "registered"}
 
 
@@ -69,6 +71,9 @@ async def stopTunnelR(serverUuid: UUID):
     result = cache.getCurrentServerAndSm(serverUuid)
     serverManager: mcUtilities.ServerManager = result["serverManager"]
     if not serverManager.tunnelProcess:
-        raise HTTPException(404, f"No tunnel seems to run for server {serverUuid}")
+        if serverManager.justRegistered:
+            return {"status": "No running tunnel"}
+        else:
+            raise HTTPException(404, f"No tunnel seems to run for server {serverUuid}")
     tunneling.stopTunnel(serverManager)
     return {"status": "stopped"}

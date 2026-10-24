@@ -17,6 +17,8 @@ import utilities.mcUtilities as mcUtilities
 from utilities import db, tunneling
 from utilities.miscellaneous import getSystem, getResourceRuntimePath
 
+# TODO : Make download system better by having an entire custom manifest with download URL
+
 logger.remove()
 logger.add(
     sys.stdout,
