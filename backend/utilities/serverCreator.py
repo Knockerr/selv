@@ -120,9 +120,9 @@ def getFrpcBinaryPath():
     system = getSystem()
 
     if system == "Windows":
-        return getResourceRuntimePath("bin/frpc.exe")
+        return getResourceRuntimePath("binaries/frpc/frpc.exe")
     elif system == "Linux":
-        return getResourceRuntimePath("bin/frpc")
+        return getResourceRuntimePath("binaries/frpc/frpc")
     else:
         raise RuntimeError(f"OS non supporté: {system}")
 

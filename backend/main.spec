@@ -11,7 +11,7 @@ a = Analysis(
     binaries=[],
     datas=[
         ('templates', 'templates'),
-        (f'binaries/frpc/{frpc_name}', 'bin')
+        (f'binaries/frpc/{frpc_name}', 'binaries/frpc')
     ],
     hiddenimports=[],
     hookspath=[],
