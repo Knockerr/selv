@@ -1,7 +1,7 @@
 <script>
   import { open } from "@tauri-apps/plugin-dialog";
   import { pathDb } from "$lib/icons/pathDb";
-  import { minecraftVersions } from "$lib/serversInfosDb";
+  import { getMinecraftVersions } from "$lib/ServersVersionHandler.svelte.js";
   import { online } from "svelte/reactivity/window";
   import Button from "../baseComponents/Button.svelte";
   import ComboBox from "../baseComponents/ComboBox.svelte";
@@ -18,23 +18,15 @@
   let currentRam = $state("");
   let currentPath = $state("");
 
-  const allMinecraftVersions = Object.keys(minecraftVersions);
-  const availableVersions = $derived.by(() => {
-    let temp = [];
-    allMinecraftVersions.forEach((version) => {
-      if (minecraftVersions[version].availableTypes.includes(currentType))
-        temp.push(version);
-    });
-    return temp;
-  });
+  let minecraftVersions = $derived(getMinecraftVersions());
 
   const availableVersionItems = $derived.by(() => {
+    if (!minecraftVersions) return;
     let temp = [];
-    if (availableVersions === undefined) return;
-    availableVersions.forEach((version) => {
+    minecraftVersions[currentVersion].versions.forEach((version) => {
       temp.push({
-        label: version,
-        value: version,
+        label: version.id,
+        value: version.id,
       });
     });
     return temp;
@@ -146,7 +138,7 @@
   ></Input>
 
   <Button
-  iconPath={pathDb.folder}
+    iconPath={pathDb.folder}
     onclick={async () => {
       await selectFolderDir();
     }}>Dossier du serveur</Button

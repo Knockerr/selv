@@ -7,9 +7,11 @@
   import { uiStore } from "$lib/components/bits-ui/uiComponentsStore.svelte";
   import ErrorReportDialog from "$lib/components/bits-ui/presets/ErrorReportDialog.svelte";
   import { invoke } from "@tauri-apps/api/core";
+  import { initMinecraftServersVersions } from "$lib/ServersVersionHandler.svelte";
 
   let { children } = $props();
 
+  // Chance icon in taskbar depending on system theme
   onMount(() => {
     const media = window.matchMedia("(prefers-color-scheme: light)");
 
@@ -26,6 +28,10 @@
     return () => {
       media.removeEventListener("change", updateIcon);
     };
+  });
+
+  onMount(() => {
+    initMinecraftServersVersions();
   });
 </script>
 

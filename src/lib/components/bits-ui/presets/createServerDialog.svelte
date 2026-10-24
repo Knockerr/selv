@@ -1,7 +1,6 @@
 <script>
   import { pathDb } from "$lib/icons/pathDb";
-  import { minecraftVersions } from "$lib/serversInfosDb";
-  import { online } from "svelte/reactivity/window";
+  import { getMinecraftVersions } from "$lib/ServersVersionHandler.svelte.js";
   import Button from "../baseComponents/Button.svelte";
   import ComboBox from "../baseComponents/ComboBox.svelte";
   import Dialog from "../baseComponents/dialog.svelte";
@@ -12,28 +11,27 @@
 
   const { refreshFoldersFunction } = $props();
 
+  let minecraftVersions = $derived(getMinecraftVersions());
+
+  $inspect(minecraftVersions);
+
   let currentName = $state("");
   let currentVersion = $state("");
   let currentType = $state("");
   let currentRam = $state("");
 
-  const allMinecraftVersions = Object.keys(minecraftVersions);
-  const availableVersions = $derived.by(() => {
-    let temp = [];
-    allMinecraftVersions.forEach((version) => {
-      if (minecraftVersions[version].availableTypes.includes(currentType))
-        temp.push(version);
-    });
-    return temp;
+  $inspect(minecraftVersions).with(() => {
+    console.warn("minecraftVersions > " + minecraftVersions);
+    console.warn("currentType > " + currentType);
   });
 
   const availableVersionItems = $derived.by(() => {
+    if (!minecraftVersions || !currentType) return;
     let temp = [];
-    if (availableVersions === undefined) return;
-    availableVersions.forEach((version) => {
+    minecraftVersions[currentType].versions.forEach((version) => {
       temp.push({
-        label: version,
-        value: version,
+        label: version.id,
+        value: version.id,
       });
     });
     return temp;
@@ -42,7 +40,7 @@
   const availableTypesItems = [
     {
       value: "vanilla",
-      label: "défaut",
+      label: "Vanilla",
     },
     {
       value: "spigot",

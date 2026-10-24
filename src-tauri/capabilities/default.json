@@ -24,6 +24,10 @@
       "identifier": "fs:allow-app-write",
       "allow": [{ "path": "$LOCALDATA/Selv/**" }]
     },
+        {
+      "identifier": "fs:allow-app-meta",
+      "allow": [{ "path": "$LOCALDATA/Selv/**" }]
+    },
     {
       "identifier": "shell:allow-execute",
       "allow": [
