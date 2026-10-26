@@ -7,7 +7,7 @@
   import { uiStore } from "$lib/components/bits-ui/uiComponentsStore.svelte";
   import ErrorReportDialog from "$lib/components/bits-ui/presets/ErrorReportDialog.svelte";
   import { invoke } from "@tauri-apps/api/core";
-  import { initMinecraftServersVersions } from "$lib/ServersVersionHandler.svelte";
+  import { initManifests } from "$lib/manifestsManager.svelte";
 
   let { children } = $props();
 
@@ -23,15 +23,13 @@
 
     updateIcon();
 
+    initManifests();
+
     media.addEventListener("change", updateIcon);
 
     return () => {
       media.removeEventListener("change", updateIcon);
     };
-  });
-
-  onMount(() => {
-    initMinecraftServersVersions();
   });
 </script>
 

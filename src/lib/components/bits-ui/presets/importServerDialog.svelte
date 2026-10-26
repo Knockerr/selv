@@ -1,7 +1,6 @@
 <script>
   import { open } from "@tauri-apps/plugin-dialog";
   import { pathDb } from "$lib/icons/pathDb";
-  import { getMinecraftVersions } from "$lib/ServersVersionHandler.svelte.js";
   import { online } from "svelte/reactivity/window";
   import Button from "../baseComponents/Button.svelte";
   import ComboBox from "../baseComponents/ComboBox.svelte";
@@ -9,6 +8,7 @@
   import Input from "../baseComponents/Input.svelte";
   import Select from "../baseComponents/select.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
+  import { getMinecraftVersions } from "$lib/manifestsManager.svelte";
 
   const { refreshFoldersFunction } = $props();
 

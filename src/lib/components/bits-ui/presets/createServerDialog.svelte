@@ -1,6 +1,5 @@
 <script>
   import { pathDb } from "$lib/icons/pathDb";
-  import { getMinecraftVersions } from "$lib/ServersVersionHandler.svelte.js";
   import Button from "../baseComponents/Button.svelte";
   import ComboBox from "../baseComponents/ComboBox.svelte";
   import Dialog from "../baseComponents/dialog.svelte";
@@ -8,12 +7,11 @@
   import Select from "../baseComponents/select.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import { uiStore } from "../uiComponentsStore.svelte";
+  import { getMinecraftVersions } from "$lib/manifestsManager.svelte";
 
   const { refreshFoldersFunction } = $props();
 
   let minecraftVersions = $derived(getMinecraftVersions());
-
-  $inspect(minecraftVersions);
 
   let currentName = $state("");
   let currentVersion = $state("");
