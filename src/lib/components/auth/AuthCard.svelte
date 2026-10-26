@@ -13,7 +13,6 @@
     background-color: var(--background-alt);
     width: 25%;
     height: fit-content;
-    max-height: 700px;
     padding: 30px;
     box-sizing: border-box;
 }

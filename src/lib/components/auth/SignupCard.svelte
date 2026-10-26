@@ -7,12 +7,25 @@
   import AuthCard from "./AuthCard.svelte";
   import ClickableText from "../bits-ui/baseComponents/ClickableText.svelte";
   import { supabase } from "$lib/supabaseClient.svelte";
+  import Checkbox from "../bits-ui/baseComponents/Checkbox.svelte";
+  import { openUrl } from "@tauri-apps/plugin-opener";
 
   let { currentAction = $bindable(), email = $bindable() } = $props();
 
   let password = $state("");
   let confirmPassword = $state("");
   let username = $state("");
+
+  let termsConditionCheckbox = $state(false);
+  let ageCheckbox = $state(false);
+
+  let passwordInputColor = $state("");
+  let passwordCorrect = $state("");
+
+  let emailInputColor = $state("");
+  let emailCorrect = $state();
+
+  let errorMessage = $state("");
 
   const validateEmail = (email) => {
     return String(email)
@@ -22,16 +35,14 @@
       );
   };
 
-  const emailCorrect = $derived(validateEmail(email));
-  let emailInputColor = $derived(
-    emailCorrect || !email ? "" : "var(--dangerous)",
-  );
-  const arePasswordIdentical = $derived(password == confirmPassword);
-  let passwordInputColor = $derived(
-    arePasswordIdentical ? "" : "var(--dangerous)",
-  );
+  const validatePasswd = (passwd) => {
+    return String(passwd).match(
+      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/,
+    );
+  };
 
   async function signUp() {
+    justCreated = true;
     console.log("Trying to sign up new user");
     if (!email || !password) return;
     const { data, error } = await supabase.auth.signUp({
@@ -51,6 +62,41 @@
     }
     console.log("Sign up users data: ", data);
     currentAction = "emailValidation";
+  }
+
+  function evaluateEmail() {
+    emailCorrect = email && validateEmail(email);
+    if (!emailCorrect) {
+      emailInputColor = "var(--dangerous)";
+      errorMessage = "Mauvais format d'adresse mail.";
+      return;
+    }
+
+    emailCorrect = true;
+    errorMessage = "";
+    emailInputColor = "";
+  }
+
+  function evaluatePassword() {
+    const doPasswdFitRequirements = password && validatePasswd(password);
+    if (!doPasswdFitRequirements) {
+      passwordCorrect = false;
+      errorMessage = "Le mot de passe ne répond pas aux exigences.";
+      passwordInputColor = "var(--dangerous)";
+      return;
+    }
+
+    const arePasswordIdentical = password == confirmPassword;
+    if (!arePasswordIdentical) {
+      passwordCorrect = false;
+      errorMessage = "Les mots de passe sont différents.";
+      passwordInputColor = "var(--dangerous)";
+      return;
+    }
+
+    passwordCorrect = true;
+    errorMessage = "";
+    passwordInputColor = "";
   }
 </script>
 
@@ -76,14 +122,23 @@
         placeholder="Email"
         labelProps={{ style: "font-size:0.95rem;" }}
         color={emailInputColor}
+        onblur={evaluateEmail}
       />
       <Input
         label="Mot de passe"
+        requirements={[
+          "Plus de 8 caractères",
+          "Au moins une majuscule",
+          "Au moins une minuscule",
+          "Au moins un chiffre",
+          "Au moins un caractère spécial",
+        ]}
         password
         bind:value={password}
         placeholder="Password"
         labelProps={{ style: "font-size:0.95rem;" }}
         color={passwordInputColor}
+        onblur={evaluatePassword}
       />
       <Input
         label="Confirmer le mot de passe"
@@ -92,12 +147,48 @@
         placeholder="Password"
         labelProps={{ style: "font-size:0.95rem;" }}
         color={passwordInputColor}
+        onblur={evaluatePassword}
+      />
+      {#if errorMessage}
+        <p class="error">
+          {errorMessage}
+        </p>
+      {/if}
+      <Checkbox
+        label="Accepter les conditions d'utilisation et la politique de confidentialité."
+        bind:checked={termsConditionCheckbox}
+        id="terms"
+      >
+        {#snippet labelSnippet()}
+          Accepter les <ClickableText
+            onclick={() => {
+              openUrl("https://docs.selvmc.com/informations/cgu");
+            }}
+            style="font-size: inherit; font-family: inherit; font-weight: inherit; color: inherit"
+            >conditions d'utilisation</ClickableText
+          >
+          et la <ClickableText
+            onclick={() => {
+              openUrl("https://docs.selvmc.com/informations/terms");
+            }}
+            style="font-size: inherit; font-family: inherit; font-weight: inherit; color: inherit"
+            >politique de confidentialité</ClickableText
+          >
+        {/snippet}
+      </Checkbox>
+      <Checkbox
+        id="age"
+        bind:checked={ageCheckbox}
+        label="J'ai au moins 15 ans, ou j'ai l'autorisation de mon représentant légal."
       />
       <Button
         emphasize
         width="100%"
         height="40px"
-        disabled={!arePasswordIdentical || !password || !emailCorrect}
+        disabled={!passwordCorrect ||
+          !emailCorrect ||
+          !ageCheckbox ||
+          !termsConditionCheckbox}
         onclick={signUp}
         style="font-size:0.95rem; font-weight: 500;">Créer le compte</Button
       >
@@ -144,5 +235,11 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+  }
+
+  .error {
+    color: var(--dangerous);
+    margin: 0;
+    font-size: 0.8rem;
   }
 </style>

@@ -16,8 +16,12 @@
     labelProps,
     color = "",
     defaultValue = "",
+    requirements,
+    onblur = () => {},
     ...others
   } = $props();
+
+  // If given, requirements is an array
 
   onMount(() => {
     if (defaultValue) value = defaultValue;
@@ -43,6 +47,7 @@
       {style}
       type={password ? "password" : "text"}
       bind:value
+      {onblur}
     />
     <Icon
       className="absolute right-3 top-3"
@@ -51,4 +56,19 @@
       path={iconPath}
     />
   </div>
+  <div class="flex flex-col gap-0">
+    {#if requirements}
+      {#each requirements as req}
+        <p class="requirements">{req}</p>
+      {/each}
+    {/if}
+  </div>
 </div>
+
+<style>
+  .requirements {
+    color: var(--color-foreground-alt);
+    font-size: 0.8rem;
+    margin: 0;
+  }
+</style>

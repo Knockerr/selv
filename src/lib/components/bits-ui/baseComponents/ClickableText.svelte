@@ -8,11 +8,10 @@
 
 <style>
   .component {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    display: inline;
+    padding: 0;
+    margin: 0;
     gap: 5px;
-    width: fit-content;
     height: fit-content;
     background-color: transparent;
     outline: none;
