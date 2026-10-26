@@ -60,18 +60,18 @@ class ManifestManager {
     async getLatest() {
         const res = await fetch(this.remoteUrl);
 
-        // If unable to fetch, fallback on local version of the manifest
-        if (!res.ok) return;
+        // Getting local version of the manifest
+        const localManifestContent = await this.getLocal();
+
+        // If unable to fetch remote, fallback on local version of the manifest
+        if (!res.ok) return localManifestContent;
 
         const remoteManifestData = await res.json();
 
         if (!remoteManifestData) return;
 
-        // Getting local version of the manifest
-        const localManifestContent = await this.getLocal();
-
         // Checking if remote manifest is newer than local
-        if (!localManifestContent || localManifestContent.schema_version >= remoteManifestData.schema_version) {
+        if (!localManifestContent || localManifestContent.schema_version < remoteManifestData.schema_version) {
             this.updateLocal(remoteManifestData);
             return remoteManifestData;
         } else {
@@ -90,6 +90,6 @@ export async function initManifests() {
     versionsManifestContent = await versionsManifest.getLatest();
 };
 
-export async function getMinecraftVersions() {
+export function getMinecraftVersions() {
     return versionsManifestContent.software;
 }
