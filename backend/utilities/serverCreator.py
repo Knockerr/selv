@@ -159,14 +159,8 @@ def createFrpcFolder(server: mcUtilities.Server):
 
 
 async def handleSpigotDownload(version: str):
-    # Charger le fichier manifest de spigot non officiel
-    with open('./orgBukkitManifest-unoff.json', 'r') as f:
-        spigotManifest = json.load(f)
-    # Récuperer le lien de téléchargement
-    spigotServerJarLink = spigotManifest[version]['url']
-    if not spigotServerJarLink:
-        logger.error(f"Impossible de trouver la version {version} dans le manifest de spigot")
-        return
+    # Construire le lien de téléchargement
+    spigotServerJarLink = f"https://getbukkit.org/spigot/spigot-{version}.jar"
 
     # Télécharger le jar
     jarFile = requests.get(spigotServerJarLink)
