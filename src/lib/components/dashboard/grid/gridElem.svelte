@@ -38,6 +38,7 @@
     font-size: 1.2rem;
     position: relative;
     overflow: hidden;
+    overflow-x: scroll;
   }
 
   .title {
