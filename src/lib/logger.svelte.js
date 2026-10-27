@@ -1,5 +1,7 @@
 import {
     mkdir,
+    readTextFile,
+    writeFile,
     writeTextFile
 } from "@tauri-apps/plugin-fs";
 import {
@@ -10,6 +12,8 @@ import {
     join,
     localDataDir
 } from '@tauri-apps/api/path';
+import JSZip from "jszip";
+import { save } from "@tauri-apps/plugin-dialog";
 
 const logs = [];
 const maxLogs = 5000;
@@ -88,4 +92,43 @@ export async function init() {
         captureLog('warn', args);
         originalWarn(...args);
     };
+}
+
+
+export async function getReport() {
+    const zip = new JSZip();
+
+    const content = await readTextFile(logPath);
+    zip.file(`frontend/frontend.log`, content);
+
+    const backendLogsResponse = await fetch(
+        "http://localhost:40401/logs/download",
+    );
+    const backendLogsBlob = await backendLogsResponse.blob();
+    const backendLogsBuffer = new Uint8Array(
+        await backendLogsBlob.arrayBuffer(),
+    );
+    zip.file("backend/backend.log", backendLogsBuffer);
+
+    const zipContent = await zip.generateAsync({
+        type: "uint8array"
+    });
+
+    return zipContent;
+}
+
+export async function downloadReport() {
+    const zipContent = await getReport();
+
+    const savePath = await save({
+        defaultPath: `selv_logs_${Date.now()}.zip`,
+        filters: [{
+            name: "Zip",
+            extensions: ["zip"]
+        }],
+    });
+
+    if (savePath) {
+        await writeFile(savePath, zipContent);
+    }
 }

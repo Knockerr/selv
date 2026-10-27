@@ -7,6 +7,7 @@
   import { readTextFile, writeFile } from "@tauri-apps/plugin-fs";
   import { save } from "@tauri-apps/plugin-dialog";
   import JSZip from "jszip";
+  import { downloadReport, getReport } from "$lib/logger.svelte";
 
   const error = $derived(uiStore.currentError);
 
@@ -18,39 +19,6 @@
     logDir = await join(baseDir, "Selv", "logs", "frontend");
     logPath = await join(logDir, "frontend.log");
   });
-
-  async function getReport() {
-    const zip = new JSZip();
-
-    const content = await readTextFile(logPath);
-    zip.file(`frontend/frontend.log`, content);
-
-    const backendLogsResponse = await fetch(
-      "http://localhost:40401/logs/download",
-    );
-    const backendLogsBlob = await backendLogsResponse.blob();
-    const backendLogsBuffer = new Uint8Array(
-      await backendLogsBlob.arrayBuffer(),
-    );
-    zip.file("backend/backend.log", backendLogsBuffer);
-
-    const zipContent = await zip.generateAsync({ type: "uint8array" });
-
-    return zipContent;
-  }
-
-  async function downloadReport() {
-    const zipContent = await getReport();
-
-    const savePath = await save({
-      defaultPath: `selv_logs_${Date.now()}.zip`,
-      filters: [{ name: "Zip", extensions: ["zip"] }],
-    });
-
-    if (savePath) {
-      await writeFile(savePath, zipContent);
-    }
-  }
 
   async function sendReport() {
     // TODO

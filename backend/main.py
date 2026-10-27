@@ -79,8 +79,15 @@ async def shutdown():
     # TODO : Better error handling
     results = await asyncio.gather(*stopRunningServersList)
 
-    # Closing the process in itself
-    os.kill(os.getpid(), signal.SIGTERM)
+    async def kill():
+        """
+        Kills backend after a few seconds so that api call can answer before shutdown
+        """
+        await asyncio.sleep(0.5)
+        # Closing the process in itself
+        os.kill(os.getpid(), signal.SIGTERM)
+
+    _ = asyncio.create_task(kill())
     return {"status": "Stopping.."}
 
 
