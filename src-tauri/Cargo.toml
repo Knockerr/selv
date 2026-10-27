@@ -1,6 +1,6 @@
 [package]
 name = "Selv"
-version = "0.0.8"
+version = "0.0.7"
 description = "Logiciel de panel et de simplification de gestion de serveurs minecraft hébergés sur son pc. Plus d'informations sur www.selvmc.com"
 authors = ["Knocker"]
 edition = "2024"
@@ -27,6 +27,7 @@ tauri-plugin-store = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-fs = "2"
 image = { version = "0.25", default-features = false, features = ["png"] }
+tauri-plugin-http = "2"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows = { version = "0.62.2", features = ["Win32_System_Services", "Win32_Foundation", "Win32_Security"] }

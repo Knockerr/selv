@@ -23,9 +23,9 @@ fn main() {
             return;
         }
         let candidates = [
-            "/usr/lib/libwayland-client.so.0", // Arch-based
+            "/usr/lib/libwayland-client.so.0",                  // Arch-based
             "/usr/lib/x86_64-linux-gnu/libwayland-client.so.0", // Debian / Ubuntu
-            "/usr/lib64/libwayland-client.so.0", // Fedora / openSUSE
+            "/usr/lib64/libwayland-client.so.0",                // Fedora / openSUSE
         ];
         if let Some(path) = candidates.iter().find(|p| std::path::Path::new(p).exists()) {
             let new = match std::env::var("LD_PRELOAD") {

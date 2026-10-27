@@ -12,6 +12,7 @@
   import { check } from "@tauri-apps/plugin-updater";
   import { marked } from "marked";
   import { onMount } from "svelte";
+  import { fetch } from "@tauri-apps/plugin-http";
 
   let currentVersion = $state("v0.1.0");
   let newVersion = $state("");
@@ -55,10 +56,7 @@
   }
 
   async function closeBackend() {
-    let res = await post("shutdown");
-    if (!res.ok) {
-      console.error("Impossible to stop internal backend : ", res);
-    }
+    await post("http://127.0.0.1:40401/shutdown");
   }
 
   async function installUpdate() {
@@ -176,7 +174,14 @@
         {/if}
       </div>
       <div class="right">
-        <Button iconPath={pathDb.arrowRight} disabled={downloadState} emphasize={!newVersion} onclick={goto("/core/dashboard")}>
+        <Button
+          iconPath={pathDb.arrowRight}
+          disabled={downloadState}
+          emphasize={!newVersion}
+          onclick={() => {
+            goto("/core/dashboard");
+          }}
+        >
           {#if newVersion}
             Continuer sans mettre à jour
           {:else}

@@ -10,23 +10,46 @@
     "shell:allow-open",
     {
       "identifier": "fs:allow-mkdir",
-      "allow": [{ "path": "$LOCALDATA/Selv" }, { "path": "$LOCALDATA/Selv/**" }]
+      "allow": [
+        {
+          "path": "$LOCALDATA/Selv"
+        },
+        {
+          "path": "$LOCALDATA/Selv/**"
+        }
+      ]
     },
     {
       "identifier": "fs:allow-write-text-file",
-      "allow": [{ "path": "$LOCALDATA/Selv/**" }]
+      "allow": [
+        {
+          "path": "$LOCALDATA/Selv/**"
+        }
+      ]
     },
     {
       "identifier": "fs:allow-read-text-file",
-      "allow": [{ "path": "$LOCALDATA/Selv/**" }]
+      "allow": [
+        {
+          "path": "$LOCALDATA/Selv/**"
+        }
+      ]
     },
     {
       "identifier": "fs:allow-app-write",
-      "allow": [{ "path": "$LOCALDATA/Selv/**" }]
-    },
+      "allow": [
         {
+          "path": "$LOCALDATA/Selv/**"
+        }
+      ]
+    },
+    {
       "identifier": "fs:allow-app-meta",
-      "allow": [{ "path": "$LOCALDATA/Selv/**" }]
+      "allow": [
+        {
+          "path": "$LOCALDATA/Selv/**"
+        }
+      ]
     },
     {
       "identifier": "shell:allow-execute",
@@ -39,6 +62,17 @@
       ]
     },
     "store:default",
-    "dialog:default"
+    "dialog:default",
+    {
+      "identifier": "http:default",
+      "allow": [
+        {
+          "url": "https://github.com/Knockerr/selv/**"
+        },
+        {
+          "url": "https://github.com/Knockerr/selv/releases/**"
+        }
+      ]
+    }
   ]
 }

@@ -59,8 +59,8 @@
       icon: pathDb.update,
       color: "#b50",
       onclick: () => {
-        goto("/update")
-      }, // TODO: Update after the update system is done
+        goto("/update");
+      },
     },
     {
       label: "Fichiers",
@@ -68,9 +68,12 @@
       color: "",
       onclick: async () => {
         // Fetching %localappdata%/servers
-        const res = await fetch("http://localhost:40401/api/servers/localPath", {
-          method: "GET",
-        });
+        const res = await fetch(
+          "http://localhost:40401/api/servers/localPath",
+          {
+            method: "GET",
+          },
+        );
         const datas = await res.json();
 
         Command.create("explorer", datas["serversPath"]).execute();
@@ -90,7 +93,7 @@
       icon: pathDb.question,
       color: "#5865F2",
       onclick: () => {
-        openUrl("https://discord.gg/FVh9daFrH7")
+        openUrl("https://discord.gg/FVh9daFrH7");
       }, // TODO : Goto discord link
     },
   ]);
