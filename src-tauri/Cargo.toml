@@ -1,6 +1,6 @@
 [package]
 name = "Selv"
-version = "0.0.9"
+version = "0.0.10"
 description = "Logiciel de panel et de simplification de gestion de serveurs minecraft hébergés sur son pc. Plus d'informations sur www.selvmc.com"
 authors = ["Knocker"]
 edition = "2024"
