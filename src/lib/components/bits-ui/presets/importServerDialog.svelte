@@ -9,6 +9,7 @@
   import Select from "../baseComponents/select.svelte";
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import { getMinecraftVersions } from "$lib/manifestsManager.svelte";
+  import { supabase } from "$lib/supabaseClient.svelte";
 
   const { refreshFoldersFunction } = $props();
 
@@ -60,11 +61,7 @@
   }
 
   async function onServerImportClick() {
-    console.warn(currentName);
-    console.warn(currentRam);
-    console.warn(currentVersion);
-    console.warn(currentType);
-    console.warn(currentPath);
+    const user = await supabase.auth.getUser().data.user.id;
     const response = await fetch(`http://localhost:40401/api/servers/import`, {
       method: "POST",
       headers: {
@@ -76,6 +73,7 @@
         version: currentVersion,
         type: currentType,
         path: currentPath.toString(),
+        owner: user,
       }),
     });
 

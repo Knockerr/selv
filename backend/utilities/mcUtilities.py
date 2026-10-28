@@ -402,7 +402,8 @@ class Server:
                  path: str = None,
                  uuid: UUID = None,
                  domain: str = None,
-                 localPort: int = None):
+                 localPort: int = None,
+                 owner: str = None):
 
         self.domain: str or None = domain
         self.uuid: UUID = uuid
@@ -417,6 +418,7 @@ class Server:
         self.uptime: int = 0
         self.startTime = None
         self.localPort: int = localPort
+        self.owner = owner
 
         self.batPath: str
         self.propertiesPath: str
@@ -448,10 +450,10 @@ class Server:
         cursor = conn.cursor()
         cursor.execute(f"""
             INSERT INTO servers (uuid, name, creation_date, last_use_date, max_ram, version, server_type, path, uptime, 
-            domain, local_port) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            domain, local_port, owner_id) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (str(self.uuid), self.name, self.creationDate, self.lastUseDate, self.maxRam, self.version,
-              self.serverType, self.path, self.uptime, self.domain or None, self.localPort))
+              self.serverType, self.path, self.uptime, self.domain or None, self.localPort, self.owner))
         conn.commit()
         conn.close()
 

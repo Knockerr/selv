@@ -173,7 +173,7 @@ async def handleSpigotDownload(version: str):
         file.write(jarFile.content)
 
 
-async def handleSpigotCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
+async def handleSpigotCreation(name: str, uuid: UUID, type_: str, version: str, ram: int, owner: str):
     # Vérification : Si le fichier n'est pas déja téléchargé, l'installer.
     serverFile = jarsDir / 'spigot' / f"Spigot-{version}.jar"
     if not serverFile.exists():
@@ -196,7 +196,7 @@ async def handleSpigotCreation(name: str, uuid: UUID, type_: str, version: str, 
     logger.debug("Création du serveur")
     # Créer le serveur
     server = mcUtilities.Server(name, creationDate, creationDate, ram, version, type_, str(serversDir / name), uuid,
-                                None, availablePort)
+                                None, availablePort, owner)
     server.init()
     logger.debug(f"Objet Server de {name} créé et sauvegardé.")
 
@@ -248,7 +248,7 @@ async def handleVanillaDownload(version: str) -> None:
         file.write(jarFile.content)
 
 
-async def handleVanillaCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
+async def handleVanillaCreation(name: str, uuid: UUID, type_: str, version: str, ram: int, owner: str):
     # Vérification : Si le fichier n'est pas déja téléchargé, l'installer.
     serverFile = jarsDir / 'vanilla' / f"Vanilla-{version}.jar"
     if not serverFile.exists():
@@ -271,7 +271,7 @@ async def handleVanillaCreation(name: str, uuid: UUID, type_: str, version: str,
     logger.debug("Création du serveur")
     # Créer le serveur
     server = mcUtilities.Server(name, creationDate, creationDate, ram, version, type_, str(serversDir / name), uuid,
-                                None, availablePort)
+                                None, availablePort, owner)
     server.init()
     logger.debug(f"Objet Server de {name} créé et sauvegardé.")
 
@@ -303,7 +303,7 @@ async def handlePaperDownload(version: str) -> None:
         file.write(jarFile.content)
 
 
-async def handlePaperCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
+async def handlePaperCreation(name: str, uuid: UUID, type_: str, version: str, ram: int, owner: str):
     # Shield qui empeche le téléchargement de versions non prises en charge
     if version.split('.')[1] < '12':
         logger.error("Seul les versions supérieur a la 1.12 sont stable et suportées par paper.")
@@ -332,7 +332,7 @@ async def handlePaperCreation(name: str, uuid: UUID, type_: str, version: str, r
     logger.debug("Création du serveur")
     # Créer le serveur
     server = mcUtilities.Server(name, creationDate, creationDate, ram, version, type_, str(serversDir / name), uuid,
-                                None, availablePort)
+                                None, availablePort, owner)
     server.init()
     logger.debug(f"Objet Server de {name} créé et sauvegardé.")
 
@@ -382,7 +382,7 @@ async def handleForgeDownload(version: str):
         file.write(jarFile.content)
 
 
-async def handleForgeCreation(name: str, uuid: UUID, type_: str, version: str, ram: int):
+async def handleForgeCreation(name: str, uuid: UUID, type_: str, version: str, ram: int, owner: str):
     # Vérification : Si le fichier n'est pas déja téléchargé, l'installer.
     serverFile = jarsDir / 'forge' / f"ForgeInstaller-{version}.jar"
     if not serverFile.exists():
@@ -417,7 +417,7 @@ async def handleForgeCreation(name: str, uuid: UUID, type_: str, version: str, r
     logger.debug("Création du serveur")
     # Créer le serveur
     server = mcUtilities.Server(name, creationDate, creationDate, ram, version, type_, str(serversDir / name), uuid,
-                                None, availablePort)
+                                None, availablePort, owner)
     server.init()
     logger.debug(f"Objet Server de {name} créé et sauvegardé.")
 
@@ -454,13 +454,13 @@ def getServerRam(name, path):
         return "askUser"
 
 
-def importServer(name: str, path: str | pathlib.Path, ram, version, serverType, uuid):
+def importServer(name: str, path: str | pathlib.Path, ram, version, serverType, uuid, owner):
     # TODO: Create a system that automatically gets servers datas
     # Récuperer la date
     creationDate: str = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     logger.debug("Création du serveur")
     # Créer le serveur
-    server = mcUtilities.Server(name, creationDate, creationDate, ram, version, serverType, path, uuid)
+    server = mcUtilities.Server(name, creationDate, creationDate, ram, version, serverType, path, uuid, owner)
     server.init()
     logger.debug(f"Objet Server de {name} créé et sauvegardé.")

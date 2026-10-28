@@ -8,6 +8,7 @@
   import { folderSystem } from "$lib/stores/folderSystem.svelte";
   import { uiStore } from "../uiComponentsStore.svelte";
   import { getMinecraftVersions } from "$lib/manifestsManager.svelte";
+  import { supabase } from "$lib/supabaseClient.svelte";
 
   const { refreshFoldersFunction } = $props();
 
@@ -51,6 +52,7 @@
 
   async function onServerCreationClick() {
     uiStore.load("Téléchargement des fichiers");
+    const user = await supabase.auth.getUser().data.user.id;
     const response = await fetch(`http://localhost:40401/api/servers/create`, {
       method: "POST",
       headers: {
@@ -61,6 +63,7 @@
         ram: parseInt(currentRam),
         version: currentVersion,
         type: currentType,
+        owner: user,
       }),
     });
 

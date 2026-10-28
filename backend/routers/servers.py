@@ -234,13 +234,14 @@ class Configuration(BaseModel):
     ram: int
     type: str
     version: str
+    owner: str
 
 
 @router.post("/servers/create")
 async def createServerR(config: Configuration):
     logger.info("Server Creation Detected!")
     uuid = uuidLib.uuid4()
-    await utilities.serverCreator.createServer(config.name, uuid, config.type, config.version, config.ram)
+    await utilities.serverCreator.createServer(config.name, uuid, config.type, config.version, config.ram, config.owner)
     return {"status": "created", "uuid": str(uuid)}
 
 
@@ -250,6 +251,7 @@ class importConfig(BaseModel):
     type: str
     version: str
     path: str
+    owner: str
 
 
 @router.post("/servers/import")
@@ -259,10 +261,11 @@ async def importServerR(config: importConfig):
     serverType = config.type
     version = config.version
     path = config.path
+    owner = config.owner
 
     logger.info(f"Importing server {name}")
     uuid = str(uuidLib.uuid4())
-    utilities.serverCreator.importServer(name, path, ram, version, serverType, uuid)
+    utilities.serverCreator.importServer(name, path, ram, version, serverType, uuid, owner)
     return {"status": "imported", "uuid": uuid}
 
 

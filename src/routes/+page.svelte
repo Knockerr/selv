@@ -6,7 +6,7 @@
 
   async function isUpdate() {
     try {
-      update = await check();
+      let update = await check();
       if (update) return true;
       else return false;
     } catch (error) {
@@ -15,9 +15,9 @@
   }
 
   onMount(async () => {
-    isUpdate = await isUpdate();
+    const isUpdateAvailable = await isUpdate();
     // Check for updates
-    if (isUpdate) {
+    if (isUpdateAvailable) {
       console.log("Update detected, redirecting to update...")
       goto("/update");
     } else {

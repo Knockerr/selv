@@ -39,7 +39,8 @@ def initDb():
         uptime INTEGER,
         domain TEXT,
         deletion_time TEXT,
-        local_port INTEGER
+        local_port INTEGER,
+        owner_id TEXT
     );
     """)
     cursor.execute("""
