@@ -61,7 +61,13 @@
   }
 
   async function onServerImportClick() {
-    const user = await supabase.auth.getUser().data.user.id;
+    const { data, error } = await supabase.auth.getSession();
+    if (error) {
+      console.error("Can't get user");
+      return;
+    }
+    const uid = await data?.session.user.id;
+
     const response = await fetch(`http://localhost:40401/api/servers/import`, {
       method: "POST",
       headers: {
@@ -73,7 +79,7 @@
         version: currentVersion,
         type: currentType,
         path: currentPath.toString(),
-        owner: user,
+        owner: uid,
       }),
     });
 
@@ -83,9 +89,9 @@
       return;
     }
 
-    const data = await response.json();
+    const sData = await response.json();
 
-    await folderSystem.addServer(data.uuid);
+    await folderSystem.addServer(sData.uuid);
 
     refreshFoldersFunction();
   }

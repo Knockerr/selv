@@ -59,9 +59,6 @@
     }
     const uid = await data?.session.user.id;
 
-    console.warn("data > ", data);
-    console.warn("UID > ", uid);
-
     const response = await fetch(`http://localhost:40401/api/servers/create`, {
       method: "POST",
       headers: {
