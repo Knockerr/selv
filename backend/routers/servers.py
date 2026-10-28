@@ -234,11 +234,18 @@ class Configuration(BaseModel):
     ram: int
     type: str
     version: str
+
+
+class CreateConfiguration(BaseModel):
+    name: str
+    ram: int
+    type: str
+    version: str
     owner: str
 
 
 @router.post("/servers/create")
-async def createServerR(config: Configuration):
+async def createServerR(config: CreateConfiguration):
     logger.info("Server Creation Detected!")
     uuid = uuidLib.uuid4()
     await utilities.serverCreator.createServer(config.name, uuid, config.type, config.version, config.ram, config.owner)

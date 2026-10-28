@@ -103,13 +103,13 @@ def createStartBatFile(serverName, version, maxRam, serverFileName):
         file.write(f"@echo off \n\"{javaPath}\" -Xmx{maxRam}G -jar {serverFileName} --nogui")
 
 
-def editAutoForgeBatFile(serverName, mcVersion):
+async def editAutoForgeBatFile(serverName, mcVersion):
     serverPath = serversDir / serverName
     # Override les arguments de la JVM initiaux
     with open(serverPath / "user_jvm_args.txt", 'w') as argsFile:
         argsFile.write(" -Xmx4G")
 
-    forgeVersion = getForgeVersion(mcVersion)
+    forgeVersion = await getForgeVersion(mcVersion)
 
     # Override le start.bat pour le démarrer en noGUi est forcer l'utilisation du JRE portable installé
     with open(serverPath / "run.bat", 'w') as batFile:
@@ -367,7 +367,7 @@ async def handleForgeDownload(version: str):
     """
        Gère le téléchargement d'une version de forge.
        """
-    forgeVersion = getForgeVersion(version)
+    forgeVersion = await getForgeVersion(version)
     # Forger l'url du jar
     jarFileLink = (f"https://maven.minecraftforge.net/net/minecraftforge/forge/{version}-{forgeVersion}/"
                    f"forge-{version}-{forgeVersion}-installer.jar")
@@ -407,7 +407,7 @@ async def handleForgeCreation(name: str, uuid: UUID, type_: str, version: str, r
         createStartBatFile(name, version, ram, f'minecraft_server.{version}.jar')
     else:
         # Il est cependant nécessaire de modifier le fichier bat généré
-        editAutoForgeBatFile(name, version)
+        await editAutoForgeBatFile(name, version)
 
     # Récuperer la date
     creationDate: str = datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -424,16 +424,16 @@ async def handleForgeCreation(name: str, uuid: UUID, type_: str, version: str, r
     return server
 
 
-async def createServer(name: str, uuid: UUID, type_: str, version: str, ram: int):
+async def createServer(name: str, uuid: UUID, type_: str, version: str, ram: int, owner: str):
     match type_:
         case "vanilla":
-            server = await handleVanillaCreation(name, uuid, type_, version, ram)
+            server = await handleVanillaCreation(name, uuid, type_, version, ram, owner)
         case "spigot":
-            server = await handleSpigotCreation(name, uuid, type_, version, ram)
+            server = await handleSpigotCreation(name, uuid, type_, version, ram, owner)
         case "paper":
-            server = await handlePaperCreation(name, uuid, type_, version, ram)
+            server = await handlePaperCreation(name, uuid, type_, version, ram, owner)
         case "forge":
-            server = await handleForgeCreation(name, uuid, type_, version, ram)
+            server = await handleForgeCreation(name, uuid, type_, version, ram, owner)
         case _:
             logger.error(f"Le type du serveur n'a pas été reconnu. Type : {type_}")
             return

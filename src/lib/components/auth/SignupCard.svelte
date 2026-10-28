@@ -42,7 +42,6 @@
   };
 
   async function signUp() {
-    justCreated = true;
     console.log("Trying to sign up new user");
     if (!email || !password) return;
     const { data, error } = await supabase.auth.signUp({
@@ -60,7 +59,6 @@
       console.error("error: ", error);
       return;
     }
-    console.log("Sign up users data: ", data);
     currentAction = "emailValidation";
   }
 
@@ -188,7 +186,8 @@
         disabled={!passwordCorrect ||
           !emailCorrect ||
           !ageCheckbox ||
-          !termsConditionCheckbox}
+          !termsConditionCheckbox ||
+          !username}
         onclick={signUp}
         style="font-size:0.95rem; font-weight: 500;">Créer le compte</Button
       >

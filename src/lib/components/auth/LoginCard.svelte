@@ -23,7 +23,6 @@
       console.error(error);
       return;
     }
-    console.log("supabase login datas:", data);
     onlogin()
   }
 </script>

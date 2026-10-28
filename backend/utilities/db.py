@@ -87,7 +87,7 @@ def addColumn(name, type, default):
     """
     conn = getConnexion()
     cursor = conn.cursor()
-    cursor.execute(f"ALTER TABLE local_ports_list ADD COLUMN {name} {type} DEFAULT {default}")
+    cursor.execute(f"ALTER TABLE servers ADD COLUMN {name} {type} DEFAULT {default}")
     conn.close()
 
 

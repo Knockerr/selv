@@ -52,7 +52,16 @@
 
   async function onServerCreationClick() {
     uiStore.load("Téléchargement des fichiers");
-    const user = await supabase.auth.getUser().data.user.id;
+    const { data, error } = await supabase.auth.getSession();
+    if (error) {
+      console.error("Can't get user");
+      return;
+    }
+    const uid = await data?.session.user.id;
+
+    console.warn("data > ", data);
+    console.warn("UID > ", uid);
+
     const response = await fetch(`http://localhost:40401/api/servers/create`, {
       method: "POST",
       headers: {
@@ -63,13 +72,13 @@
         ram: parseInt(currentRam),
         version: currentVersion,
         type: currentType,
-        owner: user,
+        owner: uid,
       }),
     });
 
-    const data = await response.json();
+    const sData = await response.json();
 
-    await folderSystem.addServer(data.uuid);
+    await folderSystem.addServer(sData.uuid);
 
     uiStore.stopLoad();
 
