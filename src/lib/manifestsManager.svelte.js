@@ -16,80 +16,82 @@ import {
     get
 } from "svelte/store";
 
-const baseDir = await localDataDir();
-const localManifestBase = await join(await localDataDir(), "Selv", "manifests")
-
 class ManifestManager {
     constructor(name, fileName = "") {
         this.name = name;
-        this.manifest = {};
-        this.fileName = fileName ? fileName : `${name}.json`;
-        this.localPath = "";
+        this.fileName = fileName || `${name}.json`;
         this.remoteUrl = `https://selvmc.com/manifest/${this.fileName}`
     }
 
-    async init() {
-        this.localPath = await join(localManifestBase, this.fileName);
+    async localPath() {
+        return join(await localDataDir(), "Selv", "manifests", this.fileName);
     }
 
-    async updateLocal(newContent) {
-        const parentDir = await dirname(this.localPath);
-        await mkdir(parentDir, {
+    async updateLocal(content) {
+        const path = await this.localPath();
+        await mkdir(await dirname(path), {
             recursive: true
         });
-
-        await writeTextFile(
-            this.localPath,
-            JSON.stringify(newContent),
-        );
+        await writeTextFile(path, JSON.stringify(content));
     }
 
+
     async getLocal() {
-        await this.init();
-
-        const localExists = await exists(this.localPath);
-
-        if (!localExists) return;
-
-        const content = await readTextFile(this.localPath);
-
-        return JSON.parse(content);
+        try {
+            const path = await this.localPath();
+            if (!(await exists(path))) return null;
+            return JSON.parse(await readTextFile(path));
+        } catch (e) {
+            console.error("Manifest local read failed:", e);
+            return null;
+        }
     }
 
 
     async getLatest() {
-        const res = await fetch(this.remoteUrl);
+        const local = await this.getLocal();
 
-        // Getting local version of the manifest
-        const localManifestContent = await this.getLocal();
-
-        // If unable to fetch remote, fallback on local version of the manifest
-        if (!res.ok) return localManifestContent;
-
-        const remoteManifestData = await res.json();
-
-        if (!remoteManifestData) return;
-
-        // Checking if remote manifest is newer than local
-        if (!localManifestContent || localManifestContent.schema_version < remoteManifestData.schema_version) {
-            this.updateLocal(remoteManifestData);
-            return remoteManifestData;
-        } else {
-            return localManifestContent;
+        try {
+            const res = await fetch(this.remoteUrl, {
+                signal: AbortSignal.timeout(5000)
+            });
+            if (!res.ok) return local;
+            const remote = await res.json();
+            if (!remote) return local;
+            if (!local || local.schema_version < remote.schema_version) {
+                try {
+                    await this.updateLocal(remote);
+                } catch (e) {
+                    console.error("Manifest write failed:", e);
+                }
+                return remote;
+            }
+            return local;
+        } catch (e) {
+            console.error("Manifest fetch failed", e)
+            return local;
         }
-
     }
 }
 
-let versionsManifest;
-let versionsManifestContent;
+let baseDir;
+let localManifestBase;
+
+let versionsManifestContent = {};
 
 export async function initManifests() {
-    // Minecraft servers versions manifest:
-    versionsManifest = new ManifestManager("versions");
-    versionsManifestContent = await versionsManifest.getLatest();
+    try {
+        baseDir = await localDataDir();
+        localManifestBase = await join(await localDataDir(), "Selv", "manifests");
+
+        // Minecraft servers versions manifest:
+        const versionsManifest = new ManifestManager("versions");
+        versionsManifestContent = await versionsManifest.getLatest();
+    } catch (e) {
+        console.error("initManifests failed:", e);
+    }
 };
 
 export function getMinecraftVersions() {
-    return versionsManifestContent.software;
+    return versionsManifestContent ?.software || {};
 }

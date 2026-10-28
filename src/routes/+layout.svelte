@@ -23,7 +23,7 @@
 
     updateIcon();
 
-    initManifests();
+    initManifests().catch(console.error);
 
     media.addEventListener("change", updateIcon);
 
