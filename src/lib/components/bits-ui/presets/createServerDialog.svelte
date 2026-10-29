@@ -19,6 +19,9 @@
   let currentType = $state("");
   let currentRam = $state("");
 
+  // TODO: Centralize form logic in a <Form> component
+  let errorMsg = $state();
+
   const availableVersionItems = $derived.by(() => {
     if (!minecraftVersions || !currentType) return;
     let temp = [];
@@ -51,6 +54,13 @@
   ];
 
   async function onServerCreationClick() {
+    if (!currentName || !currentRam || !currentType || !currentVersion) {
+      errorMsg = "Un des paramètres n'est pas renseigné";
+      return;
+    }
+    errorMsg = "";
+    uiStore.closeDialog("createServerDialog");
+
     uiStore.load("Téléchargement des fichiers");
     const { data, error } = await supabase.auth.getSession();
     if (error) {
@@ -95,7 +105,7 @@
   {/snippet}
 
   <Input
-    placeholder="Serveur du [userName] //TODO"
+    placeholder="Mon serveur"
     label="Nom du serveur"
     width="calc(100% - 2rem)"
     iconPath={pathDb.pencil}
@@ -128,8 +138,18 @@
     bind:value={currentRam}
   ></Input>
 
-  {#snippet closeButton()}
-    <Button iconPath={pathDb.plus} onclick={onServerCreationClick}>Créer</Button
-    >
-  {/snippet}
+  {#if errorMsg}
+    <p class="error">
+      {errorMsg}
+    </p>
+  {/if}
+
+  <Button iconPath={pathDb.plus} onclick={onServerCreationClick}>Créer</Button>
 </Dialog>
+
+<style>
+  .error {
+    color: var(--dangerous);
+    font-size: 0.8rem;
+  }
+</style>
